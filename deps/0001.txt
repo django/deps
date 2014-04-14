@@ -56,7 +56,7 @@ Often, feature proposals get batted around on the django-developers mailing
 list, with various people contributing small pieces to the idea. This is a
 wonderfully messy and open process, but it's hard to get a quick overview
 of a feature without reading through entire mailing-list threads, reconciling
-the many micro-decisions made in the discussions. A big benefit to DEPs is that
+the many micro-decisions made in the discussion. A big benefit to DEPs is that
 you'll not only see all the information in one place, you're also able to see
 the evolution of the feature idea by inspecting the DEP's revision-control
 history.
@@ -103,7 +103,8 @@ running.
 
 To submit a DEP, write a text document in the DEP format and submit it as a
 pull request to the DEP GitHub repository (https://github.com/django/deps).
-Put it in the "drafts" directory of the repository.
+Put it in the "drafts" directory of the repository and give it a short name
+that describes the feature, e.g. "magic-removal.txt".
 
 The DEP format is reStructuredText, with "Created," "Author" and "Status"
 fields near the top. For example, look at the top of this document. "Status"
@@ -129,3 +130,8 @@ commit it to the repository as "Active." This doesn't mean the feature will be
 implemented; it merely means the proposal is officially a DEP.
 
 TODO: Next steps.
+
+Copyright
+=========
+
+This document has been placed in the public domain.

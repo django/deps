@@ -104,7 +104,7 @@ running.
 To submit a DEP, write a text document in the DEP format and submit it as a
 pull request to the DEP GitHub repository (https://github.com/django/deps).
 Put it in the "drafts" directory of the repository and give it a short name
-that describes the feature, e.g. "magic-removal.txt".
+that describes the feature, e.g. "magic-removal.rst".
 
 The DEP format is reStructuredText, with "Created," "Author" and "Status"
 fields near the top. For example, look at the top of this document. "Status"

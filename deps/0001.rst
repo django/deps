@@ -31,19 +31,19 @@ haphazard. For almost 10 years (Django was open-sourced in July 2005),
 developer communication and planning of new features has been spread across
 these places:
 
-    * The django-developers mailing list
-      (http://groups.google.com/group/django-developers/).
+* The django-developers mailing list
+  (http://groups.google.com/group/django-developers/).
 
-    * The #django-dev IRC channel on Freenode.
+* The #django-dev IRC channel on Freenode.
 
-    * Trac, our bug-tracking system (https://code.djangoproject.com/).
+* Trac, our bug-tracking system (https://code.djangoproject.com/).
 
-    * Comments sections of GitHub pull requests
-      (https://github.com/django/django/pulls).
+* Comments sections of GitHub pull requests
+  (https://github.com/django/django/pulls).
 
-    * In person, at programming sprints around the world.
+* In person, at programming sprints around the world.
 
-    * Occasional Skype chats among core developers.
+* Occasional Skype chats among core developers.
 
 This scattered approach worked to some extent, but the problem is obvious:
 when communication about a new Django feature happens in all of these different
@@ -73,24 +73,24 @@ DEPs are for medium-to-large Django features. It's ultimately a judgment call,
 but here are some examples of existing Django features/efforts that would
 have required a DEP:
 
-    * Magic removal (https://code.djangoproject.com/wiki/RemovingTheMagic).
+* Magic removal (https://code.djangoproject.com/wiki/RemovingTheMagic).
 
-    * Changing Django to use all Unicode internally
-      (https://code.djangoproject.com/wiki/UnicodeBranch).
+* Changing Django to use all Unicode internally
+  (https://code.djangoproject.com/wiki/UnicodeBranch).
 
-    * Adding multi-database support.
+* Adding multi-database support.
 
-    * Changing the template system to use auto-escaping
-      (https://code.djangoproject.com/wiki/AutoEscaping).
+* Changing the template system to use auto-escaping
+  (https://code.djangoproject.com/wiki/AutoEscaping).
 
-    * Implementing database migrations.
+* Implementing database migrations.
 
 Here are examples of that would *not* require a DEP:
 
-    * Fixing a bug.
+* Fixing a bug.
 
-    * Changing some internal Django function to accept another argument for
-      some edge case.
+* Changing some internal Django function to accept another argument for
+  some edge case.
 
 Use judgment. When in doubt, write a short DEP -- it shouldn't be much more
 effort than writing a proposal to the django-developers mailing list.
@@ -112,16 +112,16 @@ should be "Draft" to start.
 
 Beyond that, a DEP should include the following sections:
 
-    * Overview. A sentence or short paragraph describing the feature.
+* Overview. A sentence or short paragraph describing the feature.
 
-    * Rationale. A few paragraphs describing why this feature is needed
-      and what specific problem(s) it solves.
+* Rationale. A few paragraphs describing why this feature is needed
+  and what specific problem(s) it solves.
 
-    * Implementation. A technical description of how this feature will
-      be implemented. This may or may not include code snippets.
+* Implementation. A technical description of how this feature will
+  be implemented. This may or may not include code snippets.
 
-    * Copyright. A statement placing the document in the public domain.
-      For example, see the bottom of this document.
+* Copyright. A statement placing the document in the public domain.
+  For example, see the bottom of this document.
 
 Once you've written a DEP and submitted the pull request, post a message about
 it to the django-developers mailing list. At that point, Django developers will

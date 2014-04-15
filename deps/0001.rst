@@ -1,9 +1,9 @@
 DEP 1: DEP Purpose and Guidelines
 =================================
 
-Created: 2014-04-14
-Author: Adrian Holovaty
-Status: Draft
+:Created: 2014-04-14
+:Author: Adrian Holovaty
+:Status: Draft
 
 What is a DEP?
 ==============

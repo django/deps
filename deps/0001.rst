@@ -120,8 +120,8 @@ Beyond that, a DEP should include the following sections:
 * Implementation. A technical description of how this feature will
   be implemented. This may or may not include code snippets.
 
-* Copyright. A statement placing the document in the public domain.
-  For example, see the bottom of this document.
+* Copyright. A statement placing the document in the public domain via the
+  CC0 1.0 Universal License. For example, see the bottom of this document.
 
 Once you've written a DEP and submitted the pull request, post a message about
 it to the django-developers mailing list. At that point, Django developers will
@@ -134,4 +134,5 @@ TODO: Next steps.
 Copyright
 =========
 
-This document has been placed in the public domain.
+This document has been placed in the public domain per the Creative Commons
+CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).

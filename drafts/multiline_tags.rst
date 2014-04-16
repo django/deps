@@ -14,6 +14,13 @@ Several examples were given, such as:
 
 - Form rendering tool which accepted many arguments in a block tag.
 - Thumbnailing tools which take many arguments.
+
+  Example:
+
+  .. code-block:: html
+
+    {% cloudinary main_image.image width=300 height=300 class="img-thumbnail main-product-image" crop="fill" gravity="face" effect="sepia" %}
+
 - Multi-clause {% if %} tags.
 - "practicality beats purity"
 - ``{% blocktrans %}``

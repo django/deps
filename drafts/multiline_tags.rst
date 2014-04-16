@@ -13,7 +13,7 @@ Arguments for
 Several examples were given, such as:
 
 - Form rendering tool which accepted many arguments in a block tag.
-- thumbnailing tools which take many arguments.
+- Thumbnailing tools which take many arguments.
 - Multi-clause {% if %} tags.
 - "practicality beats purity"
 - ``{% blocktrans %}``

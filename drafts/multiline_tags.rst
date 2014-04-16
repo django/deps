@@ -1,5 +1,9 @@
-Multiline Tags
-==============
+DEP : Multiline Template Tags
+=============================
+
+:Created: 2014-04-16
+:Author: Curtis Maloney
+:Status: Draft
 
 Several people have asked for the django template language (DTL) to support newlines within template tags.
 

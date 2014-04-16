@@ -33,7 +33,7 @@ Several examples were given, such as:
     {% blocktrans with adjective=widsom.adjective animal=wisdom.animal 
     %}The {{ adjective }} {{animal}} jumps over the lazy dog, lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."{% endblocktrans %}
 
-- ```{% url %}```
+- ``{% url %}``
 
   .. code-block:: html
 

@@ -16,25 +16,33 @@ Several examples were given, such as:
 - thumbnailing tools which take many arguments.
 - Multi-clause {% if %} tags.
 - "practicality beats purity"
-- ```{% blocktrans %}```
+- ``{% blocktrans %}``
+
   Consider a basic case:
+
   .. code-block:: html
-   {% blocktrans with adjective=widsom.adjective animal=wisdom.animal %}The {{ adjective }} {{animal}} jumps over the lazy dog, lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."{% endblocktrans %}
+
+    {% blocktrans with adjective=widsom.adjective animal=wisdom.animal %}The {{ adjective }} {{animal}} jumps over the lazy dog, lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."{% endblocktrans %}
 
   (NB it causes a great deal of pain to have line breaks inside {% blocktrans %}; advice originally from Jacob Burch's "Gringo's Guide to Internationalisation" at DC 2012)
 
   If nothing else, multi-line template tags would allow the following (with variables on their own line) instead:
+
   .. code-block:: html
+
     {% blocktrans with adjective=widsom.adjective animal=wisdom.animal 
     %}The {{ adjective }} {{animal}} jumps over the lazy dog, lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."{% endblocktrans %}
 
 - ```{% url %}```
+
   .. code-block:: html
+
     {% url 'workshop_manuscript_detail' workshop_slug=workshop.slug slug=manuscript.slug as url %}
 
   versus
 
   .. code-block:: html
+
     {% url 'workshop_manuscript_detail' 
       workshop_slug=workshop.slug 
       slug=manuscript.slug as url %}

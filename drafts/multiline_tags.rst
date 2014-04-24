@@ -62,6 +62,15 @@ Arguments against
 DTL is intended to discourage putting business logic in templates. Allowing long,
 complex conditions and such in templates does not work to this goal.
 
+It's worth a notice that there is a difference between presentation logic and business logic,
+which Django Project in general fails to acknowledge. There is no way 
+
+.. code-block:: html
+
+   {% cloudinary main_image.image width=300 height=300 class="img-thumbnail main-product-image" crop="fill" gravity="face" effect="sepia" %}
+
+can be considered business logic, it's just complicated presentation logic.
+
 Sample implementation
 ---------------------
 

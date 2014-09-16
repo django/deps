@@ -76,7 +76,8 @@ that for spatialite (using a ``SELECT`` statement and a function) without
 having to subclass ``SchemaEditor``.
 
 ``Index()`` subclasses will also have a ``supports(backend)`` method which
-raises an error if the backend does not support that index type.
+returns ``True`` or ``False`` depending on whether the backend supports that
+index type.
 
 ``Field(db_index=)`` will support either the value ``True``, or an index class
 (e.g. ``IntegerField(db_index=indexes.Hash)``).
@@ -102,7 +103,7 @@ Example::
         class Meta:
             indexes = [
                 models.BTree(fields=['slug', 'name']),
-                models.FunctionalIndex(expression(F('length') * F('average_capacity')),
+                models.FunctionalIndex(expression=(F('length') * F('average_capacity')),
                     type=models.BTree),
             ]
 

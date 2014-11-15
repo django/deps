@@ -1,9 +1,11 @@
-DEP X: New implementation for ORM expressions
-=============================================
+DEP: 181
+Title: New implementation for ORM expressions
+Author: Anssi Kääriäinen
+Status: Final
+Type: Standards Track
+Created: 2014-09-09
+Django-Version: 1.8
 
-:Created: 2014-09-09
-:Author: Anssi Kääriäinen
-:Status: Draft
 
 Abstract
 ========
@@ -95,16 +97,16 @@ it hard to understand what exactly is happening.
 
 Finally, if one wants to mix ExpressionNode functionality with other SQL
 expressions (like aggregates) the current way doesn't allow for that.
-Aggregates aren't ExpressionNodes at all, but they implement a similar but
+Aggregates aren't ExpressionNodes at all. They implement a similar but
 disparate flow.
 
-The reasoning why the SQLEvaluator <-> ExpressionNode flow is performed is the
+The reason why the SQLEvaluator <-> ExpressionNode flow is performed is the
 ability to customize the generated query string by implementing a custom
 Evaluator. For example, a MongoDB ORM backend could have MongoEvaluator that
 knows how to add F() objects to query and how to produce a valid query string
 for F('foo') + F('bar'). Thus the user can use the same public API for
-MongoDB. The custom evaluator would need to change in lockstep with the existing
-evaluator if it wanted to support the same public expressions.
+MongoDB. The custom evaluator would need to change in lockstep with the
+existing evaluator if it wanted to support the same public expressions.
 
 It should be noted that the Evaluator API isn't documented and isn't public, and
 so it can't be relied upon between versions of Django.

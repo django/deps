@@ -1,9 +1,10 @@
-DEP 1: DEP Purpose and Guidelines
-=================================
+DEP: 1
+Title: DEP Purpose and Guidelines
+Author: Adrian Holovaty
+Status: Active
+Type: Process
+Created: 2014-04-14
 
-:Created: 2014-04-14
-:Author: Adrian Holovaty
-:Status: Draft
 
 What is a DEP?
 ==============
@@ -106,9 +107,10 @@ pull request to the DEP GitHub repository (https://github.com/django/deps).
 Put it in the "drafts" directory of the repository and give it a short name
 that describes the feature, e.g. "magic-removal.rst".
 
-The DEP format is reStructuredText, with "Created," "Author" and "Status"
-fields near the top. For example, look at the top of this document. "Status"
-should be "Draft" to start.
+The DEP format is reStructuredText, with "DEP", "Title", "Author", "Status",
+"Type", "Created", and optionally "Django-Version" headers at the top. For
+example, look at the top of this document. "Status" should be "Draft" to
+start.
 
 Beyond that, a DEP should include the following sections:
 
@@ -124,12 +126,13 @@ Beyond that, a DEP should include the following sections:
   CC0 1.0 Universal License. For example, see the bottom of this document.
 
 Once you've written a DEP and submitted the pull request, post a message about
-it to the django-developers mailing list. At that point, Django developers will
-make sure it's technically feasible, not spam, etc., assign it a DEP number and
-commit it to the repository as "Active." This doesn't mean the feature will be
-implemented; it merely means the proposal is officially a DEP.
+it to the django-developers mailing list. At that point, Django developers
+will make sure it's technically feasible, not spam, etc., assign it a DEP
+number and commit it to the repository as "Active." This doesn't mean the
+feature will be implemented; it merely means the proposal is officially a DEP.
 
-TODO: Next steps.
+When a DEP is complete, the Django technical board will set its "Status" to
+"Final".
 
 Copyright
 =========

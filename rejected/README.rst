@@ -1,5 +1,5 @@
 Rejected DEPs
 =============
 
-DEPs that have rejected by the Technical Advisory Board.
+DEPs that have rejected by the Technical Board.
 See `DEP 1 <../final/0001-dep-process.rst>`_ for details.

@@ -26,9 +26,9 @@ for collecting community input on issues, and for documenting design
 decisions that have gone into Django.
 
 The concept and implementation of DEPs (and this document itself!) is a nearly
-direct copy of `Django's DEP process <http://www.Django.org/dev/DEPs/>`_ . If
-you're already familiar with DEPs, you should be able to quickly grok DEPs by
-reading the `differences between DEPs and DEPs`_.
+direct copy of `Python's PEP process <https://www.python.org/dev/peps/>`_ . If
+you're already familiar with PEPs, you should be able to quickly grok DEPs by
+reading the `differences between DEPs and PEPs`_.
 
 DEP Types
 =========
@@ -48,7 +48,7 @@ There are three kinds of DEPs:
 3. A **Process** DEP describes a process surrounding Django, or
    proposes a change to (or an event in) a process.  Process DEPs are
    like Feature DEPs but apply to areas other than the Django
-   language itself.  They may propose an implementation, but not to
+   framework itself.  They may propose an implementation, but not to
    Django's codebase; they often require community consensus; unlike
    Informational DEPs, they are more than recommendations, and users
    are typically not free to ignore them.  Examples include
@@ -72,7 +72,7 @@ The Technical Board
     board>`_, the group of experienced and active committers who steer technical
     choices. Django's documentation lists `the current Technical Board
     membership <https://docs.djangoproject.com/en/dev/internals/roles
-    /#technical-board>`_
+    /#technical-board>`_.
 
 Core Developers
     Similarly, there are several references to **Core Developers** (sometimes
@@ -108,9 +108,8 @@ Pre-proposal
 
 The DEP process begins with a new idea for Django.  It is highly recommended
 that a single DEP contain a single key proposal or new idea. Small enhancements
-or patches often don't need a DEP and can be processed as following Django's
-normal `contribution process
-<https://docs.djangoproject.com/en/dev/internals/contributing/>`_.
+or patches usually don't need a DEP and follow Django's normal `contribution
+process <https://docs.djangoproject.com/en/dev/internals/contributing/>`_.
 
 The more focused the DEP, the more successful it tends to be.  The Core
 Developers reserve the right to reject DEP proposals if they appear too
@@ -119,7 +118,7 @@ ones.
 
 The DEP Author (see below for the formal definition of an Author)
 should first attempt to ascertain whether the idea is DEP-able.  Posting to
-`django- developers <https://docs.djangoproject.com/en/dev/internals/mailing-
+`django-developers <https://docs.djangoproject.com/en/dev/internals/mailing-
 lists /#django-developers-mailing-list>`_ is the best way to go about this.
 
 Vetting an idea publicly before going as far as writing a DEP is meant to save
@@ -147,8 +146,7 @@ Author
 Implementation Team
     The **Implementation Team** are the people (or single person) who will
     actually implement the thing being proposed. A DEP may have multiple
-    implementors (and the best DEPs probably will), but DEPs may only have a
-    single Author.
+    implementors (and the best DEPs probably will).
 
     Feature DEPs must have an implementation team to be submitted. Informational
     DEPs generally don't have implementors, and Process DEPs sometimes will.
@@ -171,19 +169,19 @@ is a long-time committer.
 Submitting the draft
 --------------------
 
-Once the idea's been vetted, and the roles are fulfilled a draft DEP should be
+Once the idea's been vetted and the roles are filled, a draft DEP should be
 presented to django-developers. This gives the author a chance to flesh out the
-draft DEP to make properly formatted, of high quality, and to address initial
-concerns about the proposal.
+draft DEP to make sure it's properly formatted, of high quality, and to address
+initial concerns about the proposal.
 
 Following the discussion on django-developers, the proposal should be sent as a
-Github pull request to the `django/deps <https://github.com/django/deps>`_ repo.
+GitHub pull request to the `django/deps <https://github.com/django/deps>`_ repo.
 This PR should add a DEP to the ``drafts/`` directory, written in the style
 described below. The draft must be written in DEP style; if it isn't the pull
 request may be rejected until proper formatting rules are followed.
 
 At this point, a core dev will review the pull request. In most cases the
-reviewed will be the Shepherd of the DEP, but if that's not possible for some
+reviewer will be the Shepherd of the DEP, but if that's not possible for some
 reason the author may want to ask on django-developers to ensure that this
 review happens quickly. The reviewer will do the following:
 
@@ -194,13 +192,12 @@ review happens quickly. The reviewer will do the following:
 * Make sure the title accurately describes the content.
 
 * Check the DEP for language (spelling, grammar, sentence structure,
-  etc.), markup (for reST DEPs), and code style (examples should match DEP
-  8).
+  etc.), markup, and code style (examples should match PEP 8).
 
 If the DEP isn't ready, the reviewer can leave comments on the pull request,
 asking for further revisions. If the DEP's really in bad form, the reviewer
 may reject the pull request outright and ask the author to submit a new one
-request once the problems have been fixed.
+once the problems have been fixed.
 
 The reviewer doesn't pass judgment on DEPs.  They merely do the administrative &
 editorial part (which is generally a low volume task).
@@ -217,7 +214,8 @@ Developers with commit access to the DEPs repo may create drafts directly by
 committing and pushing a new DEP. However, when doing so they need to take on
 the tasks normally handled by the reviewer described above. This includes
 ensuring the initial version meets the expected standards for submitting a DEP.
-Alternately, even developers may choose to submit DEPs as a pull request.
+Of course, committers may still choose to submit DEPs as a pull request to
+benfit from peer review.
 
 Discussion, development, and updates
 ------------------------------------
@@ -232,7 +230,7 @@ a core developer will merge those pull requests (typically they don't
 require much if any review). In cases where the Author has commit access
 (fairly common), the Author should just update the draft DEP directly.
 
-Features DEPs generally consist of two parts, a design document and a
+Feature DEPs generally consist of two parts, a design document and a
 reference implementation.  It is generally recommended that at least a
 prototype implementation be co-developed with the DEP, as ideas that sound
 good in principle sometimes turn out to be impractical when subjected to the
@@ -254,11 +252,11 @@ for review and pronouncement. The final authority for deciding on a DEP rests
 with the Technical Board. They may choose to rule on a DEP as a team, or they
 may designate one or more board members to review and decide.
 
-[Having the shepherd (i.e. a core dev) ask rather than the author helps ensure
-that the DEP the basic technical bar before it's called for review. It also
-provides a fairly strong fitness test before the board is asked to rule on it,
-making board rulings fairly easy. if the core developer shepherd is happy, the
-board will likely be as well.]
+Having the shepherd (i.e. a core dev) rather than the author ask helps ensure
+that the DEP meets the basic technical bar before it's called for review. It
+also provides a fairly strong fitness test before the board is asked to rule on
+it, making board rulings fairly easy. If the core developer shepherd is happy,
+the board will likely be as well.
 
 For a DEP to be accepted it must meet certain minimum criteria.  It must be a
 clear and complete description of the proposed enhancement. The enhancement must
@@ -357,57 +355,57 @@ Each DEP should have the following parts:
    `contribution guidelines <https://docs.djangoproject.com/en/dev/internals/contributing/>`_.
 
 #. Copyright/public domain -- Each DEP must be explicitly licensed
-   as `CC0 <http://creativecommons.org/publicdomain/zero/1.0/>`_.
+   as `CC0 <https://creativecommons.org/publicdomain/zero/1.0/>`_.
 
 DEP Metadata
 ------------
 
 Each DEP must begin with some metadata given as an rST 
-`field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_ 
+`field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_. 
 The headers must contain the following fields:
 
 ``DEP``
-    the DEP number
+    The DEP number. In an initial pull request, this can be left out or given
+    as ``XXXX``; the reviewer who merges the pull request will assign the DEP
+    number.
 ``Type``
     ``Feature``, ``Informational``, or ``Process``
 ``Status``
     ``Draft``, ``Accepted``, ``Rejected``, ``Withdrawn``, ``Final``, or ``Superseded``
 ``Created``
-    original creation date of the DEP (in ``yyyy-mm-dd`` format)
+    Original creation date of the DEP (in ``yyyy-mm-dd`` format)
 ``Last-Modified``
-    date the DEP was last modified (in ``yyyy-mm-dd`` format)
+    Date the DEP was last modified (in ``yyyy-mm-dd`` format)
 ``Author``
-    the DEP's author(s)
+    The DEP's author(s).
 ``Implementation-Team``
-    the person/people who have committed to implementing this DEP
+    The person/people who have committed to implementing this DEP
 ``Shepherd``
-    the core developer "on point" for the DEP
+    The core developer "on point" for the DEP
 ``Requires``
-    if this DEP depends on another DEP being implemented first,
+    If this DEP depends on another DEP being implemented first,
     this should be a link to the required DEP.
 ``Django-Version`` (optional)
-    for Feature DEPs, the version of Django (e.g. ``1.8``) that this
+    For Feature DEPs, the version of Django (e.g. ``1.8``) that this
     feature will be released in.
-``Replaces`` (optional)
-    ... and ...
-``Superseded-By`` (optional)
+``Replaces`` and ``Superseded-By`` (optional)
     These fields indicate that a DEP has been rendered obsolete. The newer DEP
     must have a ``Replaces`` header containing the number of the DEP that it
     rendered obsolete; the older DEP has a ``Superseded-By`` header pointing to
     the newer DEP.
 ``Resolution`` (optional)
-    for DEPs that have been decided upon, this can be a link to the final
-    rationale for acceptance/rejection. It's also reasonable for to simply
-    update the DEP with a "Resolution" section, in which case this header
-    can be left out.
+    For DEPs that have been decided upon, this can be a link to the final
+    rationale for acceptance/rejection. It's also reasonable to simply update
+    the DEP with a "Resolution" section, in which case this header can be left
+    out.
 
 Auxiliary Files
 ---------------
 
 DEPs may include auxiliary files such as diagrams.  Such files must be named
-``XXXX-descriptive-title.ext``, where "XXXX" is the DEP number, "descriptive-
-title" is a short slug indicating what the file contains, and "ext" is replaced
-by the actual file extension (e.g. "png").
+``XXXX-descriptive-title.ext``, where "XXXX" is the DEP number, 
+"descriptive-title" is a short slug indicating what the file contains, and 
+"ext" is replaced by the actual file extension (e.g. "png").
 
 Reporting DEP Bugs, or Submitting DEP Updates
 =============================================
@@ -434,10 +432,10 @@ transferred DEP, but that's really up to the original author.  A good reason to
 transfer ownership is because the original author no longer has the time or
 interest in updating it or following through with the DEP process, or has fallen
 off the face of the 'net (i.e. is unreachable or not responding to email).  A
-bad reason to transfer ownership is because the author doesn't agree with the
-direction of the DEP.  One aim of the DEP process is to try to build consensus
-around a DEP, but if that's not possible, an author can always submit a
-competing DEP.
+bad reason to transfer ownership is because the new author doesn't agree with
+the direction of the DEP. One aim of the DEP process is to try to build
+consensus around a DEP, but if that's not possible, an author can always submit
+a competing DEP.
 
 If you are interested in assuming ownership of a DEP, first try to contact the
 original author and ask for permission. If they approve, ask them to open a pull
@@ -445,7 +443,7 @@ request transfering the DEP to you. If the original author doesn't respond to
 email within a few weeks, contact django-developers.
 
 
-Differences between DEPs and DEPs
+Differences between DEPs and PEPs
 =================================
 
 As stated in the preamble, the DEP process is more or less a direct copy of
@@ -454,23 +452,23 @@ the PEP process (and this document is a modified version of
 
 Relative to the PEP process, we made the following changes in DEPs:
 
-- The workflow is Github based (rather than email-based as in PEP 1).
+- The workflow is GitHub based (rather than email-based as in PEP 1).
 
   This is a simple enough change, but has a number of ramifications for the
-  details DEPs of how DEPs work, including:
+  details of how DEPs work, including:
 
-    - DEPs use pull requests (and direct commits) as the workflow process
-    - DEPs use rST-style headers rather than RFC822 (because rST-style headers
-      render properly on Github without additional tooling)
-    - DEPs have document titles rather than title fields in the metadata
-      (again, because of Github rendering)
-    - DEP are organized into directories based on statuses (e.g. ``draft/``,
-      ``accepted/``, ``final/``, etc) so that additional tooling to create an
-      index by status isn't needed.
-    - DEP file names are more descriptive (e.g. ``0181-orm-expressions.rst``),
-      again to avoid the need for additional tooling.
-    - DEPs are "edited" (e.g. pull request approved)by any core developer,
-      rather than an explicit "editor" role like the PEP editors.
+  - DEPs use pull requests (and direct commits) as the workflow process.
+  - DEPs use rST-style headers rather than RFC822 (because rST-style headers
+    render properly on GitHub without additional tooling).
+  - DEPs have document titles rather than title fields in the metadata
+    (again, because of GitHub rendering).
+  - DEP are organized into directories based on statuses (e.g. ``draft/``,
+    ``accepted/``, ``final/``, etc) so that additional tooling to create an
+    index by status isn't needed.
+  - DEP file names are more descriptive (e.g. ``0181-orm-expressions.rst``),
+    again to avoid the need for additional tooling.
+  - DEPs are "edited" (e.g. pull request approved) by any core developer,
+    rather than an explicit "editor" role like the PEP editors.
 
 - DEPs are pronounced upon by the Technical Board, rather than a BDFL (because
   Django no longer has BDFLs).
@@ -479,7 +477,7 @@ Relative to the PEP process, we made the following changes in DEPs:
   and Shepherd) before submission and throughout the process. With PEPs, most
   are authored and implemented by the same person, but the same doesn't seem to
   be true of DEPs (so far), hence the "implementor" role. As for the "shepherd":
-  he BDFL or BDFL-delegate tends to be much more hands-on than the Technical
+  the BDFL or BDFL-delegate tends to be much more hands-on than the Technical
   Board, so the role of commenting and critiquing will be fulfilled by the
   shepherd, rather than the board. Further, we've observed that features are
   tremendously unlikely to make it into Django without a committer on board to
@@ -489,7 +487,7 @@ Relative to the PEP process, we made the following changes in DEPs:
   etc.) and dropping a couple of statuses ("Active" gets merged into "Final",
   and "Deferred" merged into "Withdrawn").
 
-- DEPs have "Feature DEPs" rather than "STandards Track" DEPs.
+- DEPs have "Feature DEPs" rather than "Standards Track" DEPs.
 
 - DEPs may only be reStructuredText (there is no plain text option).
 
@@ -497,4 +495,4 @@ Copyright
 =========
 
 This document has been placed in the public domain per the Creative Commons
-CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
+CC0 1.0 Universal license (https://creativecommons.org/publicdomain/zero/1.0/deed).

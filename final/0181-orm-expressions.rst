@@ -4,9 +4,9 @@ DEP 181: New implementation for ORM expressions
 
 :DEP: 181
 :Author: Anssi Kääriäinen
-:Implementation Team: Anssi Kääriäinen
-:Shepherd: Aymeric Augustin
-:Status: Approved
+:Implementation Team: Josh Smeaton, Anssi Kääriäinen
+:Shepherd: Anssi Kääriäinen
+:Status: Final
 :Type: Feature
 :Created: 2014-09-09
 :Django-Version: 1.8

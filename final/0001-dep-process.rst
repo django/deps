@@ -464,8 +464,9 @@ Relative to the PEP process, we made the following changes in DEPs:
       render properly on Github without additional tooling)
     - DEPs have document titles rather than title fields in the metadata
       (again, because of Github rendering)
-    - DEP are organized into directories based on statuses (e.g. ``draft/``, ``approved/``, ``final/``, etc)
-      so that additional tooling to create an index by status isn't needed.
+    - DEP are organized into directories based on statuses (e.g. ``draft/``,
+      ``accepted/``, ``final/``, etc) so that additional tooling to create an
+      index by status isn't needed.
     - DEP file names are more descriptive (e.g. ``0181-orm-expressions.rst``),
       again to avoid the need for additional tooling.
     - DEPs are "edited" (e.g. pull request approved)by any core developer,

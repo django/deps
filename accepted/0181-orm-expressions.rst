@@ -1,11 +1,19 @@
-DEP: 181
-Title: New implementation for ORM expressions
-Author: Anssi Kääriäinen
-Status: Final
-Type: Standards Track
-Created: 2014-09-09
-Django-Version: 1.8
+===============================================
+DEP 181: New implementation for ORM expressions
+===============================================
 
+:DEP: 181
+:Author: Anssi Kääriäinen
+:Implementation Team: Anssi Kääriäinen
+:Shepherd: Aymeric Augustin
+:Status: Approved
+:Type: Feature
+:Created: 2014-09-09
+:Django-Version: 1.8
+
+.. contents:: Table of Contents
+   :depth: 3
+   :local:
 
 Abstract
 ========

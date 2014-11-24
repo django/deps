@@ -1,1 +1,0 @@
-This directory is where draft DEPs go before they're assigned numbers.

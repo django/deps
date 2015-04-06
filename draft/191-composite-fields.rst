@@ -5,7 +5,7 @@ DEP 191: Composite Fields
 :DEP: 191
 :Author: Thomas Stephenson
 :Implementation Team: Thomas Stephenson
-:Shepherd: __
+:Shepherd: Anssi Kääriäinen
 :Status: Draft
 :Type: Feature
 :Created: 2015-03-12
@@ -34,36 +34,93 @@ A ``CompositeField`` is a new virtual field type which combines multiple columns
 on a model's table into a single object, which is accessible from model
 instances.
 
-The value of a ``CompositeField`` on a model instance is either, depending on
+The value of a ``CompositeField`` on a model instance is an unordered  python
+``dict``, mapping subfield names to their respective values on the model. This
+may seem restrictive, but an API which provides the ability to store the values
+of composite fields as aribitrary python objects is proposed as part of DEP 192.
 
-* A ``dict``, mapping subfield values to their values on the model (the
-  default); or
-* A ``tuple`` of the field's subfield values, ordered with the default subfield
-  ordering.
-
-depending on the value of ``field.value_is_tuple``.
-
-Limiting the field to either dicts or tuples seems restrictive, but supporting
-arbitrary python objects is proposed as part of DEP 192.
 
 Subfield
 --------
 
-A ``subfield`` of a composite field is a delegate for another field on the same
-model. The value for a subfield on a model instance is the same as the value
-for the proxied field.
-
-Subfields are ordered firstly by the execution order of calling the ``__init__``
-method of the composite field, and then within the composite field by the
-execution order of the proxied field.
+A *subfield* of a composite field is a field which exists on the model and which
+stores the value of at most one of the composite field's database columns on
+the model.
 
 
-Descriptor
-----------
+Data Binding
+------------
 
-Since a composite field does not directly store a value on the model instance,
-a python descriptor which delegates getting/setting the instance value of the
-subfields is available from
+When the value of a composite field is accessed on a model, a new object is
+created which reflects the current value of the field. Over the lifetime of
+the object, it is possible for the value of the composite field and the
+subfields to become unsynced, causing potential bugs and data corruption.
+
+The proposed solution to this problem is to implement data binding between
+the items of the value of a composite field and it's subfields.
+
+
+** TODO: Discuss **
+The data binding is strictly one way, so if a value of the attribute/item
+on the composite field's value is updated, the subfield's value will also be
+updated accordingly, but the composite field will be insensitive to any updates
+to the subfield's value.
+
+Two way data binding is possible, but would require more extensive (possibly
+breaking?) changes to the field API and make it more difficult to debug
+dataflow problems.
+
+Observer
+~~~~~~~~
+
+An observer is an informal python interface which specifies a type as able to
+respond to a change in a bound property of an observable it is watching. Any
+class which implements the following methods will be considered a conforming
+observer.
+
+.. code:: Python
+
+    class Observer(object):
+        def watch(self, observable, bound=None):
+            """
+            Add `self` to the list of observers of `observable`.
+
+            If `observable` is a `dict`, `bound` is a set of items to watch.
+            If `observable` is a `tuple`, `bound` is a set of indicies to watch.
+            Otherwise, `bound` is a set of attribute names.
+
+            If `attrs` is `None`, the observer is notified for every change of
+            an attribute or item of the observable.
+            """
+            return NotImplemented
+
+        def notify_change(self, observable, bound_name, old, new):
+            """
+            Called whenever bound value on the watched observable `observable`
+            changes.
+            """
+            return NotImplemented
+
+
+Changes to fields
+~~~~~~~~~~~~~~~~~
+
+All django fields (except relations) will be updated to implement the observer
+interface. ``notify_change`` will be implemented so that when the ``bound_name``
+matches the name of the field, the field's value will be updated on the model.
+
+Assigning an observable object to a foreign model will immediately sync the
+values of all subfields on the foreign model and add the subfields on the
+foreign model as observers.
+
+
+ObservableDict
+~~~~~~~~~~~~~~
+
+The value of a composite field will be returned as a subclass of ``dict``, with
+the item ``subfield_name`` bound to the corresponding subfield. Copying the
+object (by eg. calling `dict` on the result) will detach it from any observers.
+
 
 
 Providing a constraint that spans multiple columns
@@ -74,7 +131,7 @@ signature
 
 .. code:: Python
 
-    def constrain(*fields, unique=False, index=True, value_is_tuple=False)
+    def constrain(*fields, unique=False, index=True)
 
 The ``constrain`` function will create a `CompositeField` in the model and add
 subfields to the composite field in the order in which they appear in the
@@ -86,7 +143,7 @@ argument list.
         x = models.IntegerField()
         y = models.IntegerField()
 
-        point = models.constrain(x, y, unique=True, value_is_tuple=True)
+        point = models.constrain(x, y, unique=True)
 
 This code inserts a composite field, with the name ``point`` to the model. A
 constraint which ensures the uniqueness of the point will be added to the table
@@ -134,58 +191,6 @@ composite field.
 
 would be transformed into a lookup of all point values which have an x value
 less than 4.
-
-
-Interactions with ``Model._meta``
---------------------------------
-
-Since all subfields of a model are also local concrete fields of a model, they
-are available via ``Model._meta.fields`` with the appropriate subfield name.
-
-Since the composite field is virtual, it is not included in ``Model._meta.fields``,
-but can be accessed via ``Model._meta.virtual_fields``. It is also possible to
-retrieve a ``CompositeField`` instance via the method ``Model._meta.get_field``.
-
-To access the ``Subfield`` instance associated with the field (rather than the
-wrapped field itself), the composite field exposes a ``get_subfield`` method.
-
-For example, given the following model:
-
-..code:: python
-
-  >>> class MyModel(models.Model):
-  ...    x = models.IntegerField()
-  ...    y = models.IntegerField()
-  ...
-  ...    point = models.constrain(x, y, unique=True)
-  ...
-  >>> MyModel.get_field('x')
-  <IntegerField instance at 0x????????>
-  >>> MyModel.get_field('point')
-  <CompositeField instance at 0x????????>
-  >>> _.get_subfield('x')
-  <Subfield instance at 0x????????>
-
-An additional argument ``include_subfields`` which defaults to ``False`` will
-be added to the ``Options.get_fields`` method, which will include all subfield
-instances of the model.
-
-
-..code:: python
-
-  >>> for f in MyModel._meta.get_fields():
-  ...     print(f)
-  <IntegerField MyModel.x>
-  <IntegerField MyModel.y>
-  <CompositeField MyModel.point>
-  >>> for f in MyModel._meta.get_fields(include_subfields=True):
-  ...     print(f)
-  <IntegerField MyModel.x>
-  <IntegerField MyModel.y>
-  <Subfield MyModel.point.x>
-  <Subfield MyModel.point.y>
-  <CompositeField MyModel.point>
-
 
 
 Motivation

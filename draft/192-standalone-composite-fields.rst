@@ -5,7 +5,7 @@ DEP 192: Standalone Composite Fields
 :DEP: 192
 :Author: Thomas Stephenson
 :Implementation Team: Thomas Stephenson
-:Shepherd: __
+:Shepherd: Anssi Kääriäinen
 :Status: Draft
 :Type: Feature
 :Created: 2015-03-18
@@ -49,7 +49,9 @@ eg.
        amount = models.DecimalField()
 
     class RetailItem(models.Model):
+        name = models.CharField()
         price = MoneyField()
+        storage_code = models.CharField(max_length=16)
 
 
 The `currency_code` and `amount` fields in the example above are _managed_
@@ -59,19 +61,37 @@ class.
 Migrations of managed subfields are handled and deconstructed by the composite
 field, rather than during model deconstruction.
 
+The `value_type` of a composite field is the type of the object returned by
+the field's `value_to_dict` function. The `value_type` of a composite field must
+be a subtype of [ObservableMixin]
 
 Field parameters
 ----------------
 
-All of the parameters defined by `Field` and `CompositeField` are accepted
-by a standalone composite field with the following provisos:
+A composite field accepts all parameters that can be passed to the `Field` base
+constructor, with the exception of `db_column` and `primary_key`. In addition,
+the following arguments have slightly different meanings when applied
+to a composite field:
 
-* ``null=True`` is an acceptable argument for a standalone composite field
-* ``is_tuple=True``, from composite field is an invalid argument. A standalone
-  field should define the value transformation functions ``value_to_dict`` and
-  ``value_from_dict``, rather than auto-coercing the value into a tuple
+default
+```````
+A default argument provided to a composite field will override any ``default``
+arguments provided to it's subfields on the composite field definition.
 
-In addition, a standalone field constructor can accept keyword arguments which
+However, not providing a default argument may still result in a default value
+for the composite field, if any of the composite fields have a configured
+``default`` value.
+
+unique and db_index
+```````````````````
+Specifying the ``unique`` or ``db_index`` arguments for a composite field will
+be interpreted as providing a table level constraint which applies across the
+columns of the subfields.
+
+Subfield arguments
+~~~~~~~~~~~~~~~~~~
+
+A standalone composite field constructor can accept keyword arguments which
 are used to pass arguments to subfields. It is the user's responsibility to
 provide an appropriate ``deconstruct`` implementation for the values of these
 extra arguments.
@@ -94,12 +114,13 @@ eg.
             kwargs['amount_decimal_places'] = self.amount.decimal_places
 
 
-Managed Subfields
-~~~~~~~~~~~~~~~~~
 
-Unlike the subfields declared in DEP 191, which are proxies for other fields
+Managed Subfields
+=================
+
+Unlike the subfields declared in DEP 191, which are references to other fields
 declared on a model, a `managed subfield` is added to the model by the
-composite field which defines it and is responsible for storing it's own value
+composite field which declares it and is responsible for storing it's own value
 on the model instance.
 
 The value of a managed subfield is stored on the model with the attribute name
@@ -114,6 +135,19 @@ By defining the attribute name in this way, it is guaranteed to be unique
 amongst all fields on the model (since ``'__'`` is an illegal substring of a
 field name). It also mirrors the syntax for querying the value of a subfield,
 which aids querying for instances based on the value of a subfield.
+
+Rather than ordering managed subfields by execution order of the field's
+`__init__` method (which could be executed long before or long after the other
+fields on the class), managed subfields are ordered first by the execution order
+of the composite field and then within the composite field by the execution
+order of the subfield
+
+So, using the ``RetailItem`` model above, the fields would be ordered as
+
+..code :: python
+
+    >>> RetailItem.name < RetailItem.price__amount < RetailItem.price__currency_code < RetailItem.storage_code
+    True
 
 
 Value transformation functions
@@ -142,6 +176,9 @@ restrictions:
   argument unchanged, unless the argument is ``None``, in which case a
   ``ValueError`` is raised.
 
+  If the value returned by ``value_from_dict`` is not ``None`` or an object
+  which extends ``ObservableMixin``, a ``ValueError`` is raised.
+
 Restrictions on sublcassing of composite fields
 -----------------------------------------------
 
@@ -163,6 +200,46 @@ fields.
 
     TypeError: At most one class in the inheritance heirarchy of B can define a
                subfield.
+
+
+Data binding
+------------
+
+Data binding of custom objects is achieved through a variety of mixins and classes
+will be exposed via the ``django.db.fields.observable`` module. Depending on the
+value type of the object,
+
+
+ObservableMixin
+~~~~~~~~~~~~~~~
+
+``ObservableMixin`` is a python mixin interface which implements the capability
+to bind the attributes of an arbitrary python object, and notifies any observers
+of the object.
+
+The interface does not declare any abstract methods, but interactions are
+undefined in the case that an implementing class defines any of the methods
+- ``__getattr__``,
+- ``__setattr__`` or
+- ``__getattribute__``.
+
+The implementation adds an implementation of ``__getattribute__`` and
+``__setattr__`` to the class that extends the mixin, which notify any observers
+of the object of the change in attribute on a change in the objects value.
+
+
+ObservableTuple
+~~~~~~~~~~~~~~~
+
+``ObservableTuple`` is an implementation of the python ``tuple`` interface which
+can be used if a simple, ordered value type is desired for a composite field.
+It overrides ``__getitem__`` and ``__setitem__`` in order to notify the
+corresponding subfields of a change in mapping.
+
+Users can provide a ``subfield_mapping`` class attribute on the composite field,
+which is a ``dict`` which maps a subfield name to it's index into the tuple.
+This avoids complications where the implicit ordering of django fields might
+not be the same as the ordering of the tuple's values.
 
 
 Motivation
@@ -202,6 +279,28 @@ the table, an undesirable behaviour.
 
 The current appropach is to disallow ``value_to_dict`` from returning ``None``
 and to use the returned value to construct the ``isnull`` query.
+
+
+ObservableMixin
+---------------
+
+A couple of approaches were considered for adding observable functionality to
+a python object, including explicit abstract methods notifying observers and
+descriptors which would be added implicitly to the value type of a composite
+field.
+
+The approach which relies on internal python machinery and overriding of the
+``__getattribute__`` and ``__setattr__`` was preferred, since it
+- does not require declaring the value type of a composite field as part of the
+  composite field definition
+- can handle value types declared by a third party library without needing to
+  subclass the instance
+- can handle mappings between model subfield names and attribute names on the
+  value type without explicit declaration of their value.
+
+The downside is that it can cause unexpected behaviour for classes that implement
+``__getattr__`` or ``__setattr__``. Since value types for composite fields are
+expected to be data-driven objects, this is not expected to cause any problems.
 
 
 Reference Implementation

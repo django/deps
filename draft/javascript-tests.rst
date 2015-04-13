@@ -24,13 +24,10 @@ Create unit tests for the JavaScript code in the admin and gis contrib packages.
 Specification
 =============
 
-A native JavaScript test framework is one that can be run without any Python
-code, either in the browser or from the command line.
+QUnit test framework
+--------------------
 
-QUnit
------
-
-`Jasmine`_ and `Mocha`_ are BDD testing frameworks similar to Ruby's `RSpec`_
+`Jasmine`_ and `Mocha`_ are `BDD`_ testing frameworks similar to Ruby's `RSpec`_
 whereas `QUnit`_ uses a declarative testing style akin to Django's existing
 testing framework.
 
@@ -76,6 +73,9 @@ Rationale
 Native JavaScript Testing Framework
 -----------------------------------
 
+A native JavaScript test framework is one that can be run without any Python
+code, either in the browser or from the command line.
+
 The JavaScript code can be tested independently of the Python code.  Therefore,
 the JavaScript and Python tests do not need to be intertwined.
 
@@ -110,6 +110,7 @@ This document has been placed in the public domain per the Creative Commons
 CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
 
 .. _backbone.js: http://backbonejs.org/
+.. _bdd: https://en.wikipedia.org/wiki/Behavior-driven_development
 .. _ember.js: http://emberjs.com/
 .. _istanbul: http://gotwarlost.github.io/istanbul/
 .. _jasmine: http://jasmine.github.io/
@@ -118,5 +119,6 @@ CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed
 .. _mocha: http://visionmedia.github.io/mocha/
 .. _node.js: http://nodejs.org/
 .. _phantomjs: http://phantomjs.org/
+.. _qunit: https://qunitjs.com/
 .. _qunit demo: http://jsfiddle.net/treyh/7kKG5/
 .. _rspec: http://rspec.info/

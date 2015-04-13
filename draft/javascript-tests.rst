@@ -2,22 +2,27 @@
 JavaScript Tests
 ================
 
+:DEP: XXXX
 :Author: Trey Hunner
+:Implementation Team: Trey Hunner
+:Shepherd: Carl Meyer
 :Status: Draft
+:Type: Process
 :Created: 2014-05-04
+:Last-Modified: 2015-04-13
 
 .. contents:: Table of Contents
    :depth: 3
    :local:
 
-Overview
+Abstract
 ========
 
 Create unit tests for the JavaScript code in the admin and gis contrib packages.
 
 
-Rationale
-=========
+Motivation
+==========
 
 Django ``admin`` and ``gis`` contrib packages contain JavaScript code without
 any unit tests.  Django has functional tests which execute some of the
@@ -25,8 +30,8 @@ JavaScript code, but functional tests are not good enough.  Not all JavaScript
 code can be tested without forcing the execution of low-level browser events.
 
 
-Implementation
-==============
+Specification
+=============
 
 Native JavaScript Testing Framework
 -----------------------------------

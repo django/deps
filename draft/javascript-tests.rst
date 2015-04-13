@@ -2,12 +2,13 @@
 JavaScript Tests
 ================
 
-========  ============
-Author    Trey Hunner
-Status    Draft
-Created   2014-05-04
-========  ============
+:Author: Trey Hunner
+:Status: Draft
+:Created: 2014-05-04
 
+.. contents:: Table of Contents
+   :depth: 3
+   :local:
 
 Overview
 ========

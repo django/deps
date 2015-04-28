@@ -104,6 +104,9 @@ Running tests in a web browser should be as easy as either:
 2. Executing ``python -m SimpleHTTPServer`` and opening
    http://localhost:8000/js_tests/tests.html in your web browser
 
+Running tests with an HTTP protocol may be required to run Blanket.js in the
+browser due to `cross-origin resource sharing`_ rules.
+
 Running tests from the command-line (locally or on the CI server) should be as
 easy as:
 
@@ -179,6 +182,7 @@ CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed
 .. _backbone.js: http://backbonejs.org/
 .. _blanket.js: http://blanketjs.org/
 .. _bdd: https://en.wikipedia.org/wiki/Behavior-driven_development
+.. _cross-origin resource sharing: https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
 .. _editorconfig: http://editorconfig.org/
 .. _ember.js: http://emberjs.com/
 .. _eslint: http://eslint.org/

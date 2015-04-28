@@ -27,35 +27,99 @@ Specification
 QUnit test framework
 --------------------
 
-`Jasmine`_ and `Mocha`_ are `BDD`_ testing frameworks similar to Ruby's `RSpec`_
-whereas `QUnit`_ uses a declarative testing style akin to Django's existing
-testing framework.
+`Jasmine`_ is a `BDD`_ testing frameworks similar to Ruby's `RSpec`_.
+`QUnit`_ is a testing framework that uses a declarative testing style akin to
+Django's existing testing framework.  `Mocha`_ is a BDD testing framework that
+can also be used in a more declarative style with a syntax very similar to
+QUnit's.
 
 QUnit should be used because it is:
 
 - Popular (used by `jQuery`_, `Backbone.js`_, and `Ember.js`_)
-- Similar to the Python test suite (it is not a BDD framework)
+- Similar to the Python test suite (it is not a BDD framework like Jasmine)
 - Easy to setup (like Jasmine and Mocha, it only requires a JS and HTML file)
+- QUnit auto-resets the ``#qunit-fixture`` element which allows for more certain
+  test isolation
+
+Blanket for code coverage
+-------------------------
+
+`Istanbul`_ and `Blanket.js`_ are both popular JavaScript code coverage tools.
+Using Istanbul in a web browser requires using a Node.js command-line tool to
+generate Istanbul-wrapped test files.  Blanket.js can inject itself into your
+code directly from a web browser and therefore does not require generating new
+test files.
+
+Blanket.js should be used so that code coverage can be verified in a web
+browser without requiring Node.js.
+
+EditorConfig for code style
+---------------------------
+
+The JavaScript files currently use a variety of code styles.  As an example,
+some files use tabs for indentation, some use 4 spaces, and some use 2 spaces.
+Fortunately, each file is fairly self-consistent.  Unfortunately, this variety
+of styles makes manual code style enforcement difficult.
+
+`EditorConfig`_ should be used to document the desired code style and maintain
+this style while editing code.
+
+JSHint for code linting
+-----------------------
+
+Linting code is particularly important in JavaScript due to certain hazardous
+language features.  `JSHint`_ is a popular JavaScript linter which is based on
+the less-customizable `JSLint`_ tool.  `ESLint`_ is a very customizable and
+unopinionated JavaScript linter which also includes code style checking.
+
+JSHint should be used initially because:
+
+- It is customizable (unlike JSLint)
+- It defaults to a good set of community standards
+- It does not enforce code style (style is not yet consistent between files)
+- It is currently more widely used than JSLint or ESLint
+
+ESLint may be included later for stricter and more customizable linting and
+code style enforcement after a future JavaScript code refactor.
 
 Migration Path
 --------------
 
 The proposed migration path:
 
-1. Add a ``package.json`` file and a ``gulpfile.js`` and introduce
-   command-line `QUnit`_ tests with `Istanbul`_ for code coverage
+1. Add a ``package.json`` file and a ``Gruntfile.js`` and introduce
+   command-line `QUnit`_ tests with `Blanket.js`_ for code coverage
 2. Add a few easy-to-implement tests to start (low-hanging fruit)
-3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc`` file
-4. Document process used to run the tests from the command line and within a browser
-5. Setup CI server to run the tests
+3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc``
+   file
+4. Add `EditorConfig`_ for auto-enforced code style guide (needed for mixed
+   indentation)
+5. Document process used to run the tests from the command line and within a
+   browser
+6. Setup CI server to run the tests
+
+Running tests in a web browser should be as easy as either:
+
+1. Opening ``./js_tests/tests.html`` in your web browser (ideal case)
+2. Executing ``python -m SimpleHTTPServer`` and opening
+   http://localhost:8000/js_tests/tests.html in your web browser
+
+Running tests with an HTTP protocol may be required to run Blanket.js in the
+browser due to `cross-origin resource sharing`_ rules.
+
+Running tests from the command-line (locally or on the CI server) should be as
+easy as:
+
+1. Install `Node.js`_ and `PhantomJS`_
+2. Run ``npm install`` to install all local Node dependencies
+3. Run ``npm test`` to run the tests and read the results
 
 Open Questions
 --------------
 
-- What steps should be taken to create the new JavaScript test framework?
-- What tests should be created initially?
 - How should the test framework be run within the CI process?
-- How should the testing documentation be updated for the new JavaScript test framework?
+- How should the testing documentation be updated for the new JavaScript test
+  framework?
 
 
 Motivation
@@ -70,9 +134,6 @@ code can be tested without forcing the execution of low-level browser events.
 Rationale
 =========
 
-Native JavaScript Testing Framework
------------------------------------
-
 A native JavaScript test framework is one that can be run without any Python
 code, either in the browser or from the command line.
 
@@ -80,15 +141,17 @@ The JavaScript code can be tested independently of the Python code.  Therefore,
 the JavaScript and Python tests do not need to be intertwined.
 
 Arguments for
-~~~~~~~~~~~~~
+-------------
 
 - Easier for a developer new to Django's JavaScript testing practices
 - Tests can be run manually from a web browser without any need for `Node.js`_
-- Creating tests only requires updating/creating a JavaScript file (no need to
-  alter a py file)
+- Creating tests only requires updating/creating a JavaScript file and updating
+  an HTML file (no need to alter a py file)
+- The JS community maintains a reliable set of testing tools.  Creating custom
+  tools would require maintenance which no one has volunteered to do.
 
 Arguments against
-~~~~~~~~~~~~~~~~~
+-----------------
 
 - Executing automated tests on a continuous integration server without a Python
   wrapper will require `Node.js`_ and `PhantomJS`_
@@ -103,6 +166,13 @@ The requirement of Node.js should not prove burdensome because:
   may already be installed locally
 
 
+Reference Implementation
+========================
+
+Pull request `#4573 <https://github.com/django/django/pull/4573>`_ implements
+all suggested changes in this DEP.
+
+
 Copyright
 =========
 
@@ -110,11 +180,16 @@ This document has been placed in the public domain per the Creative Commons
 CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
 
 .. _backbone.js: http://backbonejs.org/
+.. _blanket.js: http://blanketjs.org/
 .. _bdd: https://en.wikipedia.org/wiki/Behavior-driven_development
+.. _cross-origin resource sharing: https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+.. _editorconfig: http://editorconfig.org/
 .. _ember.js: http://emberjs.com/
+.. _eslint: http://eslint.org/
 .. _istanbul: http://gotwarlost.github.io/istanbul/
 .. _jasmine: http://jasmine.github.io/
 .. _jshint: http://www.jshint.com/
+.. _jslint: http://jslint.com/
 .. _jquery: https://jquery.com/
 .. _mocha: http://visionmedia.github.io/mocha/
 .. _node.js: http://nodejs.org/

@@ -102,9 +102,6 @@ code can be tested without forcing the execution of low-level browser events.
 Rationale
 =========
 
-Native JavaScript Testing Framework
------------------------------------
-
 A native JavaScript test framework is one that can be run without any Python
 code, either in the browser or from the command line.
 
@@ -112,15 +109,17 @@ The JavaScript code can be tested independently of the Python code.  Therefore,
 the JavaScript and Python tests do not need to be intertwined.
 
 Arguments for
-~~~~~~~~~~~~~
+-------------
 
 - Easier for a developer new to Django's JavaScript testing practices
 - Tests can be run manually from a web browser without any need for `Node.js`_
-- Creating tests only requires updating/creating a JavaScript file (no need to
-  alter a py file)
+- Creating tests only requires updating/creating a JavaScript file and updating
+  an HTML file (no need to alter a py file)
+- The JS community maintains a reliable set of testing tools.  Creating custom
+  tools would require maintenance which no one has volunteered to do.
 
 Arguments against
-~~~~~~~~~~~~~~~~~
+-----------------
 
 - Executing automated tests on a continuous integration server without a Python
   wrapper will require `Node.js`_ and `PhantomJS`_

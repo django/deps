@@ -36,8 +36,10 @@ QUnit's.
 QUnit should be used because it is:
 
 - Popular (used by `jQuery`_, `Backbone.js`_, and `Ember.js`_)
-- Similar to the Python test suite (it is not a BDD framework)
+- Similar to the Python test suite (it is not a BDD framework like Jasmine)
 - Easy to setup (like Jasmine and Mocha, it only requires a JS and HTML file)
+- QUnit auto-resets the ``#qunit-fixture`` element which allows for more certain
+  test isolation
 
 Blanket for code coverage
 -------------------------
@@ -66,7 +68,8 @@ The proposed migration path:
 Running tests in a web browser should be as easy as either:
 
 1. Opening ``./js_tests/tests.html`` in your web browser (ideal case)
-2. Executing ``python -m SimpleHTTPServer`` and opening http://localhost:8000/js_tests/tests.html in your web browser
+2. Executing ``python -m SimpleHTTPServer`` and opening
+   http://localhost:8000/js_tests/tests.html in your web browser
 
 Running tests from the command-line (locally or on the CI server) should be as easy as:
 

@@ -39,13 +39,25 @@ QUnit should be used because it is:
 - Similar to the Python test suite (it is not a BDD framework)
 - Easy to setup (like Jasmine and Mocha, it only requires a JS and HTML file)
 
+Blanket for code coverage
+-------------------------
+
+`Istanbul`_ and `Blanket.js`_ are both popular JavaScript code coverage tools.
+Using Istanbul in a web browser requires using a Node.js command-line tool to
+generate Istanbul-wrapped test files.  Blanket.js can inject itself into your
+code directly from a web browser and therefore does not require generating new
+test files.
+
+Blanket.js should be used so that code coverage can be may be verified in a
+web browser without requiring Node.js.
+
 Migration Path
 --------------
 
 The proposed migration path:
 
 1. Add a ``package.json`` file and a ``gulpfile.js`` and introduce
-   command-line `QUnit`_ tests with `Istanbul`_ for code coverage
+   command-line `QUnit`_ tests with `Blanket.js`_ for code coverage
 2. Add a few easy-to-implement tests to start (low-hanging fruit)
 3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc`` file
 4. Document process used to run the tests from the command line and within a browser
@@ -112,6 +124,7 @@ This document has been placed in the public domain per the Creative Commons
 CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
 
 .. _backbone.js: http://backbonejs.org/
+.. _blanket.js: http://blanketjs.org/
 .. _bdd: https://en.wikipedia.org/wiki/Behavior-driven_development
 .. _ember.js: http://emberjs.com/
 .. _istanbul: http://gotwarlost.github.io/istanbul/

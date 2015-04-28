@@ -77,8 +77,6 @@ Running tests from the command-line (locally or on the CI server) should be as e
 Open Questions
 --------------
 
-- What steps should be taken to create the new JavaScript test framework?
-- What tests should be created initially?
 - How should the test framework be run within the CI process?
 - How should the testing documentation be updated for the new JavaScript test framework?
 

@@ -78,7 +78,7 @@ Running tests in a web browser should be as easy as either:
 Running tests from the command-line (locally or on the CI server) should be as
 easy as:
 
-1. Install `Node.js`_
+1. Install `Node.js`_ and `PhantomJS`_
 2. Run ``npm install`` to install all local Node dependencies
 3. Run ``npm test`` to run the tests and read the results
 

@@ -56,12 +56,23 @@ Migration Path
 
 The proposed migration path:
 
-1. Add a ``package.json`` file and a ``gulpfile.js`` and introduce
+1. Add a ``package.json`` file and a ``Gruntfile.js`` and introduce
    command-line `QUnit`_ tests with `Blanket.js`_ for code coverage
 2. Add a few easy-to-implement tests to start (low-hanging fruit)
 3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc`` file
 4. Document process used to run the tests from the command line and within a browser
 5. Setup CI server to run the tests
+
+Running tests in a web browser should be as easy as either:
+
+1. Opening ``./js_tests/tests.html`` in your web browser (ideal case)
+2. Executing ``python -m SimpleHTTPServer`` and opening http://localhost:8000/js_tests/tests.html in your web browser
+
+Running tests from the command-line (locally or on the CI server) should be as easy as:
+
+1. Install `Node.js`_
+2. Run ``npm install`` to install all local Node dependencies
+3. Run ``npm test`` to run the tests and read the results
 
 Open Questions
 --------------

@@ -62,8 +62,9 @@ The proposed migration path:
    command-line `QUnit`_ tests with `Blanket.js`_ for code coverage
 2. Add a few easy-to-implement tests to start (low-hanging fruit)
 3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc`` file
-4. Document process used to run the tests from the command line and within a browser
-5. Setup CI server to run the tests
+4. Add EditorConfig for auto-enforced code style guide (needed for mixed indentation)
+5. Document process used to run the tests from the command line and within a browser
+6. Setup CI server to run the tests
 
 Running tests in a web browser should be as easy as either:
 

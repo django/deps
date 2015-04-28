@@ -27,9 +27,11 @@ Specification
 QUnit test framework
 --------------------
 
-`Jasmine`_ and `Mocha`_ are `BDD`_ testing frameworks similar to Ruby's `RSpec`_
-whereas `QUnit`_ uses a declarative testing style akin to Django's existing
-testing framework.
+`Jasmine`_ is a `BDD`_ testing frameworks similar to Ruby's `RSpec`_.
+`QUnit`_ is a testing framework that uses a declarative testing style akin to
+Django's existing testing framework.  `Mocha`_ is a BDD testing framework that
+can also be used in a more declarative style with a syntax very similar to
+QUnit's.
 
 QUnit should be used because it is:
 

@@ -61,9 +61,12 @@ The proposed migration path:
 1. Add a ``package.json`` file and a ``Gruntfile.js`` and introduce
    command-line `QUnit`_ tests with `Blanket.js`_ for code coverage
 2. Add a few easy-to-implement tests to start (low-hanging fruit)
-3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc`` file
-4. Add EditorConfig for auto-enforced code style guide (needed for mixed indentation)
-5. Document process used to run the tests from the command line and within a browser
+3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc``
+   file
+4. Add EditorConfig for auto-enforced code style guide (needed for mixed
+   indentation)
+5. Document process used to run the tests from the command line and within a
+   browser
 6. Setup CI server to run the tests
 
 Running tests in a web browser should be as easy as either:
@@ -72,7 +75,8 @@ Running tests in a web browser should be as easy as either:
 2. Executing ``python -m SimpleHTTPServer`` and opening
    http://localhost:8000/js_tests/tests.html in your web browser
 
-Running tests from the command-line (locally or on the CI server) should be as easy as:
+Running tests from the command-line (locally or on the CI server) should be as
+easy as:
 
 1. Install `Node.js`_
 2. Run ``npm install`` to install all local Node dependencies
@@ -82,7 +86,8 @@ Open Questions
 --------------
 
 - How should the test framework be run within the CI process?
-- How should the testing documentation be updated for the new JavaScript test framework?
+- How should the testing documentation be updated for the new JavaScript test
+  framework?
 
 
 Motivation
@@ -141,7 +146,8 @@ Copyright
 =========
 
 This document has been placed in the public domain per the Creative Commons
-CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
+CC0 1.0 Universal license
+(http://creativecommons.org/publicdomain/zero/1.0/deed).
 
 .. _backbone.js: http://backbonejs.org/
 .. _blanket.js: http://blanketjs.org/

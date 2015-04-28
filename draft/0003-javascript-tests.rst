@@ -129,6 +129,13 @@ The requirement of Node.js should not prove burdensome because:
   may already be installed locally
 
 
+Reference Implementation
+========================
+
+Pull request `#4573 <https://github.com/django/django/pull/4573>`_ implements
+all suggested changes in this DEP.
+
+
 Copyright
 =========
 

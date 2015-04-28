@@ -67,20 +67,20 @@ this style while editing code.
 JSHint for code linting
 -----------------------
 
-Linting code is particularly important in JavaScript due to certain dangerous
+Linting code is particularly important in JavaScript due to certain hazardous
 language features.  `JSHint`_ is a popular JavaScript linter which is based on
 the less-customizable `JSLint`_ tool.  `ESLint`_ is a very customizable and
-unopinionated JavaScript linter which includes also code style checking.
+unopinionated JavaScript linter which also includes code style checking.
 
 JSHint should be used initially because:
 
 - It is customizable (unlike JSLint)
 - It defaults to a good set of community standards
 - It does not enforce code style (style is not yet consistent between files)
-- It is currently more widely used than JSHint or ESLint
+- It is currently more widely used than JSLint or ESLint
 
 ESLint may be included later for stricter and more customizable linting and
-code style enforcement during or after a future JavaScript code refactor.
+code style enforcement after a future JavaScript code refactor.
 
 Migration Path
 --------------

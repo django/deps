@@ -53,6 +53,35 @@ test files.
 Blanket.js should be used so that code coverage can be verified in a web
 browser without requiring Node.js.
 
+EditorConfig for code style
+---------------------------
+
+The JavaScript files currently use a variety of code styles.  As an example,
+some files use tabs for indentation, some use 4 spaces, and some use 2 spaces.
+Fortunately, each file is fairly self-consistent.  Unfortunately, this variety
+of styles makes manual code style enforcement difficult.
+
+`EditorConfig`_ should be used to document the desired code style and maintain
+this style while editing code.
+
+JSHint for code linting
+-----------------------
+
+Linting code is particularly important in JavaScript due to certain dangerous
+language features.  `JSHint`_ is a popular JavaScript linter which is based on
+the less-customizable `JSLint`_ tool.  `ESLint`_ is a very customizable and
+unopinionated JavaScript linter which includes also code style checking.
+
+JSHint should be used initially because:
+
+- It is customizable (unlike JSLint)
+- It defaults to a good set of community standards
+- It does not enforce code style (style is not yet consistent between files)
+- It is currently more widely used than JSHint or ESLint
+
+ESLint may be included later for stricter and more customizable linting and
+code style enforcement during or after a future JavaScript code refactor.
+
 Migration Path
 --------------
 
@@ -63,7 +92,7 @@ The proposed migration path:
 2. Add a few easy-to-implement tests to start (low-hanging fruit)
 3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc``
    file
-4. Add EditorConfig for auto-enforced code style guide (needed for mixed
+4. Add `EditorConfig`_ for auto-enforced code style guide (needed for mixed
    indentation)
 5. Document process used to run the tests from the command line and within a
    browser
@@ -145,16 +174,18 @@ Copyright
 =========
 
 This document has been placed in the public domain per the Creative Commons
-CC0 1.0 Universal license
-(http://creativecommons.org/publicdomain/zero/1.0/deed).
+CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
 
 .. _backbone.js: http://backbonejs.org/
 .. _blanket.js: http://blanketjs.org/
 .. _bdd: https://en.wikipedia.org/wiki/Behavior-driven_development
+.. _editorconfig: http://editorconfig.org/
 .. _ember.js: http://emberjs.com/
+.. _eslint: http://eslint.org/
 .. _istanbul: http://gotwarlost.github.io/istanbul/
 .. _jasmine: http://jasmine.github.io/
 .. _jshint: http://www.jshint.com/
+.. _jslint: http://jslint.com/
 .. _jquery: https://jquery.com/
 .. _mocha: http://visionmedia.github.io/mocha/
 .. _node.js: http://nodejs.org/

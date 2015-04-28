@@ -50,8 +50,8 @@ generate Istanbul-wrapped test files.  Blanket.js can inject itself into your
 code directly from a web browser and therefore does not require generating new
 test files.
 
-Blanket.js should be used so that code coverage can be may be verified in a
-web browser without requiring Node.js.
+Blanket.js should be used so that code coverage can be verified in a web
+browser without requiring Node.js.
 
 Migration Path
 --------------

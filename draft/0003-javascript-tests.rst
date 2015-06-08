@@ -34,7 +34,7 @@ testing framework.  `Mocha`_ is a testing framework with pluggable testing
 syntax options.
 
 Any of these (especially QUnit or Mocha) could be a fine choice for
-Django. This PEP selects QUnit because it is:
+Django. This DEP selects QUnit because it is:
 
 - Popular enough to provide some assurance of future maintenance (used by
   `jQuery`_, `Backbone.js`_, and `Ember.js`_).
@@ -77,10 +77,10 @@ unopinionated JavaScript linter which also includes code style checking.
 
 JSHint should be used initially because:
 
-- It is customizable (unlike JSLint)
-- It defaults to a good set of community standards
-- It does not enforce code style (style is not yet consistent between files)
-- It is currently more widely used than JSLint or ESLint
+- It is customizable (unlike JSLint).
+- It defaults to a good set of community standards.
+- It does not enforce code style (style is not yet consistent between files).
+- It is currently more widely used than JSLint or ESLint.
 
 ESLint may be included later for stricter and more customizable linting and
 code style enforcement after a future JavaScript code refactor.
@@ -112,7 +112,7 @@ Running tests via HTTP is required to run Blanket.js in the browser due to
 
 Steps to run tests from the command-line (locally or on the CI server):
 
-1. Install `Node.js`_ and `NPM`_.
+1. Install `Node.js`_.
 2. Run ``npm install`` to install Node dependencies.
 3. Run ``npm test`` to run the tests and see results, including code coverage.
 
@@ -188,7 +188,6 @@ CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed
 .. _jquery: https://jquery.com/
 .. _mocha: http://visionmedia.github.io/mocha/
 .. _node.js: http://nodejs.org/
-.. _npm: http://npmjs.com/
 .. _phantomjs: http://phantomjs.org/
 .. _qunit: https://qunitjs.com/
 .. _qunit demo: http://jsfiddle.net/treyh/7kKG5/

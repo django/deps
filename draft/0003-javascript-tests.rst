@@ -1,6 +1,6 @@
-================
-JavaScript Tests
-================
+==========================
+JavaScript Tests & Linting
+==========================
 
 :DEP: 0003
 :Author: Trey Hunner
@@ -9,7 +9,7 @@ JavaScript Tests
 :Status: Draft
 :Type: Process
 :Created: 2014-05-04
-:Last-Modified: 2015-04-13
+:Last-Modified: 2015-06-08
 
 .. contents:: Table of Contents
    :depth: 3
@@ -18,7 +18,8 @@ JavaScript Tests
 Abstract
 ========
 
-Create unit tests for the JavaScript code in the admin and gis contrib packages.
+Add unit tests and coding style consistency enforcement (linting) for the
+JavaScript code in the admin and gis contrib packages.
 
 
 Specification
@@ -27,19 +28,21 @@ Specification
 QUnit test framework
 --------------------
 
-`Jasmine`_ is a `BDD`_ testing frameworks similar to Ruby's `RSpec`_.
-`QUnit`_ is a testing framework that uses a declarative testing style akin to
-Django's existing testing framework.  `Mocha`_ is a BDD testing framework that
-can also be used in a more declarative style with a syntax very similar to
-QUnit's.
+`Jasmine`_ is a `BDD`_ testing frameworks similar to Ruby's `RSpec`_.  `QUnit`_
+is a testing framework that uses a testing syntax similar to Django's existing
+testing framework.  `Mocha`_ is a testing framework with pluggable testing
+syntax options.
 
-QUnit should be used because it is:
+Any of these (especially QUnit or Mocha) could be a fine choice for
+Django. This PEP selects QUnit because it is:
 
-- Popular (used by `jQuery`_, `Backbone.js`_, and `Ember.js`_)
-- Similar to the Python test suite (it is not a BDD framework like Jasmine)
-- Easy to setup (like Jasmine and Mocha, it only requires a JS and HTML file)
-- QUnit auto-resets the ``#qunit-fixture`` element which allows for more certain
-  test isolation
+- Popular enough to provide some assurance of future maintenance (used by
+  `jQuery`_, `Backbone.js`_, and `Ember.js`_).
+- Similar syntax to the Python test suite (module/test/assert rather than
+  describe/it/expect/should).
+- Easy to setup (like Jasmine and Mocha, it only requires a JS and HTML file).
+- Auto-resets the ``#qunit-fixture`` element, providing easy isolation for
+  DOM-related tests (and much of Django's JS code is DOM-related).
 
 Blanket for code coverage
 -------------------------
@@ -88,38 +91,30 @@ Migration Path
 The proposed migration path:
 
 1. Add a ``package.json`` file and a ``Gruntfile.js`` and introduce
-   command-line `QUnit`_ tests with `Blanket.js`_ for code coverage
-2. Add a few easy-to-implement tests to start (low-hanging fruit)
+   command-line `QUnit`_ tests with `Blanket.js`_ for code coverage.
+2. Add a few easy-to-implement tests to start (low-hanging fruit).
 3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc``
-   file
-4. Add `EditorConfig`_ for auto-enforced code style guide (needed for mixed
-   indentation)
+   file.
+4. Add `EditorConfig`_ for auto-enforced code style guide.
 5. Document process used to run the tests from the command line and within a
-   browser
-6. Setup CI server to run the tests
+   browser.
+6. Setup CI server to run the tests.
 
-Running tests in a web browser should be as easy as either:
+Running tests in a web browser is as easy as either:
 
-1. Opening ``./js_tests/tests.html`` in your web browser (ideal case)
+1. Opening ``./js_tests/tests.html`` in your web browser (simplest case).
 2. Executing ``python -m SimpleHTTPServer`` and opening
-   http://localhost:8000/js_tests/tests.html in your web browser
+   http://localhost:8000/js_tests/tests.html in your web browser (needed for
+   code coverage reporting).
 
-Running tests with an HTTP protocol may be required to run Blanket.js in the
-browser due to `cross-origin resource sharing`_ rules.
+Running tests via HTTP is required to run Blanket.js in the browser due to
+`cross-origin resource sharing`_ rules.
 
-Running tests from the command-line (locally or on the CI server) should be as
-easy as:
+Steps to run tests from the command-line (locally or on the CI server):
 
-1. Install `Node.js`_ and `PhantomJS`_
-2. Run ``npm install`` to install all local Node dependencies
-3. Run ``npm test`` to run the tests and read the results
-
-Open Questions
---------------
-
-- How should the test framework be run within the CI process?
-- How should the testing documentation be updated for the new JavaScript test
-  framework?
+1. Install `Node.js`_ and `NPM`_.
+2. Run ``npm install`` to install Node dependencies.
+3. Run ``npm test`` to run the tests and see results, including code coverage.
 
 
 Motivation
@@ -143,10 +138,10 @@ the JavaScript and Python tests do not need to be intertwined.
 Arguments for
 -------------
 
-- Easier for a developer new to Django's JavaScript testing practices
-- Tests can be run manually from a web browser without any need for `Node.js`_
+- Easier for a developer new to Django's JavaScript testing practices.
+- Tests can be run manually from a web browser without any need for `Node.js`_.
 - Creating tests only requires updating/creating a JavaScript file and updating
-  an HTML file (no need to alter a py file)
+  an HTML file (no need to alter a py file).
 - The JS community maintains a reliable set of testing tools.  Creating custom
   tools would require maintenance which no one has volunteered to do.
 
@@ -154,23 +149,23 @@ Arguments against
 -----------------
 
 - Executing automated tests on a continuous integration server without a Python
-  wrapper will require `Node.js`_ and `PhantomJS`_
+  wrapper will require `Node.js`_ and `PhantomJS`_.
 - JavaScript tests must be executed separately from Python tests
-  (``./runtests.py`` will only execute Python tests)
+  (``./runtests.py`` will only execute Python tests).
 
 The requirement of Node.js should not prove burdensome because:
 
-- Running JS tests locally only requires opening an HTML file in a web browser
-  (see `QUnit demo`_).
+- Running JS tests locally only requires opening an HTML file in a web browser.
 - `JSHint`_ (a popular JS linter) also requires Node.js and therefore Node.js
-  may already be installed locally
+  may already be installed locally.
 
 
 Reference Implementation
 ========================
 
-Pull request `#4573 <https://github.com/django/django/pull/4573>`_ implements
-all suggested changes in this DEP.
+Pull requests `#4573 <https://github.com/django/django/pull/4573>`_ and `#4577
+<https://github.com/django/django/pull/4577>`_ implement all suggested changes
+in this DEP.
 
 
 Copyright
@@ -193,6 +188,7 @@ CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed
 .. _jquery: https://jquery.com/
 .. _mocha: http://visionmedia.github.io/mocha/
 .. _node.js: http://nodejs.org/
+.. _npm: http://npmjs.com/
 .. _phantomjs: http://phantomjs.org/
 .. _qunit: https://qunitjs.com/
 .. _qunit demo: http://jsfiddle.net/treyh/7kKG5/

@@ -6,7 +6,7 @@ JavaScript Tests & Linting
 :Author: Trey Hunner
 :Implementation Team: Trey Hunner
 :Shepherd: Carl Meyer
-:Status: Draft
+:Status: Accepted
 :Type: Process
 :Created: 2014-05-04
 :Last-Modified: 2015-06-08

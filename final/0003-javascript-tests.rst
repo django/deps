@@ -6,10 +6,10 @@ JavaScript Tests & Linting
 :Author: Trey Hunner
 :Implementation Team: Trey Hunner
 :Shepherd: Carl Meyer
-:Status: Accepted
+:Status: Final
 :Type: Process
 :Created: 2014-05-04
-:Last-Modified: 2015-06-08
+:Last-Modified: 2015-07-24
 
 .. contents:: Table of Contents
    :depth: 3
@@ -67,7 +67,7 @@ of styles makes manual code style enforcement difficult.
 `EditorConfig`_ should be used to document the desired code style and maintain
 this style while editing code.
 
-JSHint for code linting
+ESLint for code linting
 -----------------------
 
 Linting code is particularly important in JavaScript due to certain hazardous
@@ -75,15 +75,11 @@ language features.  `JSHint`_ is a popular JavaScript linter which is based on
 the less-customizable `JSLint`_ tool.  `ESLint`_ is a very customizable and
 unopinionated JavaScript linter which also includes code style checking.
 
-JSHint should be used initially because:
+ESLint should be used because:
 
 - It is customizable (unlike JSLint).
 - It defaults to a good set of community standards.
-- It does not enforce code style (style is not yet consistent between files).
-- It is currently more widely used than JSLint or ESLint.
-
-ESLint may be included later for stricter and more customizable linting and
-code style enforcement after a future JavaScript code refactor.
+- It can enforce a wider range of code style preferences.
 
 Migration Path
 --------------
@@ -93,9 +89,9 @@ The proposed migration path:
 1. Add a ``package.json`` file and a ``Gruntfile.js`` and introduce
    command-line `QUnit`_ tests with `Blanket.js`_ for code coverage.
 2. Add a few easy-to-implement tests to start (low-hanging fruit).
-3. Add JSHint and update code to conform to a style dictated in a ``.jshintrc``
+3. Add ESLint and update code to conform to a style dictated in a ``.eslintrc``
    file.
-4. Add `EditorConfig`_ for auto-enforced code style guide.
+4. Add `EditorConfig`_ for editor enforcement of code style guide.
 5. Document process used to run the tests from the command line and within a
    browser.
 6. Setup CI server to run the tests.
@@ -103,9 +99,9 @@ The proposed migration path:
 Running tests in a web browser is as easy as either:
 
 1. Opening ``./js_tests/tests.html`` in your web browser (simplest case).
-2. Executing ``python -m SimpleHTTPServer`` and opening
-   http://localhost:8000/js_tests/tests.html in your web browser (needed for
-   code coverage reporting).
+2. Executing ``python -m http.server`` (``python m SimpleHTTPServer`` on
+   Python 2) and opening http://localhost:8000/js_tests/tests.html in your web
+   browser (needed for code coverage reporting).
 
 Running tests via HTTP is required to run Blanket.js in the browser due to
 `cross-origin resource sharing`_ rules.

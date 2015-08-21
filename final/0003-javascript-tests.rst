@@ -99,7 +99,7 @@ The proposed migration path:
 Running tests in a web browser is as easy as either:
 
 1. Opening ``./js_tests/tests.html`` in your web browser (simplest case).
-2. Executing ``python -m http.server`` (``python m SimpleHTTPServer`` on
+2. Executing ``python -m http.server`` (``python -m SimpleHTTPServer`` on
    Python 2) and opening http://localhost:8000/js_tests/tests.html in your web
    browser (needed for code coverage reporting).
 

@@ -6,13 +6,16 @@ DEP 182: Multiple Template Engines
 :Type: Feature
 :Status: Accepted
 :Created: 2014-09-14
-:Last-Modified: 2014-12-28
+:Last-Modified: 2015-10-02
 :Author: Aymeric Augustin
 :Implementation-Team: Aymeric Augustin
 :Shepherd: Carl Meyer
 :Django-Version: 1.8
 :Resolution: Accepted
 
+.. contents:: Table of Contents
+   :depth: 3
+   :local:
 
 Abstract
 ========
@@ -345,7 +348,7 @@ appendix for details:
 * Any file that isn't a Python module is assumed to be written in the DTL
 * Extraction algorithms are hardcoded in ``django.utils.translation``
 
-Ideally each template engine will provide a list of template files it can
+Perhaps each template engine could provide a list of template files it can
 handle and implement a suitable extraction process for translatable strings.
 However this raises several questions.
 
@@ -361,11 +364,11 @@ However this raises several questions.
   without settings. An option to enable "legacy mode" and preserve the
   historical behavior of ``makemessages`` may help.
 
-An alternative would be to switch to Babel_ for extracting translatable
-strings. It would solve the problems described above at the cost of adding an
-optional dependency. ``makemessages`` would become a wrapper around Babel and
-invoke it with an appropriate configuration. This option will be considered
-and may be chosen during the implementation phase.
+Given this complexity, improvements to the internationalization APIs are
+considered out of scope of this DEP. If it appears useful to formalize a
+better API, another DEP can be written on that topic.
+
+Until then Jinja2 users will use Babel_ to extract translatable strings.
 
 Management commands
 -------------------
@@ -386,8 +389,8 @@ Backends API
 The entry point for a template engine is the class designated by the
 ``'BACKEND'`` entry in its configuration.
 
-This class must inherit ``django.template.backends.BaseEngine`` or implement
-the following interface.
+This class must inherit ``django.template.backends.base.BaseEngine`` or
+implement the following interface.
 
 .. code:: python
 
@@ -439,36 +442,11 @@ the following interface.
                 "subclasses of BaseEngine must provide "
                 "a get_template() method")
 
-        # Internationalization methods (tentative).
-
-        def extract_from_dir(dirname=None, **options):
-            """
-            Extract messages from template files found in the given directory.
-            """
-            # The default implementation will build upon the find_files and
-            # prepare_for_xgettext methods defined below and xgettext itself.
-
-        def find_files(self, dirname, followlinks=False):
-            """
-            List template files found in the given directory.
-            """
-            # The default implementation will walk directories pointed to by
-            # DIRS and APP_DIRS if they're under dirname and return all files
-            # found in these directories.
-
-        xgettext_target_language = "Python"
-
-        def prepare_for_xgettext(self, template_code, **options):
-            """
-            Transform template code into something xgettext accepts as Python.
-
-            The target language is defined by xgettext_target_language.
-            """
-            raise NotImplementedError(
-                "subclasses of BaseEngine must provide "
-                "a prepare_for_xgettext() method")
+``BaseEngine`` will also provide utilities that most backends will need.
 
 Template objects returned by backends must conform to the following interface.
+Django won't provide a ``BaseTemplate`` class because it would have only one
+abstract method.
 
 .. code:: python
 
@@ -481,9 +459,9 @@ Template objects returned by backends must conform to the following interface.
             """
             Render this template with a given context.
 
-            If context is provided, it must be a dict.
+            If ``context`` is provided, it must be a ``dict``.
 
-            If request is provided, it must be a ``django.http.HttpRequest``.
+            If ``request`` is provided, it must be a ``django.http.HttpRequest``.
             """
             if context is None:
                 context = {}
@@ -536,8 +514,10 @@ Here's the default configuration for the Django backend:
             'OPTIONS': {
                 'allowed_include_roots': [],
                 'context_processors': [],
+                'debug': settings.DEBUG,
                 'loaders': None,
                 'string_if_invalid': '',
+                file_charset=settings.FILE_CHARSET,
             },
         },
     ]
@@ -566,6 +546,7 @@ follows:
             'OPTIONS': {
                 'allowed_include_roots': settings.ALLOWED_INCLUDE_ROOTS,
                 'context_processors': settings.TEMPLATE_CONTEXT_PROCESSORS,
+                'debug': settings.TEMPLATE_DEBUG,
                 'loaders': settings.TEMPLATE_LOADERS,
                 'string_if_invalid': settings.TEMPLATE_STRING_IF_INVALID,
             },
@@ -664,8 +645,8 @@ The current public APIs are:
 
 The new public APIs are:
 
-* ``render(request, template_name[, context, using, content_type, status])``
-* ``render_to_response(template_name[, context, using, content_type, status])``
+* ``render(request, template_name[, context, content_type, status, using])``
+* ``render_to_response(template_name[, context, content_type, status, using])``
 
 ``dictionary`` is renamed to ``context`` because it's a better name and
 because it's consistent with template responses. This is transparent when it's
@@ -710,9 +691,6 @@ The current public APIs are:
 
 ``current_app`` is treated exactly like for ``render``.
 
-Public method ``resolve_context`` loses its purpose once ``Template.render``
-no longer requires a ``Context`` and is deprecated.
-
 
 Backwards Compatibility
 =======================
@@ -734,12 +712,6 @@ will change. In order to clarify the landscape, private APIs imported in the
 ``django.template`` namespace will be removed. Only public APIs will be left.
 The author will make an effort to provide a deprecation path or document the
 removal of private APIs that are likely to be used in the wild.
-
-
-Reference Implementation
-========================
-
-In progress.
 
 
 Appendix: the Django Template Language
@@ -963,9 +935,8 @@ Conventional attributes
 Private APIs
 ------------
 
-The following APIs aren't documented but will have to be made public to allow
-for feature parity between the Django Template Language and third-party
-template engines.
+The following private APIs might have to be made public to allow for feature
+parity between the Django Template Language and third-party template engines.
 
 Debug
 ~~~~~

@@ -4,7 +4,7 @@ DEP 182: Multiple Template Engines
 
 :DEP: 182
 :Type: Feature
-:Status: Accepted
+:Status: Final
 :Created: 2014-09-14
 :Last-Modified: 2015-10-02
 :Author: Aymeric Augustin
@@ -16,6 +16,7 @@ DEP 182: Multiple Template Engines
 .. contents:: Table of Contents
    :depth: 3
    :local:
+
 
 Abstract
 ========

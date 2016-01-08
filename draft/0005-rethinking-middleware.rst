@@ -19,10 +19,10 @@ DEP 0005: Re-thinking middleware
 Abstract
 ========
 
-The existing Django "middleware" abstraction suffers from an absence of
-strict layering and balanced in/out calls to a given middleware. This
-DEP proposes an improved abstraction for wrapping the request cycle in
-strictly layered pre-view and post-view actions.
+The existing Django "middleware" abstraction suffers from a lack of strict
+layering and balanced in/out calls to a given middleware. This DEP proposes an
+improved abstraction for wrapping the request cycle in layered pre-view and
+post-view actions.
 
 
 Motivation
@@ -68,9 +68,9 @@ This is the primary problem that this DEP intends to solve.
 Acknowledgment
 ==============
 
-The proposed API in this DEP is modelled on Pyramid's `Tween`_ concept
-(the author and implementor of this DEP developed a very similar idea
-independently at a Django sprint before reading about Tweens).
+The proposed API in this DEP is modelled on Pyramid's `Tween`_ concept. The
+author and implementor of this DEP developed a very similar idea independently
+at a Django sprint before reading about Tweens.
 
 .. _Tween: http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hooks.html#registering-tweens
 
@@ -87,12 +87,17 @@ A middleware factory can be written as a function that looks like this::
 
         def middleware(request):
             # code to be executed for each request before
-            # the view is called
+            # the view is called; equivalent to process_request
 
-            response = get_response(request)
+            try:
+                response = get_response(request)
+            except Exception as e:
+                # code to handle an exception that wasn't caught
+                # further up the chain, if desired. equivalent to
+                # process_exception.
 
             # code to be executed for each request/response after
-            # the view is called
+            # the view is called; equivalent to process_response
 
             return response
 
@@ -110,12 +115,22 @@ Or it can be written as a class with a ``__call__`` method, like this::
             # code to be executed for each request before
             # the view is called
 
-            response = self.get_response(request)
+            try:
+                response = self. get_response(request)
+            except Exception as e:
+                # code to handle an exception that wasn't caught
+                # further up the chain, if desired. equivalent to
+                # process_exception.
 
             # code to be executed for each request/response after
             # the view is called
 
             return response
+
+(In both examples, the ``try/except`` is not required if the middleware doesn't
+need to handle any exceptions, and if it is included it should probably catch
+something more specific than ``Exception``. The above just illustrates how to
+implement the generic equivalent of ``process_exception``.)
 
 In prose instead of examples: a middleware factory is a callable that
 takes a ``get_response`` callable and returns a middleware. A middleware
@@ -134,46 +149,30 @@ a wrapper method from the handler which takes care of view middleware,
 calling the view with appropriate url args, and template-response
 middleware; see below.)
 
-
-Disabling middleware
---------------------
-
-A middleware can be disabled at setup time, if it's not needed or not
-supported under the current settings.
-
-For a class-based middleware, this is achieved the same way as in
-current Django: by raising ``MiddlewareNotUsed`` from the ``__init__``
-method.
-
-A function middleware factory can either raise ``MiddlewareNotUsed``, or
-can simply return ``None`` instead of a middleware callable.
+This specification already encompasses the full functionality of
+``process_request``, ``process_response``, and ``process_exception``. It
+also allows more powerful idioms that aren't currently possible, like
+wrapping the call to ``get_response`` in a context manager
+(e.g. ``transaction.atomic``) or in a ``try/finally`` block.
 
 
 View and template-response middleware
 -------------------------------------
 
-The above examples already encompass the full functionality of
-``process_request`` (this is the code that goes before the call to
-``get_response``), ``process_response`` (the code that goes after), and
-``process_exception`` (just place the call to ``get_response`` within a
-``try/except`` block). It also allows more powerful idioms, like
-wrapping the call to ``get_response`` in a context manager
-(e.g. ``transaction.atomic``).
-
 This DEP does not propose to change the implementation of view
-middleware or template-response middleware (since these are really
-single-point hooks, not wrappers, and don't suffer from the same in/out
-balancing issue). A middleware that wishes to implement one or both of
-these hooks should be implemented in the class style, and should
-implement ``process_view`` and/or ``process_template_response`` methods,
-exactly as it would today.
+middleware or template-response middleware. These are single-point
+hooks, not wrappers, and don't suffer from the same in/out balancing
+issues. A middleware that wishes to implement one or both of these hooks
+should be implemented in the class style, and should implement
+``process_view`` and/or ``process_template_response`` methods, exactly
+as it would today.
 
 
 Changes in short-circuiting semantics
 -------------------------------------
 
-Under the new scheme, middleware really will behave more like an
-"onion", as described in the documentation. That is, when a middleware
+Under the new scheme, middleware will behave more like an "onion", as
+described in the documentation. That is, when a middleware
 short-circuits the upstream middleware and view by returning a response,
 that response will only pass through previous middleware in the list,
 rather than passing through the ``process_response`` methods of *all*
@@ -187,19 +186,32 @@ exception on the way out, it can just wrap its call to ``get_response``
 in a ``try/except``).
 
 
+Disabling middleware
+--------------------
+
+A middleware can be disabled at setup time, if it's not needed or not
+supported under the current settings.
+
+For a class-based middleware, this is achieved the same way as in
+current Django: by raising ``MiddlewareNotUsed`` from the ``__init__``
+method.
+
+A function middleware factory can either raise ``MiddlewareNotUsed``, or
+it can simply return the same ``get_response`` callable it was passed,
+instead of a new middleware callable; this has the same effect.
+
+
 Backwards Compatibility
 =======================
 
 "New-style" middleware factories cannot inter-operate
 backwards-compatibly in a single mixed list with old-style middlewares,
-because it is not possible to maintain both the "in/out balanced"
-invariant of the new and the existing short-circuiting behaviors of the
-old. This is why a new ``MIDDLEWARE`` setting is introduced to contain
-the new-style middleware factories. If the ``MIDDLEWARE`` setting is
-provided (it will initially be set to ``None`` in the global default
-settings), the old ``MIDDLEWARE_CLASSES`` setting will be ignored. If
-``MIDDLEWARE`` is not set, ``MIDDLEWARE_CLASSES`` will behave exactly as
-it does today.
+because the short-circuiting semantics of the two differ. This is why a
+new ``MIDDLEWARE`` setting is introduced to contain the new-style
+middleware factories. If the ``MIDDLEWARE`` setting is provided (it will
+initially be set to ``None`` in the global default settings), the old
+``MIDDLEWARE_CLASSES`` setting will be ignored. If ``MIDDLEWARE`` is not
+set, ``MIDDLEWARE_CLASSES`` will behave exactly as it does today.
 
 The implementation of this DEP will include new-style implementations of
 all middlewares included in Django; the current implementations will not
@@ -275,42 +287,20 @@ implemented as a simple function that took both ``request`` and
         # response-munging
         return response
 
-This approach turned out to have two disadvantages: it was less
+This approach turned out to have three disadvantages: it is less
 backwards-compatible, because it's not compatible with class-based
-middleware (when would a class be instantiated?), and it would be
-slower, since it requires Django to construct a new chain of closures
-for every request, whereas the factory approach allows the closure chain
-to be constructed just once and reused for each request.
-
-
-Using generators
-----------------
-
-It would be possible to eliminate the need to pass in a ``get_response``
-callable by turning middleware into generators which would ``yield`` the
-request, and then Django would call ``.send(response)`` on the generator
-object to pass back in the response. In that case a middleware body
-might look like this::
-
-    def simple_middleware(request):
-        # request-munging
-        response = yield request
-        # response-munging
-        return response
-
-This is clever; probably too clever. In the end it doesn't provide any
-useful benefits over the approach proposed above and takes advantage of
-Python features that are unfamiliar to many developers (generators that
-receive values).
+middleware (when would a class be instantiated?), it doesn't provide any
+mechanism for one-time setup or disabling, and it would be slower, since
+it requires Django to construct a new chain of closures for every
+request, whereas the factory approach allows the closure chain to be
+constructed just once and reused for each request.
 
 
 Reference Implementation
 ========================
 
-The reference implementation work-in-progress (which as of this writing
-doesn't yet implement the proposal described here, but rather an earlier
-iteration) can be found at
-https://github.com/django/django/pull/5591/files
+The reference implementation work-in-progress can be found at
+https://github.com/django/django/pull/5949/files
 
 
 Copyright

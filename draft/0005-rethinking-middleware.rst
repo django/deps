@@ -39,32 +39,34 @@ called on that same middleware in that same request cycle. Django itself has in
 the past included middleware (the now-defunct ``TransactionMiddleware``) that
 implicitly relied on this invariant.
 
-In fact, due to the short-circuiting behavior of various middleware methods,
-this invariant does not hold. It is possible for a middleware to have its
-``process_request`` method called, but then never see its ``process_response``
-or ``process_exception`` called for that request. It is also possible for a
-middleware to never see its ``process_request`` method called for a given
-request (because an earlier middleware's ``process_request`` returned a
-response), but still have its ``process_response`` or ``process_exception``
-method called on that response.
+In fact, due to the short-circuiting and exception-handling behavior of various
+middleware methods, this invariant does not hold. It is possible for a
+middleware to have its ``process_request`` method called, but then never see
+its ``process_response`` or ``process_exception`` called for that request
+(e.g. in case of an uncaught exception in a "later" middleware method).
+
+It is also possible for a middleware to never see its ``process_request``
+method called for a given request (because an earlier middleware's
+``process_request`` returned a response), but still have its
+``process_response`` or ``process_exception`` method called on that response.
 
 This lack of strict in/out layering makes it impossible to safely implement
 some types of middleware (such as ``TransactionMiddleware``), and requires
-verbose defensive programming: even if ``process_request`` sets a certain
+verbose defensive programming: e.g. even if ``process_request`` sets a certain
 attribute on the request, ``process_response`` on that same middleware can't
 assume that that attribute will be present on the request it receives.
 
 This is the primary problem that this DEP intends to solve.
 
-.. _middleware specification: https://docs.djangoproject.com/en/stable/topics/http/middleware/
+.. _the documentation: https://docs.djangoproject.com/en/stable/topics/http/middleware/
 
 
 Acknowledgment
 ==============
 
-The proposed API in this DEP is modelled on Pyramid's `Tween`_ concept
-(although the author and implementor of this DEP developed the same core idea
-independently at a Django sprint before reading about Tweens).
+The proposed API in this DEP is modelled on Pyramid's `Tween`_ concept (the
+author and implementor of this DEP developed a very similar idea independently
+at a Django sprint before reading about Tweens).
 
 .. _Tween: http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hooks.html#registering-tweens
 
@@ -113,7 +115,8 @@ Or it can be written as a class with a ``__call__`` method, like this::
 
 In prose instead of examples: a middleware factory is a callable that takes a
 ``get_response`` callable and returns a middleware. A middleware is a callable
-that takes a ``request`` and returns a ``response`` (just like a view!).
+that takes a ``request`` and returns a ``response``. (Just like a view! Turtles
+all the way down!)
 
 The ``get_response`` callable provided by Django might be the actual view (if
 this is the last listed middleware), or it might be the next middleware in the
@@ -151,10 +154,12 @@ The above examples already encompass the full functionality of
 call to ``get_response`` in a context manager (e.g. ``transaction.atomic``).
 
 This DEP does not propose to change the implementation of view middleware or
-template-response middleware. A middleware that wishes to implement one or both
-of these hooks should be implemented in the class style, and should implement
-``process_view`` and/or ``process_template_response`` methods exactly as it
-would today.
+template-response middleware (since these are really single-point hooks, not
+wrappers, and don't suffer from the same in/out balancing issue). A middleware
+that wishes to implement one or both of these hooks should be implemented in
+the class style, and should implement ``process_view`` and/or
+``process_template_response`` methods, exactly as it would today.
+
 
 Changes in short-circuiting semantics
 -------------------------------------
@@ -236,6 +241,9 @@ implementations in Django, and the conversion mixin, will be removed.
 
 Rationale
 =========
+
+The above specification has the advantage that a very similar scheme is already
+in use and battle-tested in another widely-used Python web framework, Pyramid.
 
 Alternatives considered and rejected:
 

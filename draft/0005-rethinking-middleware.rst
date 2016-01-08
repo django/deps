@@ -208,15 +208,21 @@ following::
             if hasattr(self, 'process_request'):
                 response = self.process_request(request)
             if not response:
-                response = self.get_response(request)
+                try:
+                    response = self.get_response(request)
+                except Exception as e:
+                    if hasattr(self, 'process_exception'):
+                        return self.process_exception(request, e)
+                    else:
+                        raise
             if hasattr(self, 'process_response'):
                 response = self.process_response(request, response)
             return response
 
-In most cases, this mixin will be sufficient to convert a middleware with full
-backwards-compatibility, and the new short-circuiting semantics will be
+In most cases, this mixin will be sufficient to convert a middleware with
+sufficient backwards-compatibility; the new short-circuiting semantics will be
 harmless or even beneficial to the existing middleware. In a few unusual cases,
-a middleware class may need more changes to adjust to the new semantics.
+a middleware class may need more invasive changes to adjust to the new semantics.
 
 
 Deprecation

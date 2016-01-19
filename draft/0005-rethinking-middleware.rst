@@ -255,8 +255,32 @@ implementation similar to the following::
 In most cases, this mixin will be sufficient to convert a middleware
 with sufficient backwards-compatibility; the new short-circuiting
 semantics will be harmless or even beneficial to the existing
-middleware. In a few unusual cases, a middleware class may need more
-invasive changes to adjust to the new semantics.
+middleware.
+
+In a few unusual cases, a middleware class may need more invasive
+changes to adjust to the new semantics. Some of these cases are
+documented here (and will also be documented in the upgrade guide in the
+Django documentation as part of the implementation of this PEP):
+
+
+Uncaught exceptions vs error responses
+--------------------------------------
+
+In the current request-handling logic, the handler transforms any
+exception that passes through all ``process_exception`` middleware
+uncaught into a response with appropriate status code (e.g. 404, 403,
+400, or 500), and then passes that response through the full chain of
+``process_response`` middleware.
+
+In new-style middleware, a given middleware only gets one shot at a
+given response or uncaught exception "on the way out," and will see
+either a returned response or an uncaught exception, but not both.
+
+This means that certain middleware which want to do something with all
+404 responses (for example, the ``RedirectFallbackMiddleware`` and
+``FlatpageFallbackMiddleware`` in ``django.contrib.redirects`` and
+``django.contrib.flatpages``) may now need to watch out for both a 404
+response and an uncaught ``Http404`` exception.
 
 
 Deprecation

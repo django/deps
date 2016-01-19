@@ -323,6 +323,50 @@ it requires Django to construct a new chain of closures for every
 request, whereas the factory approach allows the closure chain to be
 constructed just once and reused for each request.
 
+Using a new word
+----------------
+
+Django's use of the term ``middleware`` to mean "hooks for munging the
+request and/or response in between the web-server interface and the
+view" does not appear to be consistent with the primary historical use
+of that term in computing (e.g. see `the Wikipedia page`_ on
+middleware).
+
+.. _the Wikipedia page: https://en.wikipedia.org/wiki/Middleware
+
+Thus, some have suggested abandoning the term "middleware" with the
+deprecation of ``MIDDLEWARE_CLASSES`` and coining a new term (or
+borrowing a term like Pyramid's "Tween") for the new system described in
+this DEP.
+
+This DEP prefers instead to retain the use of the term "middleware."
+However it originated, Django's use of the term appears to already be
+widely shared in the web framework world, even beyond Python; it is used
+at least by `Flask`_, by `Rack`_, and by `WSGI`_ itself. The scheme
+introduced in this DEP is clearly an evolution of Django's existing
+middleware, not a brand-new concept, so introducing a brand-new term for
+it is likely to cause more confusion than it solves.
+
+.. _Flask: http://werkzeug.pocoo.org/docs/0.11/middlewares/
+.. _Rack: https://github.com/rack/rack/wiki/List-of-Middleware
+.. _WSGI: http://wsgi.readthedocs.org/en/latest/libraries.html
+
+
+Pluralization
+-------------
+
+Some have suggested naming the new setting ``MIDDLEWARES`` instead of
+``MIDDLEWARE``.  There appears to be some debate over the correct
+pluralization of "middleware," ranging from those who assert that
+"middleware" is already a mass noun (like "furniture") which can never
+be used in the singular (and thus we should speak of "a middleware
+component," never "a middleware"), to those who prefer "a middleware"
+and "middlewares."
+
+This DEP chooses to paint the bikeshed an intermediate color, in which
+we may speak of "a middleware" but the plural of "middleware" remains
+"middleware."
+
 
 Reference Implementation
 ========================

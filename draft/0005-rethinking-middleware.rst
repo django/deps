@@ -210,9 +210,12 @@ backwards-compatibly in a single mixed list with old-style middlewares,
 because the short-circuiting semantics of the two differ. This is why a
 new ``MIDDLEWARE`` setting is introduced to contain the new-style
 middleware factories. If the ``MIDDLEWARE`` setting is provided (it will
-initially be set to ``None`` in the global default settings), the old
-``MIDDLEWARE_CLASSES`` setting will be ignored. If ``MIDDLEWARE`` is not
-set, ``MIDDLEWARE_CLASSES`` will behave exactly as it does today.
+initially be set to ``None`` in the global default settings), new-style
+middleware is used. If ``MIDDLEWARE`` is not set, ``MIDDLEWARE_CLASSES``
+will behave exactly as it does today. If both are set to non-default
+values, the checks framework will flag it as a warning, but
+``MIDDLEWARE`` will take priority and ``MIDDLEWARE_CLASSES`` will not be
+used.
 
 The implementation of this DEP will include new-style implementations of
 all middlewares included in Django; the current implementations will not

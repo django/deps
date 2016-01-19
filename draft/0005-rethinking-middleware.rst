@@ -62,7 +62,7 @@ attribute will be present on the request it receives.
 
 This is the primary problem that this DEP intends to solve.
 
-.. _the documentation: https://docs.djangoproject.com/en/stable/topics/http/middleware/
+.. _the documentation: https://docs.djangoproject.com/en/1.9/topics/http/middleware/
 
 
 Acknowledgment
@@ -73,6 +73,7 @@ author and implementor of this DEP developed a very similar idea independently
 at a Django sprint before reading about Tweens.
 
 .. _Tween: http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hooks.html#registering-tweens
+
 
 Specification
 =============

@@ -27,32 +27,32 @@ particularly WebSockets — don't work in this simple round-trip way. Adding
 support for these protocols to today's Django apps is can be complicated and
 difficult.
 
-Thus, Channels. The top-line feature of Channels is simple, easy-to-use support
+Thus, channels. The top-line feature of channels is simple, easy-to-use support
 for WebSockets. Channels makes it very easy to write apps that support
-WebSockets alongside traditional HTTP views. Notably, Channels does not
+WebSockets alongside traditional HTTP views. Notably, channels does not
 introduce asyncio, gevent, or any other async code to Django app; all the code
 users write runs synchronously in a worker process or thread. This is primarily
 an accessiblity play: it's traditionally been very easy to write a "Hello World"
-HTTP view; the goal of Channels is to make it just that easy to write "Hello
+HTTP view; the goal of channels is to make it just that easy to write "Hello
 World" WebSockets views.
 
-Under the hood, Channels does a fair bit more. In a nutshell, Channels replaces
+Under the hood, channels does a fair bit more. In a nutshell, channels replaces
 Django's request/response cycle with *messages* that are sent across *channels*.
-This means that adding Channels to Django enabled not just WebSocket support,
+This means that adding channels to Django enabled not just WebSocket support,
 but support for any future protocol (whether uni- or bi-directional). Channels
 also allows for background tasks to run out-of-band of the web servers, similar
 to some of the feaures of Celery or Python-RQ (though its featureset is far
 smaller, and it is not intended to replace most uses of task queues)
 
 Although this is a fairly profound change to Django's internals, it's also fully
-backwards-compatible. Django will continue to run under WSGI, and Channels
+backwards-compatible. Django will continue to run under WSGI, and channels
 barely touches the WSGI codepaths. Thus, the new features only "appear" when
-running Django in "Channels mode".
+running Django in "channels mode".
 
 Specification
 =============
 
-The section summarizes the basic concepts of Channels, shows a simple example,
+The section summarizes the basic concepts of channels, shows a simple example,
 and explains the implementation plan. This is intended as a high-level overview;
 for detailed specifications, documentation, and examples see `the Channels
 documentation <https://channels.readthedocs.io/>`_.
@@ -62,15 +62,19 @@ Channels Concepts
 
 The core of the system is, unsurprisingly, a datastructure called a *channel*.
 What is a channel? It is an *ordered, first-in first-out queue* with message
-expiry and at-most-once delivery to only one listener at a time.
+expiry, capacity, and at-most-once delivery to only one listener at a time.
 
 You can think of it as analogous to a task queue - messages are put onto the
 channel by producers, and then given to just one of the consumers listening to
 that channel.
 
-For more details, see `What is a Channel? <https://channels.readthedocs.io/en/latest/concepts.html#what-is-a-channel>`_.
+For more details, see `What is a channel? <https://channels.readthedocs.io/en/latest/concepts.html#what-is-a-channel>`_.
 
-To deploy an app using Channels, instead of running a WSGI server, you'll run a
+The other key concept is Groups, a set of channels that you can send messages
+to and get them delivered to all channels in the group. Groups are
+network-transparent and look the same across all 
+
+To deploy an app using channels, instead of running a WSGI server, you'll run a
 few different things:
 
 * An *interface server* that handles HTTP and WebSocket connections. 
@@ -108,10 +112,10 @@ few different things:
        implement workers in other Python web frameworks, such as Flask,
        and it may even be possible to implement workers in other languages.
 
-An example app using Channels
+An example app using channels
 -----------------------------
 
-To make this concrete, let's look at a simple example app using Channels.  The
+To make this concrete, let's look at a simple example app using channels.  The
 app is a simple real-time chat app — like a very, very light-weight Slack. There are
 a bunch of rooms, and everyone in the same room can chat, in real-time, with
 each other using WebSockets. This section will show off the highlights;
@@ -213,7 +217,7 @@ Integration plan
 We propose the following integration plan:
 
 * Merge `Channels <https://github.com/andrewgodwin/channels>`_ into Django 1.10.
-  Document the Channels APIs as "provisional" (using the terminalogy from
+  Document the channels APIs as "provisional" (using the terminalogy from
   `PEP 411 <https://www.python.org/dev/peps/pep-0411/>`_) so that we have room
   to make API changes. We think changes will be fairly unlikely -- the current
   design represents over two years of design work -- but we should leave the 
@@ -237,7 +241,7 @@ We propose the following integration plan:
 Motivation
 ==========
 
-The primary motivation for Channels is that of a percieved gap in Django's
+The primary motivation for channels is that of a percieved gap in Django's
 abilities; as the Web grows and evolves, the original view-based design has
 lasted surprisingly well, but is starting to chafe when presented with some
 of the new technologies the web is growing, particularly WebSockets.
@@ -253,14 +257,14 @@ their own, Django loses out on the potential for a community of apps, examples
 and code around WebSockets that has brought it as far as it has today for
 normal HTTP and view code.
 
-Thus, Channels' goal is to create a single, unified interface for Django
+Thus, channels' goal is to create a single, unified interface for Django
 developers to write their applications against (the consumer and routing model
 shown above), and to provide a good abstraction that allows extension and
 adaptation of the underlying coordination logic by end-users, specialists, or
 the project itself in the future (ASGI).
 
 Like the rest of Django, we cannot hope to satisfy everyone's needs, and in
-particular it is unlikely Channels could be used as-is at huge scale; however,
+particular it is unlikely channels could be used as-is at huge scale; however,
 no generic component survives that trip, and any resulting code always ends up
 very company- and situation-specific.
 
@@ -271,7 +275,7 @@ communication requirements, but the growth of existing integrations with other
 platforms like Slack provides ample opportunity for Django to position itself
 as an easy-to-use and reliable solution for all sorts of backend needs.
 
-The core Channels design is protocol-agnostic; while it ships with HTTP and
+The core channels design is protocol-agnostic; while it ships with HTTP and
 WebSocket support, work is either planned or already underway
 for Slack, IRC, email, HTTP/2 and SMS interface servers, allowing developers
 to use the same, familiar consumers-and-routing structure to service all kinds
@@ -296,7 +300,7 @@ as close as possible.
 Rationale
 =========
 
-There are several obvious alternatives to Channels that could be taken, and
+There are several obvious alternatives to channels that could be taken, and
 some major decisions in its design that have at first glance equally viable
 alternatives. This section tries to address some of the more important ones.
 
@@ -342,7 +346,7 @@ Channels' core abstraction, the channel, has at-most-once delivery. This choice
 is one side of a binary choice that all queue systems must make; at-most-once,
 or at-least-once.
 
-The situations that Channels will actually drop messages in are quite small;
+The situations that channels will actually drop messages in are quite small;
 mostly, they revolve around servers unexpectedly dying, or inordinate amounts
 of traffic filling up the channel capacity. In general, day-to-day use, users
 would likely see less than 0.01% of messages dropped.
@@ -366,7 +370,7 @@ and interface servers in the same deployment see the same channels and groups.
 
 This introduces what may seem like unnecessary complexity, but it addresses
 a key scaling problem that any project that grows past a single node must
-consider - broadcast. Many applications for Channels, such as chat systems,
+consider - broadcast. Many applications for channels, such as chat systems,
 notifications, live blogs and status GUIs, require the ability to send messages
 to an end-user WebSocket (or other open socket) from any number of places in
 the system - model code, consumers on other sockets, CLI tools, etc.
@@ -378,16 +382,16 @@ broadcast messages to large groups of connected sockets would likely have been
 very inefficient in terms of network traffic without the interface servers also
 understanding the network routing system at a higher level.
 
-Thus, the network transparency is built-in to Channels at the core, allowing
+Thus, the network transparency is built-in to channels at the core, allowing
 not only broadcast but a host of other useful features, like the ability to
 dedicate and tune machines to a single role (interface, worker, or worker on
 specific channels), and the lack of requirement for session stickiness.
 
 Small-scale deployments that only run on a single machine can still use a
-machine- or process-local channel backend, and Channels comes with one of each;
+machine- or process-local channel backend, and channels comes with one of each;
 scaling down is important, too.
 
-The ASGI specification, which defines the channel and group transport Channels
+The ASGI specification, which defines the channel and group transport channels
 uses, is designed to only impose as many guarantees and provide just enough API
 that it can be sensibly built against while allowing flexibility in
 implementation; writing a network-transparent channel layer is difficult, but
@@ -413,7 +417,7 @@ before others have finished executing.
 
 Solving this problem in a general way in a networked system is impossible to
 do without a significant performance hit, either by coordination or session
-stickiness. For this reason, Channels leaves the non-global-ordering,
+stickiness. For this reason, channels leaves the non-global-ordering,
 simultaneous style as the default, and provides a decorator, ``enforce_ordering``,
 that provides one of two levels of ordering and exclusivity guarantees at
 different levels of performance degredation.
@@ -439,7 +443,7 @@ Backwards Compatibility
 Channels is fully backwards-compatible. Until you switch into ASGI mode by
 deploying an interface server and running workers, Django continues to use
 the WSGI codepaths. This means that performance under WSGI is unchanged
-by the introduction of Channels.
+by the introduction of channels.
 
 The underlying architecture *does* change substantially after switching into
 ASGI mode, but that's an explicit opt-in step, and thus has no backwards-

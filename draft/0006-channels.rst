@@ -3,7 +3,7 @@ DEP 0006: Channels
 ==================
 
 :DEP: 0006
-:Author: Jacob Kaplan-Moss
+:Author: Jacob Kaplan-Moss, Andrew Godwin
 :Implementation Team: Andrew Godwin et al.
 :Shepherd: Andrew Godwin, Jacob Kaplan-Moss
 :Status: Draft
@@ -237,18 +237,201 @@ We propose the following integration plan:
 Motivation
 ==========
 
-TODO:
-- background
-- "real-time web" and looking forward (apps, new protocols)
-- accessibilty play
+The primary motivation for Channels is that of a percieved gap in Django's
+abilities; as the Web grows and evolves, the original view-based design has
+lasted surprisingly well, but is starting to chafe when presented with some
+of the new technologies the web is growing, particularly WebSockets.
+
+Django projects have had to take on external, third-party solutions to try and
+fill this hole, whether they are single-use Python servers that proxy into
+Django in a variety of ways, or endpoints in entirely different languages
+altogether that have more direct first-class support for non-request-response
+workflows (such as Node.js or Go).
+
+Every time a Django developer has to go and find a solution, adapt it, or write
+their own, Django loses out on the potential for a community of apps, examples
+and code around WebSockets that has brought it as far as it has today for
+normal HTTP and view code.
+
+Thus, Channels' goal is to create a single, unified interface for Django
+developers to write their applications against (the consumer and routing model
+shown above), and to provide a good abstraction that allows extension and
+adaptation of the underlying coordination logic by end-users, specialists, or
+the project itself in the future (ASGI).
+
+Like the rest of Django, we cannot hope to satisfy everyone's needs, and in
+particular it is unlikely Channels could be used as-is at huge scale; however,
+no generic component survives that trip, and any resulting code always ends up
+very company- and situation-specific.
+
+Moreover, WebSockets are likely the tip of the iceberg; not only does the
+growth of connected devices and the "Internet of Things" mean that Django has
+to communicate with an ever-growing number of devices with different
+communication requirements, but the growth of existing integrations with other
+platforms like Slack provides ample opportunity for Django to position itself
+as an easy-to-use and reliable solution for all sorts of backend needs.
+
+The core Channels design is protocol-agnostic; while it ships with HTTP and
+WebSocket support, work is either planned or already underway
+for Slack, IRC, email, HTTP/2 and SMS interface servers, allowing developers
+to use the same, familiar consumers-and-routing structure to service all kinds
+of non-request-response patterns; not just WebSockets.
+
+Channels' end goal is to provide an easy, accessible path for new and existing
+Django projects to easily add WebSocket (and other protocol) support in a way
+that performs well at small and medium scales, and which cleanly gets out of
+the way and leaves you with a good abstraction to build upon once you reach
+large scale.
+
+We should not lose sight of the fact that one of our jobs as a framework is
+to choose tradeoffs for our users and present them with a single, cohesive
+approach that helps inform good project architecture and foster a community of
+third-party solutions, extensions and additions to the code; without things
+like a standardised view, middleware, model information and settings system,
+Django would not be where it is today. Channels takes that to the next missing
+component - the "real-time", evented web, and provides a design model that is
+a balance between flexible and rigid, trying to match the Django philosophy
+as close as possible.
 
 Rationale
 =========
 
-TODO:
-- why channels?
-- not async because....
-- altneratives
+There are several obvious alternatives to Channels that could be taken, and
+some major decisions in its design that have at first glance equally viable
+alternatives. This section tries to address some of the more important ones.
+
+In-process async/asyncio
+------------------------
+
+Python has had in-process async support for some time with solutions like
+Twisted and gevent, and with the introduction of ``asyncio`` in Python 3,
+an officially-blessed solution, too.
+
+Putting Django's Python 2 compatability requirement aside, the main argument
+against using these for this design was one of both feasibility and 
+developer-friendliness. Making the entirely of Django run asynchronously would
+have been a huge challenge; we have over a decade of synchronous code, and
+going through all of it to fix and audit it would have taken a multi-year
+effort on the part of many developers, resources Django is unlikely to have
+in the near future.
+
+Developer-friendliness comes in when we ask new or async-inexperienced
+programmers to jump in and write async code as part of even their first
+"hello world" WebSocket example; due to the way Python async works, we would
+have to provide parallel sync and async versions of most of the API if we
+were to maintain backwards compatibility, meaning developers would have to
+sit down and slowly work out what to use in which case (with a failure case -
+using synchronous code in an async context, or setting yourself up for occasional
+deadlocks or livelocks - that is not immediately apparent
+and can in fact silently live in a codebase for months or years until it causes
+performance problems).
+
+Channels tries to take the benefit of Python's async support, and apply it in
+the interface servers, which run as 100% asynchronous code, but separately from
+the user's main business logic. There's nothing preventing advanced users from
+writing their own interface or worker servers that do highly-asynchronous
+operations using an entirely async stack - one can imagine a custom worker
+server that did parallel fetches on APIs, for example - but we should not force
+this into the basic abstraction users have to work with, and instead provide
+something familiar, safe, and that performs reasonably well.
+
+At-most-once delivery
+---------------------
+
+Channels' core abstraction, the channel, has at-most-once delivery. This choice
+is one side of a binary choice that all queue systems must make; at-most-once,
+or at-least-once.
+
+The situations that Channels will actually drop messages in are quite small;
+mostly, they revolve around servers unexpectedly dying, or inordinate amounts
+of traffic filling up the channel capacity. In general, day-to-day use, users
+would likely see less than 0.01% of messages dropped.
+
+The choice of delivery guarantee informs the design of the rest of the solution,
+as well. With at-most-once, we will have to allow for retry logic and coding
+to cope with failure - something Django developers are very used to given the
+non-guaranteed nature of HTTP and browsers. If we were to have chosen
+at-least-once, however, we would have had to introduce a whole deduplication
+system and try and educate developers that their consumer code might be run
+multiple times per message, on different worker machines; a situation the
+Django community has less experience dealing with and which is arguably harder
+to resolve in a system that also deals with HTTP's dropped connections and
+request queue overloads.
+
+Network transparency
+--------------------
+
+The channel layer is, by design, network-transparent; that is, all worker
+and interface servers in the same deployment see the same channels and groups.
+
+This introduces what may seem like unnecessary complexity, but it addresses
+a key scaling problem that any project that grows past a single node must
+consider - broadcast. Many applications for Channels, such as chat systems,
+notifications, live blogs and status GUIs, require the ability to send messages
+to an end-user WebSocket (or other open socket) from any number of places in
+the system - model code, consumers on other sockets, CLI tools, etc.
+
+Without the network transparency, we would have had to build a separate
+infrastructure to enable the transport of these messages around, as well as
+a second abstraction just for these cross-network messages. Routing large
+broadcast messages to large groups of connected sockets would likely have been
+very inefficient in terms of network traffic without the interface servers also
+understanding the network routing system at a higher level.
+
+Thus, the network transparency is built-in to Channels at the core, allowing
+not only broadcast but a host of other useful features, like the ability to
+dedicate and tune machines to a single role (interface, worker, or worker on
+specific channels), and the lack of requirement for session stickiness.
+
+Small-scale deployments that only run on a single machine can still use a
+machine- or process-local channel backend, and Channels comes with one of each;
+scaling down is important, too.
+
+The ASGI specification, which defines the channel and group transport Channels
+uses, is designed to only impose as many guarantees and provide just enough API
+that it can be sensibly built against while allowing flexibility in
+implementation; writing a network-transparent channel layer is difficult, but
+not tying Django to a single one and decoupling it like this allows both
+iteration on the one or two preferred solutions, and lets large companies or
+projects built out their own to suit their specific needs.
+
+Multi-listener ordering
+-----------------------
+
+While channels guarantees ordering of messages on a channel when there is a
+single listener - for example, when an interface server is reading a response
+body to send back to a connected client - it does not guarantee global ordering
+or mutually exclusive consumer execution when there is more than one connected
+listener.
+
+This is not a problem for listeners to channels like ``http.request``; all of
+the consumers run on the messages in that channel are entirely independent and
+can run simultaneously. It becomes an issue for channels like
+``websocket.receive`` where a client is sending WebSocket frames rapidly, such
+that several different workers pick messages off the queue from the same client
+before others have finished executing.
+
+Solving this problem in a general way in a networked system is impossible to
+do without a significant performance hit, either by coordination or session
+stickiness. For this reason, Channels leaves the non-global-ordering,
+simultaneous style as the default, and provides a decorator, ``enforce_ordering``,
+that provides one of two levels of ordering and exclusivity guarantees at
+different levels of performance degredation.
+
+Alternatives
+------------
+
+There are many alternative architectures to the ones proposed by this DEP, and
+each has their advantages and disadvantages. Channels does not intend to make
+it impossible to use these; indeed, if someone wishes to run an
+evented system, it is designed so that the message formats, consumer and
+routing abstraction is re-useable.
+
+However, based on several years of prototypes, design work, and the existing
+design of Django, it is the authors' belief that this design represents the
+best set of compromises for the large majority of current and future Django
+projects.
+
 
 Backwards Compatibility
 =======================

@@ -231,7 +231,7 @@ We propose the following integration plan:
 
 .. [#] We may want to move these components under the Django github org to 
        signify their "more official" status. Since that's an that's orthagonal
-       to the technical work proposed by this PEP, this PEP takes no possition 
+       to the technical work proposed by this DEP, this DEP takes no position 
        on this question.
 
 Motivation

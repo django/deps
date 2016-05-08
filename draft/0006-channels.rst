@@ -72,7 +72,8 @@ For more details, see `What is a channel? <https://channels.readthedocs.io/en/la
 
 The other key concept is groups, sets of channels that you can send messages
 to and get them delivered to all channels in the group. Groups are
-network-transparent and look the same across all 
+network-transparent and look the same across all machines running the same
+*channel layer*.
 
 To deploy an app using channels, instead of running a WSGI server, you'll run a
 few different things:

@@ -33,15 +33,16 @@ WebSockets alongside traditional HTTP views. Notably, Channels does not
 introduce asyncio, gevent, or any other async code to Django app; all the code
 users write runs synchronously in a worker process or thread. This is primarily
 an accessiblity play: it's traditionally been very easy to write a "Hello World"
-HTTP view; the goal of Channls is to make it just that easy to write "Hello
+HTTP view; the goal of Channels is to make it just that easy to write "Hello
 World" WebSockets views.
 
 Under the hood, Channels does a fair bit more. In a nutshell, Channels replaces
 Django's request/response cycle with *messages* that are sent across *channels*.
 This means that adding Channels to Django enabled not just WebSocket support,
-but support for any future protocol (weather uni- or bi-directional). Channels
+but support for any future protocol (whether uni- or bi-directional). Channels
 also allows for background tasks to run out-of-band of the web servers, similar
-to some of the feaures of Celery or Python-RQ.
+to some of the feaures of Celery or Python-RQ (though its featureset is far
+smaller, and it is not intended to replace most uses of task queues)
 
 Although this is a fairly profound change to Django's internals, it's also fully
 backwards-compatible. Django will continue to run under WSGI, and Channels
@@ -111,7 +112,7 @@ An example app using Channels
 -----------------------------
 
 To make this concrete, let's look at a simple example app using Channels.  The
-appa simple real-time chat app — like a very, very light-weight Slack. There are
+app is a simple real-time chat app — like a very, very light-weight Slack. There are
 a bunch of rooms, and everyone in the same room can chat, in real-time, with
 each other using WebSockets. This section will show off the highlights;
 for full details see `the code on Github <https://github.com/jacobian/channels-example>`_

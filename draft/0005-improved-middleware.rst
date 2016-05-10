@@ -4,12 +4,12 @@ DEP 0005: Improved middleware
 
 :DEP: 0005
 :Author: Carl Meyer
-:Implementation Team: Florian Apolloner
+:Implementation Team: Florian Apolloner, Tim Graham
 :Shepherd: Carl Meyer
 :Status: Draft
 :Type: Feature
 :Created: 2016-01-07
-:Last-Modified: 2016-01-07
+:Last-Modified: 2016-05-10
 
 .. contents:: Table of Contents
    :depth: 3
@@ -19,10 +19,10 @@ DEP 0005: Improved middleware
 Abstract
 ========
 
-The existing Django "middleware" abstraction suffers from a lack of strict
-layering and balanced in/out calls to a given middleware. This DEP proposes an
-improved abstraction for wrapping the request cycle in layered pre-view and
-post-view actions.
+The existing Django "middleware" abstraction suffers from a lack of
+strict layering and balanced in/out calls to a given middleware. This
+DEP proposes an improved abstraction for wrapping the request cycle in
+layered pre-view and post-view actions.
 
 
 Motivation
@@ -68,9 +68,9 @@ This is the primary problem that this DEP intends to solve.
 Acknowledgment
 ==============
 
-The proposed API in this DEP is modelled on Pyramid's `Tween`_ concept. The
-author and implementor of this DEP developed a very similar idea independently
-at a Django sprint before reading about Tweens.
+The proposed API in this DEP is modelled on Pyramid's `Tween`_
+concept. The author and implementor of this DEP developed a very similar
+idea independently at a Django sprint before reading about Tweens.
 
 .. _Tween: http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hooks.html#registering-tweens
 
@@ -128,10 +128,11 @@ Or it can be written as a class with a ``__call__`` method, like this::
 
             return response
 
-(In both examples, the ``try/except`` is not required if the middleware doesn't
-need to handle any exceptions, and if it is included it should probably catch
-something more specific than ``Exception``. The above just illustrates how to
-implement the generic equivalent of ``process_exception``.)
+(In both examples, the ``try/except`` is not required if the middleware
+doesn't need to handle any exceptions, and if it is included it should
+probably catch something more specific than ``Exception``. The above
+just illustrates how to implement the generic equivalent of
+``process_exception``.)
 
 In prose instead of examples: a middleware factory is a callable that
 takes a ``get_response`` callable and returns a middleware. A middleware
@@ -372,7 +373,7 @@ Reference Implementation
 ========================
 
 The reference implementation work-in-progress can be found at
-https://github.com/django/django/pull/5949/files
+https://github.com/django/django/pull/6501/files
 
 
 Copyright

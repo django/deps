@@ -289,9 +289,11 @@ Deprecation
 
 The fallback from a missing ``MIDDLEWARE`` setting to
 ``MIDDLEWARE_CLASSES`` will be subject to a normal deprecation path. At
-the conclusion of that deprecation path, support for the fallback, the
-old-style middleware implementations in Django, and the conversion
-mixin, will be removed.
+the conclusion of that deprecation path, support for the fallback and
+the old-style middleware implementations in Django will be removed. The
+compatibility mixin will begin its own deprecation path at that
+point. (This allows warning-free use of the compatibility mixin
+throughout the deprecation path for ``MIDDLEWARE_CLASSES``).
 
 
 Rationale

@@ -277,11 +277,12 @@ In new-style middleware, a given middleware only gets one shot at a
 given response or uncaught exception "on the way out," and will see
 either a returned response or an uncaught exception, but not both.
 
-This means that certain middleware which want to do something with all
-404 responses (for example, the ``RedirectFallbackMiddleware`` and
-``FlatpageFallbackMiddleware`` in ``django.contrib.redirects`` and
-``django.contrib.flatpages``) may now need to watch out for both a 404
-response and an uncaught ``Http404`` exception.
+This means that, for example, certain middleware which want to do
+something with all 404 responses (for example, the
+``RedirectFallbackMiddleware`` and ``FlatpageFallbackMiddleware`` in
+``django.contrib.redirects`` and ``django.contrib.flatpages``) may now
+need to watch out for both a 404 response and an uncaught ``Http404``
+exception.
 
 The implementation of this DEP adds an ``ExceptionMiddleware`` which
 converts known types of uncaught exceptions into the appropriate HTTP
@@ -289,9 +290,8 @@ response (e.g. converts an ``Http404`` exception to a 404 HTTP
 response). This middleware is always automatically applied as the
 outer-most middleware. Other middleware can also inherit from
 ``ExceptionMiddleware`` to ensure that exceptions are converted to
-responses before their own logic runs: this can save a middleware that
-needs to handle e.g. all 404 responses (like Django's own
-``FlatpageFallbackMiddleware`` and ``RedirectFallbackMiddleware``) from
+responses before their own logic runs; this is how
+``FlatpageFallbackMiddleware`` and ``RedirectFallbackMiddleware`` avoid
 having to manually check for both the response status code and the
 exception.
 

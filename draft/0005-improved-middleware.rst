@@ -9,7 +9,7 @@ DEP 0005: Improved middleware
 :Status: Draft
 :Type: Feature
 :Created: 2016-01-07
-:Last-Modified: 2016-05-10
+:Last-Modified: 2016-05-12
 
 .. contents:: Table of Contents
    :depth: 3
@@ -142,8 +142,8 @@ like a view! Turtles all the way down!)
 The ``get_response`` callable provided by Django might be the actual
 view (if this is the last listed middleware), or it might be the next
 middleware in the chain. The current middleware doesn't need to know or
-care what exactly it is -- just that it represents "upstream", and that
-it also takes a request and returns a response.
+care what exactly it is -- just that it represents "the remainder of
+request processing", and that it takes a request and returns a response.
 
 (The above is a slight simplification -- the ``get_response`` callable
 for the last middleware in the chain won't be the actual view, it'll be
@@ -175,10 +175,10 @@ Changes in short-circuiting semantics
 
 Under the new scheme, middleware will behave more like an "onion", as
 described in the documentation. That is, when a middleware
-short-circuits the upstream middleware and view by returning a response,
-that response will only pass through previous middleware in the list,
-rather than passing through the ``process_response`` methods of *all*
-middleware (including some who never got a crack at
+short-circuits the following middleware and the view by returning a
+response, that response will only pass through previous middleware in
+the list, rather than passing through the ``process_response`` methods
+of *all* middleware (including some who never got a crack at
 ``process_request``), as occurs today.
 
 Similarly, a middleware that modifies the request on the way in and does

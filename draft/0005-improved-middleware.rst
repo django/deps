@@ -117,7 +117,7 @@ Or it can be written as a class with a ``__call__`` method, like this::
             # the view is called
 
             try:
-                response = self. get_response(request)
+                response = self.get_response(request)
             except Exception as e:
                 # code to handle an exception that wasn't caught
                 # further up the chain, if desired. equivalent to
@@ -152,10 +152,12 @@ calling the view with appropriate url args, and template-response
 middleware; see below.)
 
 This specification already encompasses the full functionality of
-``process_request``, ``process_response``, and ``process_exception``. It
-also allows more powerful idioms that aren't currently possible, like
-wrapping the call to ``get_response`` in a context manager
-(e.g. ``transaction.atomic``) or in a ``try/finally`` block.
+``process_request``, ``process_response``, and ``process_exception``
+(with some differences in short-circuiting behavior discussed below
+under "Backwards Compatibility"). It also allows more powerful idioms
+that aren't currently possible, like wrapping the call to
+``get_response`` in a context manager (e.g. ``transaction.atomic``) or
+in a ``try/finally`` block.
 
 
 View and template-response middleware
@@ -294,6 +296,29 @@ responses before their own logic runs; this is how
 ``FlatpageFallbackMiddleware`` and ``RedirectFallbackMiddleware`` avoid
 having to manually check for both the response status code and the
 exception.
+
+
+Seeing all responses
+--------------------
+
+An old-style middleware's ``process_response`` method would see (almost)
+all outbound responses, even short-circuit responses from the
+``process_request`` method of an earlier-listed middleware. This was
+often unexpected and caused problems (middleware authors often assumed
+that their ``process_request`` and ``process_response`` methods would
+always be called as a pair), but it did enable a form of "modify _all_
+outgoing responses" that doesn't work under the new system (unless your
+middleware is listed first, or any middleware listed before it don't
+short-circuit).
+
+In practice, though, this use-case was never complete: a middleware
+still wouldn't see any changes to the responses from the
+``process_response`` methods of earlier-listed middlewares. Due to this,
+and the widespread impression that Django's middleware _already_
+implemented onion-style short-circuiting, middleware that desire to see
+all outgoing responses generally already instruct their users to place
+them first (or at least early) in the middleware list. This advice will
+remain both correct and necessary under the new system.
 
 
 Deprecation

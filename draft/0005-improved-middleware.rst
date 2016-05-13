@@ -319,6 +319,12 @@ all outgoing responses generally already instruct their users to place
 them first (or at least early) in the middleware list. This advice will
 remain both correct and necessary under the new system.
 
+The DEP author conducted a GitHub code search looking for middleware
+combinations in existing projects that couldn't work correctly under the
+new semantics, and was unable to find any examples. Also, the fact that
+Pyramid uses a very similar scheme and has not had problems in this area
+is encouraging.
+
 
 Deprecation
 -----------

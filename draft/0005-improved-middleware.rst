@@ -184,10 +184,9 @@ of *all* middleware (including some who never got a crack at
 ``process_request``), as occurs today.
 
 Similarly, a middleware that modifies the request on the way in and does
-pass it on upstream can be guaranteed that it will always see the
-response on the way back out. (If it also wants to see any uncaught
-exception on the way out, it can just wrap its call to ``get_response``
-in a ``try/except``).
+pass it on can be guaranteed that it will always see the response on the
+way back out. (If it also wants to see any uncaught exception on the way
+out, it can just wrap its call to ``get_response`` in a ``try/except``).
 
 
 Disabling middleware

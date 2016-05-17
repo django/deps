@@ -6,10 +6,10 @@ DEP 0005: Improved middleware
 :Author: Carl Meyer
 :Implementation Team: Florian Apolloner, Tim Graham
 :Shepherd: Carl Meyer
-:Status: Draft
+:Status: Final
 :Type: Feature
 :Created: 2016-01-07
-:Last-Modified: 2016-05-12
+:Last-Modified: 2016-05-13
 
 .. contents:: Table of Contents
    :depth: 3

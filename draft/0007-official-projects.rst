@@ -80,19 +80,19 @@ project.
 Adopting a project to be an official Django project consists of a number
 of phases, which are:
 
-1. `Pre-proposal`_ — a project looks like it may be worth adopting into Django
+1. `Pre-proposal`_: a project looks like it may be worth adopting into Django
    officially and initial discussions about the potential are had.
 
-2. `Forming a team`_ — the project gathers together an official maintenance
+2. `Forming a team`_: the project gathers together an official maintenance
    team including a core shepherd.
 
-3. `Discussion and debate`_ — the community discusses the project and the
+3. `Discussion and debate`_: the community discusses the project and the
    merits of making it an official Django project.
 
-4. `Review & Resolution`_ — the project proposal is reviewed by the Technical
+4. `Review & Resolution`_: the project proposal is reviewed by the Technical
    Board and a decision made if it should be adopted.
 
-5. `Adoption`_ — the project is officially adopted and moved into Django
+5. `Adoption`_: the project is officially adopted and moved into Django
    ownership and maintenance.
 
 Pre-proposal
@@ -128,7 +128,7 @@ including:
 
 Maintenance Team
     One or more people who are committed to maintaining the project once it
-    is part of Django. A project must have an active and willing maintenance
+    is adopted. A project must have an active and willing maintenance
     team to be adopted, and at least one member of the team must be willing and
     able to respond to security issues filed against the project in a timely
     manner.

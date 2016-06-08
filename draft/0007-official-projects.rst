@@ -9,7 +9,7 @@ DEP 0007: Official Django Projects
 :Status: Draft
 :Type: Process
 :Created: 2016-06-01
-:Last-Modified: 2016-06-01
+:Last-Modified: 2016-06-08
 
 .. contents:: Table of Contents
    :depth: 3

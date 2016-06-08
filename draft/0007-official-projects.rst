@@ -38,14 +38,15 @@ increased exposure, existing project infrastructure and process (like the
 security reporting process), and lend them greater credibility for larger,
 more risk-averse companies and projects who aren't sure what option to pick.
 
-It also helps Django as a project overall; adopting external projects that
+It also helps Django as a project overall. Adopting external projects that
 solve problems and add features that the core Django project doesn't have
-helps us as a project by highlighting our feature-completeness as an overall
-community, aids new Django developers by highlighting projects that they might
-otherwise overlook or try and re-implement missing features themselves,
-and acts as a useful conduit to get people contributing to Django without
-having to tackle issues on the core project, which by this point are generally
-large, difficult issues that aren't as suitable for first-time contributors.
+helps us as a project:
+
+* It shows off Django-related features that people would otherwise miss.
+* It aids new Django developers by highlighting projects that they might
+  otherwise overlook.
+* It acts as a useful conduit to get people contributing to Django without
+  having to tackle (large, difficult) issues on the core project.
 
 Rationale
 =========

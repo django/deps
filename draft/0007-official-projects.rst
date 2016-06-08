@@ -58,7 +58,7 @@ doesn't tie development to the release cadence and style of Django core
 releases too directly.
 
 That said, the Django name has gained a level of trust and respect over the
-years from our community and users, and so to become and official Django
+years from our community and users, and so to become an official Django
 project a level of quality, commitment, and security must be met, and this
 process tries to ensure those are accounted for.
 
@@ -111,7 +111,9 @@ design and philosophy, and having an available development and maintenance team.
 
 Notably, it does not need to be a maintainer of the existing project that
 starts this process, but a proposed project will need an implementation team
-willing to work with it once it is adopted to make it past the next step.
+willing to work with it once it is adopted to make it past the next step. If it
+is not the existing maintenance team, they should still be in agreement (if the
+project is not abandoned).
 
 To even be considered for adoption into Django, the project must have a
 compatible open-source license, ideally the BSD three-clause license which
@@ -138,7 +140,7 @@ Shepherd
     running the project under official Django ownership and infrastructure.
     They can also be part of the Maintenance Team.
 
-The maintenance team for the adopted project may be different for that of the
+The maintenance team for the adopted project may be different from that of the
 project pre-adoption, but a project should not be adopted against the wish of
 the original maintainers; instead, a team change would likely happen if the
 project was abandoned or the existing maintainers wished to step down, but the
@@ -171,10 +173,10 @@ at least some documentation is written to anchor the discussion.
 
 The Shepherd should call an end to discussions after a reasonable time period;
 there is no requirement to wait until all discussions have "finished" before
-moving on (as this may take a very long time and needlessly long-winded
-discussions); instead, they should move on when they are confident that all
-viewpoints have been heard and collated. The Technical Board may refuse the
-adoption if they think the project was moved onto the next phase too quickly.
+moving on (as this may take a very long time); instead, they should move
+on when they are confident that all viewpoints have been heard and collated.
+The Technical Board may refuse the adoption if they think the project was moved
+onto the next phase too quickly.
 
 Review & Resolution
 -------------------
@@ -194,7 +196,7 @@ Django; if by adopting they are crowding out other, potentially superior
 solutions; if the maintenance team is sufficient to ensure the project will
 be maintained properly once adopted; if the adoption of the project would
 place undue stress on the existing core team; and if adopting the project
-projects the right image and message about what Django is/
+projects the right image and message about what Django is.
 
 Once the decision is made, the Technical Board will inform the Shepherd about
 the decision, and a public announcement will be made about either the success
@@ -257,6 +259,11 @@ have to be core Django memebers, nor do they become core members by taking
 those positions, but they should be very strongly considered as candidates for
 the Core Team if they are not already.
 
+The main project documentation does not have to be hosted inside the main
+Django documentation, but should be under an official Django domain
+if possible, and link back to with the main Django documentation where it makes
+sense.
+
 Retiring Projects
 =================
 
@@ -267,7 +274,8 @@ be retired as an official signal that it is no longer maintained.
 Retirement involves the following steps:
 
 * Modifying the README file on the repository to remove the maintainer lists
-  and display prominently at the top that it is no longer active.
+  and display prominently at the top that it is no longer active. The
+  repository will remain in-place under the Django organisation.
 
 * Remove the project from all official Django documentation.
 

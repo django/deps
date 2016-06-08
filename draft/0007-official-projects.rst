@@ -191,12 +191,19 @@ The Technical Board are the final authority for deciding on adopting a project
 or not. They may choose to rule on the project as a team, or they
 may designate one or more board members to review and decide.
 
-The Technical Board should consider if the project's adoption would benefit
-Django; if by adopting they are crowding out other, potentially superior
-solutions; if the maintenance team is sufficient to ensure the project will
-be maintained properly once adopted; if the adoption of the project would
-place undue stress on the existing core team; and if adopting the project
-projects the right image and message about what Django is.
+The Technical Board should consider:
+
+* If the project's adoption would benefit Django.
+* If by adopting they are crowding out other, potentially superior solutions.
+* If the maintenance team is sufficient to ensure the project will
+  be maintained properly once adopted.
+* If the adoption of the project would place undue stress on the existing core team.
+* If adopting the project projects the right image and message about what Django is.
+
+They should err on the side of denial if there is some controversy or
+heavy disagreement in the community about the adoption; a project can always
+come back for another attempt at adoption later, but adopting it prematurely
+is very hard to undo.
 
 Once the decision is made, the Technical Board will inform the Shepherd about
 the decision, and a public announcement will be made about either the success

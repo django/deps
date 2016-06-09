@@ -271,7 +271,7 @@ should ideally have more than one member so that this does not put the
 project at risk of retirement.
 
 Maintainers or people with commit access on an official Django project do not
-have to be core Django memebers, nor do they become core members by taking
+have to be core Django members, nor do they become core members by taking
 those positions, but they should be very strongly considered as candidates for
 the Core Team if they are not already.
 

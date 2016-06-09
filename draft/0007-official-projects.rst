@@ -223,6 +223,11 @@ to make it an official Django project:
   Shepherd and Maintenance Team, as well as details about Django's security
   policy.
 
+* The project's documentation should be updated to clarify how contributions
+  will be accepted (pull requests, patches, etc.) and what criteria the
+  Maintenance Team and Shepherd have for bringing on new contributors and
+  making them part of the Maintenance Team.
+
 * References to the project should be added in the official Django
   documentation where sensible, as well as other changes made to ensure it's
   discoverable.
@@ -246,6 +251,10 @@ project must maintain the following things:
 * Compatability with the current release and current LTS release of Django,
   within a month of the Django release coming out (LTS compatability may be
   with an older but still maintained version)
+
+* Responding to contributions made in the way suggested by the project's
+  contribution guide and updating the guide if the way they wish to accept
+  contributions changes.
 
 If any of these requirements does not continue to be true, effort should be
 made to find new maintainers or a new Shepherd to bring the project up to

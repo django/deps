@@ -290,8 +290,11 @@ be retired as an official signal that it is no longer maintained.
 Retirement involves the following steps:
 
 * Modifying the README file on the repository to remove the maintainer lists
-  and display prominently at the top that it is no longer active. The
-  repository will remain in-place under the Django organisation.
+  and display prominently at the top that it is no longer active.
+
+* Moving the repository to exist under a different organisation or group
+  on the repository hosting platform created specifically to hold retired
+  projects (it is suggested to use the name ``django-attic`` for this).
 
 * Remove the project from all official Django documentation.
 

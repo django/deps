@@ -4,12 +4,12 @@ DEP 0005: Improved middleware
 
 :DEP: 0005
 :Author: Carl Meyer
-:Implementation Team: Florian Apolloner, Tim Graham
+:Implementation Team: Florian Apolloner, Tim Graham, Carl Meyer
 :Shepherd: Carl Meyer
 :Status: Final
 :Type: Feature
 :Created: 2016-01-07
-:Last-Modified: 2016-05-13
+:Last-Modified: 2016-06-17
 
 .. contents:: Table of Contents
    :depth: 3
@@ -90,12 +90,7 @@ A middleware factory can be written as a function that looks like this::
             # code to be executed for each request before
             # the view is called; equivalent to process_request
 
-            try:
-                response = get_response(request)
-            except Exception as e:
-                # code to handle an exception that wasn't caught
-                # further up the chain, if desired. equivalent to
-                # process_exception.
+            response = get_response(request)
 
             # code to be executed for each request/response after
             # the view is called; equivalent to process_response
@@ -116,23 +111,12 @@ Or it can be written as a class with a ``__call__`` method, like this::
             # code to be executed for each request before
             # the view is called
 
-            try:
-                response = self.get_response(request)
-            except Exception as e:
-                # code to handle an exception that wasn't caught
-                # further up the chain, if desired. equivalent to
-                # process_exception.
+            response = self.get_response(request)
 
             # code to be executed for each request/response after
             # the view is called
 
             return response
-
-(In both examples, the ``try/except`` is not required if the middleware
-doesn't need to handle any exceptions, and if it is included it should
-probably catch something more specific than ``Exception``. The above
-just illustrates how to implement the generic equivalent of
-``process_exception``.)
 
 In prose instead of examples: a middleware factory is a callable that
 takes a ``get_response`` callable and returns a middleware. A middleware
@@ -152,24 +136,24 @@ calling the view with appropriate url args, and template-response
 middleware; see below.)
 
 This specification already encompasses the full functionality of
-``process_request``, ``process_response``, and ``process_exception``
-(with some differences in short-circuiting behavior discussed below
-under "Backwards Compatibility"). It also allows more powerful idioms
-that aren't currently possible, like wrapping the call to
-``get_response`` in a context manager (e.g. ``transaction.atomic``) or
-in a ``try/finally`` block.
+``process_request`` and ``process_response`` (with some differences in
+short-circuiting behavior discussed below under "Backwards
+Compatibility"). It also allows more powerful idioms that aren't
+currently possible, like wrapping the call to ``get_response`` in a
+context manager (e.g. ``transaction.atomic``) or in a ``try/finally``
+block.
 
 
 View and template-response middleware
 -------------------------------------
 
 This DEP does not propose to change the implementation of view
-middleware or template-response middleware. These are single-point
-hooks, not wrappers, and don't suffer from the same in/out balancing
-issues. A middleware that wishes to implement one or both of these hooks
-should be implemented in the class style, and should implement
-``process_view`` and/or ``process_template_response`` methods, exactly
-as it would today.
+middleware, exception middleware, or template-response middleware. These
+are single-point hooks, not wrappers, and don't suffer from the same
+in/out balancing issues. A middleware that wishes to implement one or
+both of these hooks should be implemented in the class style, and should
+implement ``process_view``, ``process_exception``, and/or
+``process_template_response`` methods, exactly as it would today.
 
 
 Changes in short-circuiting semantics
@@ -185,8 +169,26 @@ of *all* middleware (including some who never got a crack at
 
 Similarly, a middleware that modifies the request on the way in and does
 pass it on can be guaranteed that it will always see the response on the
-way back out. (If it also wants to see any uncaught exception on the way
-out, it can just wrap its call to ``get_response`` in a ``try/except``).
+way back out.
+
+
+Exception handling
+------------------
+
+Exceptions raised in the view (or in the ``render`` method of a
+``TemplateResponse``) are processed through the ``process_exception``
+methods of middleware. If any of these return a response, it is passed
+back up through the middleware. If not, the exception is converted to a
+response (that is, certain special exceptions such as ``Http404``,
+``PermissionDenied``, and ``SuspiciousOperation`` are converted to 4xx
+HTTP responses, and all other exceptions are converted to ``500 Internal
+Server Error``), and that response is passed up through the middleware.
+
+Exceptions raised in a middleware are immediately converted to the
+appropriate response type, which is then passed to the next
+middleware. Thus, a middleware never needs to be concerned about
+handling exceptions when it calls ``get_response()``; it should always
+get back a response.
 
 
 Disabling middleware
@@ -233,8 +235,8 @@ new-style and old-style forms, and to ease similar conversions of
 third-party middleware, a converter mix-in will be provided, with an
 implementation similar to the following::
 
-    class MiddlewareConversionMixin(object):
-        def __init__(self, get_response):
+    class MiddlewareMixin(object):
+        def __init__(self, get_response=None):
             self.get_response = get_response
             super(MiddlewareMixin, self).__init__()
 
@@ -243,15 +245,16 @@ implementation similar to the following::
             if hasattr(self, 'process_request'):
                 response = self.process_request(request)
             if not response:
-                try:
-                    response = self.get_response(request)
-                except Exception as e:
-                    if hasattr(self, 'process_exception'):
-                        return self.process_exception(request, e)
-                    else:
-                        raise
+                response = self.get_response(request)
             if hasattr(self, 'process_response'):
-                response = self.process_response(request, response)
+                # In case we've got an unrendered template response, make sure we
+                # delay response handling until it's rendered.
+                if hasattr(response, 'render') and callable(response.render):
+                    def callback(response):
+                        return self.process_response(request, response)
+                    response.add_post_render_callback(callback)
+                else:
+                    response = self.process_response(request, response)
             return response
 
 In most cases, this mixin will be sufficient to convert a middleware
@@ -259,42 +262,10 @@ with sufficient backwards-compatibility; the new short-circuiting
 semantics will be harmless or even beneficial to the existing
 middleware.
 
-In a few unusual cases, a middleware class may need more invasive
-changes to adjust to the new semantics. Some of these cases are
-documented here (and will also be documented in the upgrade guide in the
-Django documentation as part of the implementation of this PEP):
-
-
-Uncaught exceptions vs error responses
---------------------------------------
-
-In the current request-handling logic, the handler transforms any
-exception that passes through all ``process_exception`` middleware
-uncaught into a response with appropriate status code (e.g. 404, 403,
-400, or 500), and then passes that response through the full chain of
-``process_response`` middleware.
-
-In new-style middleware, a given middleware only gets one shot at a
-given response or uncaught exception "on the way out," and will see
-either a returned response or an uncaught exception, but not both.
-
-This means that, for example, certain middleware which want to do
-something with all 404 responses (for example, the
-``RedirectFallbackMiddleware`` and ``FlatpageFallbackMiddleware`` in
-``django.contrib.redirects`` and ``django.contrib.flatpages``) may now
-need to watch out for both a 404 response and an uncaught ``Http404``
-exception.
-
-The implementation of this DEP adds an ``ExceptionMiddleware`` which
-converts known types of uncaught exceptions into the appropriate HTTP
-response (e.g. converts an ``Http404`` exception to a 404 HTTP
-response). This middleware is always automatically applied as the
-outer-most middleware. Other middleware can also inherit from
-``ExceptionMiddleware`` to ensure that exceptions are converted to
-responses before their own logic runs; this is how
-``FlatpageFallbackMiddleware`` and ``RedirectFallbackMiddleware`` avoid
-having to manually check for both the response status code and the
-exception.
+In a few unusual cases, a middleware class may need more adjustment to
+the new semantics. Some of these cases are documented here (and will
+also be documented in the upgrade guide in the Django documentation as
+part of the implementation of this PEP):
 
 
 Seeing all responses
@@ -324,6 +295,24 @@ combinations in existing projects that couldn't work correctly under the
 new semantics, and was unable to find any examples. Also, the fact that
 Pyramid uses a very similar scheme and has not had problems in this area
 is encouraging.
+
+
+Other differences
+-----------------
+
+1. With old-style middleware, ``process_exception`` was applied to
+   exceptions raised in middleware ``process_request`` methods. In the
+   new system with stricter onion layering, ``process_exception``
+   applies only to exceptions raised from the view (or the ``render``
+   method of a ``TemplateResponse``).
+
+2. With old-style middleware, an exception raised from a
+   ``process_response`` method would skip all remaining
+   ``process_response`` methods and be converted into a generic 500
+   error (even if it was a special type of exception such as a
+   ``Http404``). Now such an exception is immediately converted to the
+   appropriate response type, which is passed on to the next middleware
+   in line. Middleware are not skipped due to an exception.
 
 
 Deprecation
@@ -367,6 +356,41 @@ mechanism for one-time setup or disabling, and it would be slower, since
 it requires Django to construct a new chain of closures for every
 request, whereas the factory approach allows the closure chain to be
 constructed just once and reused for each request.
+
+Forcing middleware to handle exceptions
+---------------------------------------
+
+In earlier drafts of this DEP, unhandled exceptions were allowed to
+bubble up through middleware layers until caught and handled, as Python
+exceptions normally do. Catching exceptions in this way replaced
+``process_exception``. This was attractive in its simplicity and
+similarity to other Python code, but in practice makes it too difficult
+to write useful response-processing middleware, and too difficult to
+provide workable backwards-compatibility with old-style middleware.
+
+It's common for middleware to want to modify all outgoing responses in
+some way (e.g. add a header). If a middleware gets an exception instead
+of a response when it calls ``get_response()``, it has to decide whether
+to convert that exception into a response or let it bubble further
+up. This results in many different middleware having to duplicate
+similar exception-conversion logic. If a middleware wants to modify all
+outgoing responses, it has to convert all exceptions to responses, which
+shields all later middleware from receiving any view exceptions, making
+it hard to usefully implement exception-catching middleware (or at least
+imposing strict new ordering requirements on exception-handling vs
+response-handling middleware).
+
+Leaving the separate ``process_exception`` hook in place allows all
+middleware a chance to handle view exceptions in a separate phase, so
+catching exceptions in the response-handling phase becomes less
+necessary. Rather than making all middleware implement exception
+handling and conversion to a response, we just convert exceptions to
+responses before and after every middleware. This makes life much
+simpler for middleware authors, allowing them to e.g. ``raise
+Http404()`` and know that it will be handled correctly, while also
+letting them assume they will get a response (not an exception) from
+``get_response()``.
+
 
 Using a new word
 ----------------

@@ -518,7 +518,7 @@ Here's the default configuration for the Django backend:
                 'debug': settings.DEBUG,
                 'loaders': None,
                 'string_if_invalid': '',
-                file_charset=settings.FILE_CHARSET,
+                'file_charset': settings.FILE_CHARSET,
             },
         },
     ]

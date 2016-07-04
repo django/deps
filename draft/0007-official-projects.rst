@@ -276,9 +276,10 @@ those positions, but they should be very strongly considered as candidates for
 the Core Team if they are not already.
 
 The main project documentation does not have to be hosted inside the main
-Django documentation, but should be under an official Django domain
-if possible, and link back to with the main Django documentation where it makes
-sense.
+Django documentation, and can be hosted on a third-party service to ease the
+maintenance load on the Django website team, but should be CNAMEd under an
+official Django domain if possible, and interlink with the main Django
+documentation where it makes sense.
 
 Retiring Projects
 =================

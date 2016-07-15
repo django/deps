@@ -6,10 +6,10 @@ DEP 0007: Official Django Projects
 :Author: Andrew Godwin
 :Implementation Team: Andrew Godwin
 :Shepherd: Andrew Godwin
-:Status: Draft
+:Status: Final
 :Type: Process
 :Created: 2016-06-01
-:Last-Modified: 2016-06-08
+:Last-Modified: 2016-07-12
 
 .. contents:: Table of Contents
    :depth: 3

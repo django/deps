@@ -71,8 +71,8 @@ interface to our developers...
 		path('articles/<int:year>/<int:month>/<int:day>/', views.article_detail),
 	]
 
-The ``path()`` argument would also accept arguments without a convertor prefix,
-in which case the convertor would default to "string", accepting any text
+The ``path()`` argument would also accept arguments without a converter prefix,
+in which case the converter would default to "string", accepting any text
 except a ``'/'``.
 
 For example:
@@ -162,10 +162,10 @@ Flask supports the `following converters <http://flask.pocoo.org/docs/0.11/quick
 
 We might also consider including `a regex converter <http://stackoverflow.com/questions/5870188/does-flask-support-regular-expressions-in-its-url-routing>`_.
 
-Furthermore, an interface for implementating custom convertors should exist. We
+Furthermore, an interface for implementating custom converters should exist. We
 could use the same API as Flask's ``BaseConverter`` for this purpose. The
-registration of custom convertors could be handled as a Django setting,
-``CUSTOM_URL_CONVERTORS``. The default set of convertors should probably 
+registration of custom converters could be handled as a Django setting,
+``CUSTOM_URL_CONVERTERS``. The default set of converters should probably 
 *always* be included.
 
 Failure to perform a type conversion against a captured string should result in
@@ -181,17 +181,17 @@ would need to support both named and unnamed capture groups.
 
 One option could be:
 
-* Add a new ``convertors`` argument to the ``url`` argument.
+* Add a new ``converters`` argument to the ``url`` argument.
 * The value can either be a list/tuple, in which case its elements are mapped
   onto the capture groups by position, or a dict, in which case its elements
   are mapped onto the capture groups by name. (The former case is more general
   as it supports using the positional style to correspond with either named or
   unamed groups)
-* The items in the ``convertors`` argument would each be instances of
+* The items in the ``converters`` argument would each be instances of
   ``BaseConverter``
 
-(An alternate might be to add separate ``convertor_args`` and
-``convertor_kwargs`` arguments.)
+(An alternate might be to add separate ``converter_args`` and
+``converter_kwargs`` arguments.)
 
 We would also need to support the reverse side of type conversion. Ensure that
 reverse can be called with typed arguments as well as string literals.
@@ -255,7 +255,7 @@ Implementation tasks
 
 The following independant tasks can be identified:
 
-* Implement the ``convertors`` argument. This adds the low-level API support
+* Implement the ``converters`` argument. This adds the low-level API support
   for type coercion. Ensure that lookups perform type coercion, and
   correspondingly, that calls to ``reverse`` work correctly with typed
   arguments.
@@ -263,7 +263,7 @@ The following independant tasks can be identified:
   implementation based on the regex urls.
 * Add ``path_regex``, with ``from django.conf.urls import url`` becoming a shim
   for it.
-* Add support for registering custom convertors, as defined in the Django
+* Add support for registering custom converters, as defined in the Django
   settings.
 * Document the new style URL configuration.
 * Update existing URL cases in the documentation throughout.

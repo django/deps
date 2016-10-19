@@ -80,8 +80,8 @@ For example:
 .. code-block:: python
 
 	urlpatterns = [
-		path('/users/', views.user_list),
-		path('/users/<id>/', views.user_detail),
+		path('users/', views.user_list),
+		path('users/<id>/', views.user_detail),
 	]
 
 For further background, please see the `"Challenge teaching Django to beginners: urls.py" <https://groups.google.com/forum/#!topic/django-developers/u6sQax3sjO4>`_ discussion group thread.

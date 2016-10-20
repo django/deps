@@ -218,7 +218,7 @@ One way to guard against this would be to:
 
 * Enforce that new style ``path()`` arguments must not start with a leading
   ``'^'``.
-* Enfore that old style ``url()`` arguments must start with a leading ``'^'``.
+* Enforce that old style ``url()`` arguments must start with a leading ``'^'``.
 
 This behaviour would ensure that the two different cases could not be used
 incorrectly.

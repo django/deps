@@ -9,7 +9,7 @@ DEP 7: Dependency Policy
 :Status: Draft
 :Type: Process
 :Created: 2016-06-06
-:Last-Modified: 2016-09-29
+:Last-Modified: 2016-11-05
 
 .. contents:: Table of Contents
    :depth: 3
@@ -213,7 +213,6 @@ To be clear, this DEP isn't suggesting that we add these dependencies
 specifically -- there may be good arguments both for and against each specific
 example. They're offered here as examples to of the types of options that open
 up once we start to allow external dependencies.
-
 
 Copyright
 =========

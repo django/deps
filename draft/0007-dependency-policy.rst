@@ -134,12 +134,12 @@ Background and Motivation
 
 When Django was first being developed, Python packaging was in its infancy.  By
 the time of Django's first release (July 2005), the shape of Python's modern
-packaging infrastructure was starting to emerge [1]_: PyPI had been around for a
+packaging infrastructure was starting to emerge [3]_: PyPI had been around for a
 couple of years (since 2003), and in 2005 Setuptools added the ``easy_install``
 command, allowing users to automatically download and install packages from
 PyPI, including dependencies.
 
-.. [1] For more information on the early history of Python packaging, see
+.. [3] For more information on the early history of Python packaging, see
        `this wonderful timeline <http://blog.startifact.com/posts/older/a-history-of-python-packaging.html>`_ that Martijn Faassen wrote up.
 
 However, Python packaging circa 2005 was just as rough around the edges as

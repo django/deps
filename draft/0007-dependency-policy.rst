@@ -186,8 +186,8 @@ we took full advantage of features now available.
 
 In particular, external dependencies -- other packages specified in
 ``setup.py``'s ``install_requires`` argument -- should be fair game to add to
-Django, when appropriate. Django core developers often duplicate effort re-
-implementing  features that are available as dependencies. And, much of the
+Django, when appropriate. Django core developers often duplicate effort
+re-implementing  features that are available as dependencies. And, much of the
 time, those external implementations are substantially better than what's
 included in Django. For example:
 

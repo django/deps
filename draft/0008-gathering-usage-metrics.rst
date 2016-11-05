@@ -180,6 +180,10 @@ You can view all information that is sent by setting ``DJANGO_ANALYTICS_DEBUG=1`
 in your environment. This'll print analytics to the console instead of sending
 them to Google Analytics.
 
+.. note::
+
+    This section is largely cribbed from `Homebrew's analytics implementation <https://github.com/Homebrew/brew/blob/bbed7246bc5c5b7acb8c1d427d10b43e090dfd39/docs/Analytics.md>`_. Thanks!
+
 How will analytics be sent?
 ---------------------------
 

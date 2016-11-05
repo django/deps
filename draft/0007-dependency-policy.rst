@@ -78,8 +78,8 @@ as Django itself. We define "maturity" as:
 Again, these are guidelines. At the end of the day, the criteria comes down to
 "would we include this code in Django?" The Tech Board has the final call.
 
-.. [1] Note the "probably" there. It is, in principle, possible to distribute 
-       C extensions in a way that no longer requires a complier -- platform-
+.. [1] Note the "probably" there. It is, in principle, possible to distribute
+       C extensions in a way that no longer requires a compiler -- platform-
        specific Wheels,  statically-linked dependencies, testing explicitly for
        PyPy support, etc. However, this would still leave out people who use
        OSes that don't have Wheel support (BSDs) or folks who compile their own

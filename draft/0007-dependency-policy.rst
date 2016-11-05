@@ -57,9 +57,9 @@ as Django itself. We define "maturity" as:
   either.
 
 - **Maintained** - if we discover bugs in a dependency, we need to be fairly 
-  confidant that they'll be fixed quickly.
+  confident that they'll be fixed quickly.
 
-- **Takes security seriously** - we should be confidant that if we or our users
+- **Takes security seriously** - we should be confident that if we or our users
   discover vulnerabilities in a dependency that the dependency authors will
   respond to those vulnerabilities in coordination with us. This means they
   should have a vulnerability disclosure policy, security-specific contacts,
@@ -72,7 +72,7 @@ as Django itself. We define "maturity" as:
 - **Backwards compatible** in minor releases. We should be able to specify as
   wide a range of required versions as possible so that releases of Django
   are de-coupled (as much as possible) from dependencies. Generally, we'll
-  want to specify dependencies as ``foo>=1.0,<2.0``, and be confidant that
+  want to specify dependencies as ``foo>=1.0,<2.0``, and be confident that
   point-releases of ``foo`` won't break Django. 
 
 Again, these are guidelines. At the end of the day, the criteria comes down to
@@ -100,18 +100,18 @@ includes introducing Babel as part of the DEP.
 DEPs that introduce new dependencies will need a "Dependencies" section that
 answers a few questions:
 
-    - What's the dependency? Why should we use it over re-inventing this
-      particular wheel [2]_?
+- What's the dependency? Why should we use it over re-inventing this
+  particular wheel [2]_?
 
-    - Does the package meet the maturity bar laid out above? If there are 
-      any maturity risks -- for example, if the project only has a single 
-      maintainer -- that should be identified so we can do a cost/benefit
-      analysis.
+- Does the package meet the maturity bar laid out above? If there are 
+  any maturity risks -- for example, if the project only has a single 
+  maintainer -- that should be identified so we can do a cost/benefit
+  analysis.
 
-    - What version will we depend on? In general, we'd like to depend on a
-      wide range of versions (e.g. ``foo>1.0,<2.0``) so we can avoid tightly
-      coupling dependency releases to Django releases. But this may differ
-      from package to package, so the DEP should explain it closely.
+- What version will we depend on? In general, we'd like to depend on a
+  wide range of versions (e.g. ``foo>1.0,<2.0``) so we can avoid tightly
+  coupling dependency releases to Django releases. But this may differ
+  from package to package, so the DEP should explain it closely.
 
 .. [2] Pun completely intended.
 
@@ -186,8 +186,8 @@ we took full advantage of features now available.
 
 In particular, external dependencies -- other packages specified in
 ``setup.py``'s ``install_requires`` argument -- should be fair game to add to
-Django, when appropriate. Django core developers often duplicate effort re-
-implementing  features that are available as dependencies. And, much of the
+Django, when appropriate. Django core developers often duplicate effort
+re-implementing  features that are available as dependencies. And, much of the
 time, those external implementations are substantially better than what's
 included in Django. For example:
 

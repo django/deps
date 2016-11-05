@@ -100,18 +100,18 @@ includes introducing Babel as part of the DEP.
 DEPs that introduce new dependencies will need a "Dependencies" section that
 answers a few questions:
 
-    - What's the dependency? Why should we use it over re-inventing this
-      particular wheel [2]_?
+- What's the dependency? Why should we use it over re-inventing this
+  particular wheel [2]_?
 
-    - Does the package meet the maturity bar laid out above? If there are 
-      any maturity risks -- for example, if the project only has a single 
-      maintainer -- that should be identified so we can do a cost/benefit
-      analysis.
+- Does the package meet the maturity bar laid out above? If there are 
+  any maturity risks -- for example, if the project only has a single 
+  maintainer -- that should be identified so we can do a cost/benefit
+  analysis.
 
-    - What version will we depend on? In general, we'd like to depend on a
-      wide range of versions (e.g. ``foo>1.0,<2.0``) so we can avoid tightly
-      coupling dependency releases to Django releases. But this may differ
-      from package to package, so the DEP should explain it closely.
+- What version will we depend on? In general, we'd like to depend on a
+  wide range of versions (e.g. ``foo>1.0,<2.0``) so we can avoid tightly
+  coupling dependency releases to Django releases. But this may differ
+  from package to package, so the DEP should explain it closely.
 
 .. [2] Pun completely intended.
 

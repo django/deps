@@ -111,10 +111,16 @@ included in Django. For example:
 - Django vendors a version of `six <https://pythonhosted.org/six/>`_ (as
   ``django.utils.six``). Instead of vendoring, we could use a dependency.
 
+- Much of Django's core HTTP/WSGI handling overlaps with utilities provided by
+  `Werkzeug <http://werkzeug.pocoo.org/>`_, the base underlying Flask and more.
+  If Django reimplemented its core HTTP/WSGI handling, we could share
+  maintenance burden with the Werkzeug/Flask maintainers while starting to
+  offer more opportunities for interoperability.
+
 To be clear, this DEP isn't suggesting that we add these dependencies
 specifically -- there may be good arguments both for and against each specific
-example. They're offered here as examples to demonstrate ways that Django could
-simplify, improve, and remove maintenance pain if we allowed dependencies.
+example. They're offered here as examples to of the types of options that open
+up once we start to allow external dependencies.
 
 Specification
 =============
@@ -122,22 +128,96 @@ Specification
 The spec is: **Django can have dependencies.**
 
 OK, that's the easy part; the hard part is deciding *which* dependencies are
-appropriate. 
+appropriate. This DEP does not lay out a hard and fast set of rules;
+a single set of rules is unlikely to cover all cases. Instead, it defines
+a set of guidelines and a process for considering external dependencies.
 
 Guidelines for adding new dependencies
 --------------------------------------
 
-- External dependencies should be easy to install on all the platforms that Django supports (i.e. Linux/Mac/Windows, all supported Python versions including PyPy, etc). This means that dependencies that require C extensions are probably not acceptable.
-- stability
-- maintainability
-- "backup plan"
-- requires a short DEP for a new dep, ruling by core team as usual
-    - ??? accelerated mini-DEP for this?
+In a nutshell, external dependencies need to be at a similar level of maturity
+as Django itself. We define "maturity" as:
 
-Optional dependencies
----------------------
+- **Stable** - Django's pretty solid at this point: it's well-tested,
+  production-proven, and relatively bug-free. All software has bugs, of course --
+  Django has 1,200 open issues as November 2016 -- but Django is, roughly
+  speaking, free of really critical bugs (crashers, data-loss, security issues,
+  etc). Dependencies need to be at a similar level of quality: code with serious
+  issues that wouldn't make it into Django shouldn't be accepted as a dependency,
+  either.
 
-- optional deps are ok too, less stringent guidelines
+- **Maintained** - if we discover bugs in a dependency, we need to be fairly 
+  confidant that they'll be fixed quickly.
+
+- **Takes security seriously** - we should be confidant that if we or our users
+  discover vulnerabilities in a dependency that the dependency authors will
+  respond to those vulnerabilities in coordination with us. This means they
+  should have a vulnerability disclosure policy, security-specific contacts,
+  and a history of taking vulnerabilities seriously.
+
+- **Works on all the same platforms as Django does** - Linux, Mac, Windows, 
+  and all supported Python versions (including PyPy). This probably means that 
+  dependencies that require C extensions are probably not acceptable [1]_. 
+
+- **Backwards compatible** in minor releases. We should be able to specify as
+  wide a range of required versions as possible so that releases of Django
+  are de-coupled (as much as possible) from dependencies. Generally, we'll
+  want to specify dependencies as ``foo>=1.0,<2.0``, and be confidant that
+  point-releases of ``foo`` won't break Django. 
+
+Again, these are guidelines. At the end of the day, the criteria comes down to
+"would we include this code in Django?" The Tech Board has the final call.
+
+.. [1] Note the "probably" there. It is, in principle, possible to distribute 
+       C extensions in a way that no longer requires a complier -- platform-
+       specific Wheels,  statically-linked dependencies, testing explicitly for
+       PyPy support, etc. However, this would still leave out people who use
+       OSes that don't have Wheel support (BSDs) or folks who compile their own
+       Pythons, but that may be OK given that Django doesn't really test on
+       these platforms either. All that to say that we shouldn't 100% rule out
+       dependencies with C extensions, but they will face a higher bar.
+
+Process
+-------
+
+There's no process for adding a dependency on its own, since the whole point of
+a new dependency is to introduce new feature (it would be silly to add a new
+dependency without using it in some way). So, new dependencies get proposed as
+part of a larger feature DEP. For example, you wouldn't propose a  "Start
+depending on Babel" DEP; you'd propose a "Improve i18n/l10n framework" DEP that
+includes introducing Babel as part of the DEP.
+
+DEPs that introduce new dependencies will need a "Dependencies" section that
+answers a few questions:
+
+    - What's the dependency? Why should we use it over re-inventing this
+      particular wheel [2]_?
+
+    - Does the package meet the maturity bar laid out above? If there are 
+      any maturity risks -- for example, if the project only has a single 
+      maintainer -- that should be identified so we can do a cost/benefit
+      analysis.
+
+    - What version will we depend on? In general, we'd like to depend on a
+      wide range of versions (e.g. ``foo>1.0,<2.0``) so we can avoid tightly
+      coupling dependency releases to Django releases. But this may differ
+      from package to package, so the DEP should explain it closely.
+
+.. [2] Pun completely intended.
+
+From there, the rest of the DEP process proceeds as usual. When the Tech Board
+evaluates the DEP for acceptance, it will include an evaluation of dependencies
+following the guidelines above.
+
+Re-evaluating dependencies
+--------------------------
+
+During each minor release cycle -- and especially before LTS releases -- the
+core team should re-evaluate all existing dependencies. If some dependency is
+starting regress on the maturity front (particularly if it has become
+unmaintained), we want to identify it early and start looking for backup plans.
+This might mean removing the dependency, taking over maintenance ourselves, 
+looking for funding to pay new maintainers, etc.
 
 Copyright
 =========

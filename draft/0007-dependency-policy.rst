@@ -50,23 +50,23 @@ PyPI, including dependencies.
 .. [1] For more information on the early history of Python packaging, see
        `this wonderful timeline <http://blog.startifact.com/posts/older/a-history-of-python-packaging.html>`_ that Martijn Faassen wrote up.
 
-However, Python packageing circa 2005 was just as rough around the edges as
+However, Python packaging circa 2005 was just as rough around the edges as
 Django was at that time. ``virtualenv`` didn't exist yet, and system-wide
 installs were the norm (and just as problematic then as now). PyPI had
 occasional downtime, leading to frustration when trying to deploy to production.
-``easy_install`` failed in many corner casess. One of Django's early releases
+``easy_install`` failed in many corner cases. One of Django's early releases
 (0.91) required installation via ``easy_install`` and ``setuptools``, and it
 didn't go well. Many users struggled even to get the package installed.
 
 That experience led to a deep suspicion of Python packaging tools among the
 Django core team, and a de-facto policy emerged of only requiring the lowest
-common denominator: instalation via direct download and ``python setup.py
+common denominator: installation via direct download and ``python setup.py
 install``. This meant not using any of Python's packaging features developed
-since about 2002, including most notably dependecies. In 2016, Django's only
+since about 2002, including most notably dependencies. In 2016, Django's only
 dependencies are optional.
 
 However, a lot has changed in the last decade! In 2006, Django was pretty
-aweful: we had just `removed the magic
+awful: we had just `removed the magic
 <https://code.djangoproject.com/wiki/RemovingTheMagic>`_, but wouldn't ship
 Django 1.0 for another two years. It'd be 4 years until Django supported more
 than a single database, five years before it handled static files (2011), six
@@ -94,10 +94,10 @@ we took full advantage of features now available.
 
 In particular, external dependencies -- other packages specified in
 ``setup.py``'s ``install_requires`` argument -- should be fair game to add to
-Django, when apropriate. Django core developers often duplicate effort re-
+Django, when appropriate. Django core developers often duplicate effort re-
 implementing  features that are available as dependencies. And, much of the
 time, those external implementations are substantially better than what's
-included in Django. For exmaple:
+included in Django. For example:
 
 - `passlib <https://pythonhosted.org/passlib/>`_ is a password hashing
   library that implements a large variety of password hashing algorithms.
@@ -114,7 +114,7 @@ included in Django. For exmaple:
 To be clear, this DEP isn't suggesting that we add these dependencies
 specifically -- there may be good arguments both for and against each specific
 example. They're offered here as examples to demonstrate ways that Django could
-simplify, improve, and remove maintainance pain if we allowed dependencies.
+simplify, improve, and remove maintenance pain if we allowed dependencies.
 
 Specification
 =============
@@ -122,7 +122,7 @@ Specification
 The spec is: **Django can have dependencies.**
 
 OK, that's the easy part; the hard part is deciding *which* dependencies are
-apropriate. 
+appropriate. 
 
 Guidelines for adding new dependencies
 --------------------------------------

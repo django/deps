@@ -57,9 +57,9 @@ as Django itself. We define "maturity" as:
   either.
 
 - **Maintained** - if we discover bugs in a dependency, we need to be fairly 
-  confidant that they'll be fixed quickly.
+  confident that they'll be fixed quickly.
 
-- **Takes security seriously** - we should be confidant that if we or our users
+- **Takes security seriously** - we should be confident that if we or our users
   discover vulnerabilities in a dependency that the dependency authors will
   respond to those vulnerabilities in coordination with us. This means they
   should have a vulnerability disclosure policy, security-specific contacts,
@@ -72,7 +72,7 @@ as Django itself. We define "maturity" as:
 - **Backwards compatible** in minor releases. We should be able to specify as
   wide a range of required versions as possible so that releases of Django
   are de-coupled (as much as possible) from dependencies. Generally, we'll
-  want to specify dependencies as ``foo>=1.0,<2.0``, and be confidant that
+  want to specify dependencies as ``foo>=1.0,<2.0``, and be confident that
   point-releases of ``foo`` won't break Django. 
 
 Again, these are guidelines. At the end of the day, the criteria comes down to

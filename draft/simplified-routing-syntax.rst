@@ -162,7 +162,7 @@ Flask supports the `following converters <http://flask.pocoo.org/docs/0.11/quick
 
 We might also consider including `a regex converter <http://stackoverflow.com/questions/5870188/does-flask-support-regular-expressions-in-its-url-routing>`_.
 
-Furthermore, an interface for implementating custom converters should exist. We
+Furthermore, an interface for implementing custom converters should exist. We
 could use the same API as Flask's ``BaseConverter`` for this purpose. The
 registration of custom converters could be handled as a Django setting,
 ``CUSTOM_URL_CONVERTERS``. The default set of converters should probably 
@@ -190,7 +190,7 @@ One option could be:
 * The items in the ``converters`` argument would each be instances of
   ``BaseConverter``
 
-(An alternate might be to add separate ``converter_args`` and
+(An alternative might be to add separate ``converter_args`` and
 ``converter_kwargs`` arguments.)
 
 We would also need to support the reverse side of type conversion. Ensure that
@@ -199,7 +199,7 @@ reverse can be called with typed arguments as well as string literals.
 Preventing unintended errors
 ----------------------------
 
-*The following behaviour is not neccessary, and we might not choose to add
+*The following behaviour is not necessary, and we might not choose to add
 this. However, it is worth considering a way to guard against user error...*
 
 Even with differently named functions there remains some potential for user
@@ -253,7 +253,7 @@ documentation to use the new style.
 Implementation tasks
 ====================
 
-The following independant tasks can be identified:
+The following independent tasks can be identified:
 
 * Implement the ``converters`` argument. This adds the low-level API support
   for type coercion. Ensure that lookups perform type coercion, and

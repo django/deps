@@ -43,7 +43,7 @@ configuration...
 
 There are two aspects to this that we'd like to improve on:
 
-* The Regex based URL syntax is unneccessarily verbose and complex for the vast
+* The Regex based URL syntax is unnecessarily verbose and complex for the vast
   majority of use-cases.
 * The existing URL resolver system does not handle typecasting, meaning that
   all URL parameters are treated as string literals.

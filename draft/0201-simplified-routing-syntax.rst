@@ -34,12 +34,12 @@ configuration...
 
 .. code-block:: python
 
-	urlpatterns = [     
-		url(r'^articles/2003/$', views.special_case_2003),
-		url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
-		url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
-		url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})/$', views.article_detail),
-	]
+    urlpatterns = [     
+        url(r'^articles/2003/$', views.special_case_2003),
+        url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
+        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})/$', views.article_detail),
+    ]
 
 There are two aspects to this that we'd like to improve on:
 
@@ -64,12 +64,12 @@ interface to our developers...
 
 .. code-block:: python
 
-	urlpatterns = [     
-		path('articles/2003/', views.special_case_2003),
-		path('articles/<int:year>/', views.year_archive),
-		path('articles/<int:year>/<int:month>/', views.month_archive),
-		path('articles/<int:year>/<int:month>/<int:day>/', views.article_detail),
-	]
+    urlpatterns = [     
+        path('articles/2003/', views.special_case_2003),
+        path('articles/<int:year>/', views.year_archive),
+        path('articles/<int:year>/<int:month>/', views.month_archive),
+        path('articles/<int:year>/<int:month>/<int:day>/', views.article_detail),
+    ]
 
 The ``path()`` argument would also accept arguments without a converter prefix,
 in which case the converter would default to "string", accepting any text
@@ -79,10 +79,10 @@ For example:
 
 .. code-block:: python
 
-	urlpatterns = [
-		path('users/', views.user_list),
-		path('users/<id>/', views.user_detail),
-	]
+    urlpatterns = [
+        path('users/', views.user_list),
+        path('users/<id>/', views.user_detail),
+    ]
 
 For further background, please see the `"Challenge teaching Django to beginners: urls.py" <https://groups.google.com/forum/#!topic/django-developers/u6sQax3sjO4>`_ discussion group thread.
 

@@ -171,17 +171,82 @@ registration of custom converters could be handled as a Django setting,
 Failure to perform a type conversion against a captured string should result in
 an ``Http404`` exception being raised.
 
+Definining type conversions
+---------------------------
+
+A converter is an object with three attributes/methods.
+
+``regex``
+    The pattern use in place of the type-specifier.
+``to_python``
+    How to convert the string from the URL to a Python object.
+``to_url``
+    How to convert the Python object back to something suitable in a URL.
+
+For instance, a converter for handling with the ``int`` parameter can be
+defined as follows.
+
+.. code-block:: python
+
+    class IntConverter(object):
+        regex = '-?[0-9]+'
+
+        def to_python(self, value):
+            return int(value)
+
+        def to_url(self, value):
+            return str(value)
+
+Here, ``to_python`` is going to be called as part of ``resolve`` while
+``to_url`` will be called during ``reverse``.
+
+If ``to_python`` raises a ``ValueError``, it will be interpreted as if the
+given path does not match the URL, and resolving will continue. This gives the
+ability to deal with cases where the validity of the content can not easily or
+fully be described using a regular expression alone. No other exceptions are
+caught.
+
+The method ``to_url`` will always be called, no matter the type of ``value``.
+In particular, it will be called even when ``value`` is a string. This allows
+one to implement---for instance---a ``base64`` converter or a converter that
+works wth signed values as handled by ``django.core.signing.TimestampSigner``.
+
+Parametrized type converters
+----------------------------
+
+*The following behaviour is a bit less specified, and may even be postponed
+until a later date or another DEP*
+
+The ``any`` type converter as specified above would be useable as
+
+.. code-block:: python
+
+    path('/post/<any(int, string):id_or_slug>/', views.post_by_id_or_slug),
+
+This is to be implemented using parameter support. Likewise, there could be
+arguments to specify constraints, as follows
+
+.. code-block:: python
+
+    path('/user/<string(min_length=5, max_length=100):username>/', views.user)
+
+Implementation and parsing-wise this is a lot more unspecifiedd. One idea would
+be to supply the part between the ``<`` and the ``:`` to ``eval`` within a
+limited scope which only contains the registered converters (which is fine,
+*if* the ``path`` function can be safely assumed not to handle any user input).
+
 Adding type conversion to the existing system
 ---------------------------------------------
 
 Adding a new URL syntax is easy enough, as they can be mapped onto the existing
 Regex syntax. The more involved piece of work would be providing for type
-conversion with the existing regex system. The type conversion functionality
-would need to support both named and unnamed capture groups.
+conversion with the existing regex system. It is our proposal that the type
+conversion (at first) only works for named capture groups. This because the
+``path`` function only builds named capture groups.
 
 One option could be:
 
-* Add a new ``converters`` argument to the ``url`` argument.
+* Add a new ``converters`` argument to the ``url`` function.
 * The value can either be a list/tuple, in which case its elements are mapped
   onto the capture groups by position, or a dict, in which case its elements
   are mapped onto the capture groups by name. (The former case is more general
@@ -189,12 +254,21 @@ One option could be:
   unamed groups)
 * The items in the ``converters`` argument would each be instances of
   ``BaseConverter``
+* The type specifiers as supplied in the arguments to ``path`` will be used to
+  build the ``converters`` argument for ``path_regex``.
 
-(An alternative might be to add separate ``converter_args`` and
-``converter_kwargs`` arguments.)
+Type conversions and ``reverse``
+--------------------------------
 
-We would also need to support the reverse side of type conversion. Ensure that
-reverse can be called with typed arguments as well as string literals.
+To support the ``reverse`` method on ``path``-based routes, the type converters
+will have to supply a ``to_url`` method which does the reversing. There will be
+no support for passing ``converter.to_url(value)`` to ``reverse``, because some
+``to_url`` functions might actually have text as input.
+
+As an implementation detail, the plan is to call ``converter.to_url`` instead
+of ``force_text`` in ``_reverse_with_prefix``. The downside is that the
+conversion now has to happen inside a loop, instead of only once, which might
+have performance drawbacks.
 
 Preventing unintended errors
 ----------------------------
@@ -255,6 +329,7 @@ Implementation tasks
 
 The following independent tasks can be identified:
 
+* Implement several ``Converters``, and document the API.
 * Implement the ``converters`` argument. This adds the low-level API support
   for type coercion. Ensure that lookups perform type coercion, and
   correspondingly, that calls to ``reverse`` work correctly with typed
@@ -268,6 +343,20 @@ The following independent tasks can be identified:
 * Document the new style URL configuration.
 * Update existing URL cases in the documentation throughout.
 * Update the tests throughout, updating to the new style wherever possible.
+
+Routing on different aspects
+============================
+
+`Django Hosts <http://django-hosts.readthedocs.io/en/latest/>`_ allows for
+routing based on the host aspect of a request. Django Channels has a message
+routing layer, which can inspect different aspects of the messages.
+
+While it would be a good idea to see if the routing layer can be augmented to
+remove the need for django-hosts and be useful for Channels, it is our opinion
+that these are orthogonal concerns. Due to the expected implementation burden
+to also support these concerns, it is our preference that this is to be
+reconsidered at a later point in time, as to not delay the progress on the
+simplified routing syntax.
 
 Copyright
 =========

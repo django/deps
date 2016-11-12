@@ -3,7 +3,7 @@ DEP 0201: Simplified routing syntax
 ===================================
 
 :DEP: 0201
-:Author: Tom Christie
+:Author: Tom Christie, Sjoerd Job Postmus
 :Implementation Team: Tom Christie, Sjoerd Job Postmus
 :Shepherd: Tim Graham
 :Status: Draft

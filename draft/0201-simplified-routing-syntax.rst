@@ -218,14 +218,11 @@ conversion (at first) only works for named capture groups. This because the
 
 One option could be:
 
-* Add a new ``converters`` argument to the ``url`` function.
-* The value can either be a list/tuple, in which case its elements are mapped
-  onto the capture groups by position, or a dict, in which case its elements
-  are mapped onto the capture groups by name. (The former case is more general
-  as it supports using the positional style to correspond with either named or
-  unamed groups)
-* The items in the ``converters`` argument would each be instances of
-  ``BaseConverter``
+* Add a new ``converters`` argument to the ``url`` function. This argument is
+  intended to be a private-but-stable API, rather than documented.
+* The value of the ``converters`` argument is a dictionary, with keys
+  corresponding to capture group names and the corresponding values being
+  instances of ``BaseConverter`` (or something that duck-types the same way).
 * The type specifiers as supplied in the arguments to ``path`` will be used to
   build the ``converters`` argument for ``path_regex``.
 

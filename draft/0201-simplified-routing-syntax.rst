@@ -155,12 +155,8 @@ Flask supports the `following converters <http://flask.pocoo.org/docs/0.11/quick
     Like ``int`` but for floating point values
 ``path``
     Like the default but also accepts slashes
-``any``
-    Matches one of the items provided
 ``uuid``
     Accepts UUID strings
-
-We might also consider including `a regex converter <http://stackoverflow.com/questions/5870188/does-flask-support-regular-expressions-in-its-url-routing>`_.
 
 Furthermore, an interface for implementing custom converters should exist. We
 could use the same API as Flask's ``BaseConverter`` for this purpose. The
@@ -210,30 +206,6 @@ The method ``to_url`` will always be called, no matter the type of ``value``.
 In particular, it will be called even when ``value`` is a string. This allows
 one to implement---for instance---a ``base64`` converter or a converter that
 works wth signed values as handled by ``django.core.signing.TimestampSigner``.
-
-Parametrized type converters
-----------------------------
-
-*The following behaviour is a bit less specified, and may even be postponed
-until a later date or another DEP*
-
-The ``any`` type converter as specified above would be useable as
-
-.. code-block:: python
-
-    path('/post/<any(int, string):id_or_slug>/', views.post_by_id_or_slug),
-
-This is to be implemented using parameter support. Likewise, there could be
-arguments to specify constraints, as follows
-
-.. code-block:: python
-
-    path('/user/<string(min_length=5, max_length=100):username>/', views.user)
-
-Implementation and parsing-wise this is a lot more unspecifiedd. One idea would
-be to supply the part between the ``<`` and the ``:`` to ``eval`` within a
-limited scope which only contains the registered converters (which is fine,
-*if* the ``path`` function can be safely assumed not to handle any user input).
 
 Adding type conversion to the existing system
 ---------------------------------------------

@@ -21,7 +21,7 @@ Abstract
 This DEP defines 2 new properties of Model Fields:
 
 - ``readonly`` keeps Django from trying to write the value of those Fields to the database, either at creation time, update time or both;
-- ``auto_refresh`` makes Django aware that, when creating and/or updating a Field, its value needs to be fetched from the database.
+- ``auto_refresh`` makes Django aware that, when creating and/or updating an object, the value of this Field will need to be fetched from the database.
 
 The addition of those two features will mainly help two different use-cases. Firstly, it will help people who use databases that define their own values for some field (e.g. triggers automatically modifying the value of a column, database views, ...). Secondly, it will provide a simpler baseline for the implementation of advanced database features within Django (database-side default values, simplifying and expanding ``AutoField``, ...).
 
@@ -34,7 +34,7 @@ Readonly
 --------
 
 Of the two features described in this DEP, readonly should be the simplest one.
-It boils down to the following: when a ``Field`` is marked readonly, Django will not write it in the database, ever.
+It boils down to the following: when a ``Field`` is marked readonly, Django will not write its value to the database, ever.
 
 It will be done by removing these field at the SQL compiler level.
 

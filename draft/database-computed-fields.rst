@@ -90,7 +90,7 @@ Readonly fields would be included in serialization but silently excluded from de
 Empty queries
 ^^^^^^^^^^^^^
 
-If a query becomes empty because all its fields are actually readonly, it should not be fired. This is already the case in the compilers, but this behaviour will be kept.
+If a query becomes empty because all its fields are actually readonly, it should not be executed. This is already the case in the compilers, but this behaviour will be kept.
 
 Auto-Refresh
 ------------

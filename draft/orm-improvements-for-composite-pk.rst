@@ -38,6 +38,8 @@ Consider other cases where true virtual fields are needed.
 7. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField``
 8. Refactor all RelationFields based on ``VirtualField`` based ForeignKey
 9. Refactor GenericForeignKey based on ``VirtualField`` based ForeignKey
+10. Make changes to migrations framework to work properly with Reafctored Field
+   API.
 
 
 

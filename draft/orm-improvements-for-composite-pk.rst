@@ -23,68 +23,32 @@ This DEP aims to improve different part of django ORM and other associated parts
 
 Key concerns of New Approach to implement ``CompositeField``
 ==============================================================
-
-1. Change ForeignObjectRel subclasses to real field instances. (For example,
+1. Split out Field API to ConcreteField, BaseField etc and change on ORM based on the splitted API.
+2. Introduce new standalone well defined ``VirtualField``
+3. Incorporate ``VirtualField`` related changes in django
+4. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField`` etc NEW Field API
+5. Figure out other cases where true virtual fields are needed.
+6. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField`` and new Field API based ForeignKey
+7. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
+8. Change ForeignObjectRel subclasses to real field instances. (For example,
  ForeignKey generates a ManyToOneRel in the related model). The Rel instances are already returned from get_field(), but they aren't yet field subclasses.
-2. Allow direct usage of ForeignObjectRel subclasses. In certain cases it can be advantageous to be able to define reverse relations directly. For example, see ​https://github.com/akaariai/django-reverse-unique.
-
-3. Partition ForeignKey to virtual relation field, and concrete data field. The former is the model.author, the latter model.author_id's backing implementation.
-Consider other cases where true virtual fields are needed.
-
-4. Introduce new standalone ``VirtualField``
-5. Incorporate ``VirtualField`` related changes in django
-6. Split out existing Fields API into ``ConcreteField`` and BaseField
-   to utilize ``VirtualField``.
-7. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField``
-8. Refactor all RelationFields based on ``VirtualField`` based ForeignKey
-9. Refactor GenericForeignKey based on ``VirtualField`` based ForeignKey
+9. Allow direct usage of ForeignObjectRel subclasses. In certain cases it can be advantageous to be able to define reverse relations directly. For example, see ​https://github.com/akaariai/django-reverse-unique.
+ 
 10. Make changes to migrations framework to work properly with Reafctored Field
    API.
+11. Consider Database Contraints work of lan-foote and 
+
+12. Changes in AutoField
 
 
+New split out Field API
+=========================
 
-Summary of ``CompositeField``
-=============================
 
-This section summarizes the basic API as established in the proposal for
-GSoC 2011 [1]_.
+Introduce ``VirtualField``
+=========================
 
-A ``CompositeField`` requires a list of enclosed regular model fields as
-positional arguments, as shown in this example::
 
-    class SomeModel(models.Model):
-        first_field = models.IntegerField()
-        second_field = models.CharField(max_length=100)
-        composite = models.CompositeField(first_field, second_field)
-
-The model class then contains a descriptor for the composite field, which
-returns a ``CompositeValue`` which is a customized namedtuple, the
-descriptor accepts any iterable of the appropriate length. An example
-interactive session::
-
-    >>> instance = new SomeModel(first_field=47, second_field="some string")
-    >>> instance.composite
-    CompositeObject(first_field=47, second_field='some string')
-    >>> instance.composite.first_field
-    47
-    >>> instance.composite[1]
-    'some string'
-    >>> instance.composite = (74, "other string")
-    >>> instance.first_field, instance.second_field
-    (74, 'other string')
-
-``CompositeField`` supports the following standard field options:
-``unique``, ``db_index``, ``primary_key``. The first two will simply add a
-corresponding tuple to ``model._meta.unique_together`` or
-``model._meta.index_together``. Other field options don't make much sense
-in the context of composite fields.
-
-Supported ``QuerySet`` filters will be ``exact`` and ``in``. The former
-should be clear enough, the latter is elaborated in a separate section.
-
-It will be possible to use a ``CompositeField`` as a target field of
-``ForeignKey``, ``OneToOneField`` and ``ManyToManyField``. This is
-described in more detail in the following section.
 
 Changes in ``ForeignKey``
 =========================
@@ -167,6 +131,57 @@ it in their projects anyway. I still think the change is worth it, but it
 might be a good idea to include a note about the change in the release
 notes. 
 
+
+
+Summary of ``CompositeField``
+=============================
+
+This section summarizes the basic API as established in the proposal for
+GSoC 2011 [1]_.
+
+A ``CompositeField`` requires a list of enclosed regular model fields as
+positional arguments, as shown in this example::
+
+    class SomeModel(models.Model):
+        first_field = models.IntegerField()
+        second_field = models.CharField(max_length=100)
+        composite = models.CompositeField(first_field, second_field)
+
+The model class then contains a descriptor for the composite field, which
+returns a ``CompositeValue`` which is a customized namedtuple, the
+descriptor accepts any iterable of the appropriate length. An example
+interactive session::
+
+    >>> instance = new SomeModel(first_field=47, second_field="some string")
+    >>> instance.composite
+    CompositeObject(first_field=47, second_field='some string')
+    >>> instance.composite.first_field
+    47
+    >>> instance.composite[1]
+    'some string'
+    >>> instance.composite = (74, "other string")
+    >>> instance.first_field, instance.second_field
+    (74, 'other string')
+
+``CompositeField`` supports the following standard field options:
+``unique``, ``db_index``, ``primary_key``. The first two will simply add a
+corresponding tuple to ``model._meta.unique_together`` or
+``model._meta.index_together``. Other field options don't make much sense
+in the context of composite fields.
+
+Supported ``QuerySet`` filters will be ``exact`` and ``in``. The former
+should be clear enough, the latter is elaborated in a separate section.
+
+It will be possible to use a ``CompositeField`` as a target field of
+``ForeignKey``, ``OneToOneField`` and ``ManyToManyField``. This is
+described in more detail in the following section.
+
+
+
+Alternative Approach of compositeFiled
+=======================================
+
+
 Porting previous work on top of master
 ======================================
 
@@ -231,6 +246,7 @@ any database backend directly, a new flag will be introduced,
 implementation of ``composite_in_sql`` will consult in order to choose
 between the two options.
 
+
 ``contenttypes`` and ``GenericForeignKey``
 ==========================================
 
@@ -282,6 +298,7 @@ chosen by the database may be specific for each database server. Therefore
 I'm inclined to declare ``GenericRelation`` unsupported for models with a
 composite primary key containing any special columns. This should be
 extremely rare anyway.
+
 
 Database introspection, ``inspectdb``
 =====================================

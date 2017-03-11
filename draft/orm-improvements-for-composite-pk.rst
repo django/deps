@@ -74,8 +74,9 @@ Porting previous work on top of master
 ======================================
 
 The first major task of this project is to take the code written as part
-of GSoC 2013 and sync it with the current state of master. The order in
-which It was implemented two years ago was to implement
+of GSoC 2013 and compare it aganist master to have Idea of valid part. 
+
+The order in which It was implemented few years ago was to implement
 ``CompositeField`` first and then a refactor of ``ForeignKey`` which
 is required to make it support ``CompositeField``. This turned out to be
 inefficient with respect to the development process, because some parts of
@@ -87,11 +88,11 @@ rewrite certain parts in a cleaner way than what was necessary for
 ``CompositeField`` alone (e.g. database creation or certain features of
 ``model._meta``).
 
-In light of these findings I am convinced that a better approach would be
-to first do the required refactor of ``ForeignKey`` and implement
-CompositeField as the next step. This will result in a better maintainable
-development branch and a cleaner revision history, making it easier to
-review the work before its eventual inclusion into Django.
+I am convinced that a better approach would be to Improve Field API and later
+imlement VirtualField type to first do the required refactor of ``ForeignKey``
+and implement CompositeField as the next step. This will result in a better 
+maintainable development branch and a cleaner revision history, making it easier
+to review the work before its eventual inclusion into Django.
 
 
 New split out Field API

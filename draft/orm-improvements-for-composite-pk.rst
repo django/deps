@@ -266,6 +266,212 @@ Alternative Approach of compositeFiled
 =======================================
 
 
+Implementation
+--------------
+
+Specifying a CompositeField in a Model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The constructor of a CompositeField will accept the supported options as
+keyword parameters and the enclosed fields will be specified as positional
+parameters. The order in which they are specified will determine their
+order in the namedtuple representing the CompositeField value (i. e. when
+retrieving and assigning the CompositeField's value; see example below).
+
+unique and db_index
+~~~~~~~~~~~~~~~~~~~
+Implementing these will require some modifications in the backend code.
+The table creation code will have to handle virtual fields as well as
+local fields in the table creation and index creation routines
+respectively.
+
+When the code handling CompositeField.unique is finished, the
+models.options.Options class will have to be modified to create a unique
+CompositeField for each tuple in the Meta.unique_together attribute. The
+code handling unique checks in models.Model will also have to be updated
+to reflect the change.
+
+Retrieval and assignment
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Jacob has actually already provided a skeleton of the code that takes care
+of this as seen in [1]. I'll only summarize the behaviour in a brief
+example of my own.
+
+    class SomeModel(models.Model):
+        first_field = models.IntegerField()
+        second_field = models.CharField(max_length=100)
+        composite = models.CompositeField(first_field, second_field)
+
+    >>> instance = new SomeModel(first_field=47, second_field="some string")
+    >>> instance.composite
+    CompositeObject(first_field=47, second_field='some string')
+    >>> instance.composite.first_field
+    47
+    >>> instance.composite[1]
+    'some string'
+    >>> instance.composite = (74, "other string")
+    >>> instance.first_field, instance.second_field
+    (74, 'other string')
+
+Accessing the field attribute will create a CompositeObject instance which
+will behave like a tuple but also with direct access to enclosed field
+values via appropriately named attributes.
+
+Assignment will be possible using any iterable. The order of the values in
+the iterable will have to be the same as the order in which undelying
+fields have been specified to the CompositeField.
+
+QuerySet filtering
+~~~~~~~~~~~~~~~~~~
+
+This is where the real fun begins.
+
+The fundamental problem here is that Q objects which are used all over the
+code that handles filtering are designed to describe single field lookups.
+On the other hand, CompositeFields will require a way to describe several
+individual field lookups by a single expression.
+
+Since the Q objects themselves have no idea about fields at all and the
+actual field resolution from the filter conditions happens deeper down the
+line, inside models.sql.query.Query, this is where we can handle the
+filters properly.
+
+There is already some basic machinery inside Query.add_filter and
+Query.setup_joins that is in use by GenericRelations, this is
+unfortunately not enough. The optional extra_filters field method will be
+of great use here, though it will have to be extended.
+
+Currently the only parameters it gets are the list of joins the
+filter traverses, the position in the list and a negate parameter
+specifying whether the filter is negated. The GenericRelation instance can
+determine the value of the content type (which is what the extra_filters
+method is used for) easily based on the model it belongs to.
+
+This is not the case for a CompositeField -- it doesn't have any idea
+about the values used in the query. Therefore a new parameter has to be
+added to the method so that the CompositeField can construct all the
+actual filters from the iterable containing the values.
+
+Afterwards the handling inside Query is pretty straightforward. For
+CompositeFields (and virtual fields in general) there is no value to be
+used in the where node, the extra_filters are responsible for all
+filtering, but since the filter should apply to a single object even after
+join traversals, the aliases will be set up while handling the "root"
+filter and then reused for each one of the extra_filters.
+
+This way of extending the extra_filters mechanism will allow the field
+class to create conjunctions of atomic conditions. This is sufficient for
+the "__exact" lookup type which will be implemented.
+
+Of the other lookup types, the only one that looks reasonable is "__in".
+This will, however, have to be represented as a disjunction of multiple
+"__exact" conditions since not all database backends support tuple
+construction inside expressions. Therefore this lookup type will be left
+out of this project as the mechanism would need much more work to make it
+possible.
+
+CompositeField.primary_key
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As with db_index and unique, the backend table generating code will have
+to be updated to set the PRIMARY KEY to a tuple. In this case, however,
+the impact on the rest of the ORM and some other parts of Django is more
+serious.
+
+A (hopefully) complete list of things affected by this is:
+- the admin: the possibility to pass the value of the primary key as a
+  parameter inside the URL is a necessity to be able to work with a model
+- contenttypes: since the admin uses GenericForeignKeys to log activity,
+  there will have to be some support
+- forms: more precisely, ModelForms and their ModelChoiceFields
+- relationship fields: ForeignKey, ManyToManyField and OneToOneField will
+  need a way to point to a model with a CompositeField as its primary key
+
+Let's look at each one of them in more detail.
+
+Admin
+~~~~~
+
+The solution that has been proposed so many times in the past [2], [3] is
+to extend the quote function used in the admin to also quote the comma and
+then use an unquoted comma as the separator. Even though this solution
+looks ugly to some, I don't think there is much choice -- there needs to
+be a way to separate the values and in theory, any character could be
+contained inside a value so we can't really avoid choosing one and
+escaping it.
+
+GenericForeignKeys
+~~~~~~~~~~~~~~~~~~
+
+Even though the admin uses the contenttypes framework to log the history
+of actions, it turns out proper handling on the admin side will make
+things work without the need to modify GenericForeignKey code at all. This
+is thanks to the fact that the admin uses only the ContentType field and
+handles the relations on its own. Making sure the unquoting function
+recreates the whole CompositeObjects where necessary should suffice.
+
+At a later stage, however, GenericForeignKeys could also be improved to
+support composite primary keys. Using the same quoting solution as in the
+admin could work in theory, although it would only allow fields capable of
+storing arbitrary strings to be usable for object_id storage. This has
+been left out of the scope of this project, though.
+
+ModelChoiceFields
+~~~~~~~~~~~~~~~~~
+
+Again, we need a way to specify the value as a parameter passed in the
+form. The same escaping solution can be used even here.
+
+Relationship fields
+~~~~~~~~~~~~~~~~~~~
+
+This turns out to be, not too surprisingly, the toughest problem. The fact
+that related fields are spread across about fifteen different classes,
+most of which are quite nontrivial, makes the whole bundle pretty fragile,
+which means the changes have to be made carefully not to break anything.
+
+What we need to achieve is that the ForeignKey, ManyToManyField and
+OneToOneField detect when their target field is a CompositeField in
+several situations and act accordingly since this will require different
+handling than regular fields that map directly to database columns.
+
+The first one to look at is ForeignKey since the other two rely on its
+functionality, OneToOneField being its descendant and ManyToManyField
+using ForeignKeys in the intermediary model. Once the ForeignKeys work,
+OneToOneField should require minimal to no changes since it inherits
+almost everything from ForeignKey.
+
+The easiest part is that for composite related fields, the db_type will be
+None since the data will be stored elsewhere.
+
+ForeignKey and OneToOneField will also be able to create the underlying
+fields automatically when added to the model. I'm proposing the following
+default names: "fkname_targetname" where "fkname" is the name of the
+ForeignKey field and "targetname" is the name of the remote field name
+corresponding to the local one. I'm open to other suggestions on this.
+
+There will also be a way to override the default names using a new field
+option "enclosed_fields". This option will expect a tuple of fields each
+of whose corresponds to one individual field in the same order as
+specified in the target CompositeField. This option will be ignored for
+non-composite ForeignKeys.
+
+The trickiest part, however, will be relation traversals in QuerySet
+lookups. Currently the code in models.sql.query.Query that creates joins
+only joins on single columns. To be able to span a composite relationship
+the code that generates joins will have to recognize column tuples and add
+a constraint for each pair of corresponding columns with the same aliases
+in all conditions.
+
+For the sake of completeness, ForeignKey will also have an extra_filters
+method allowing to filter by a related object or its primary key.
+
+With all this infrastructure set up, ManyToMany relationships using
+composite fields will be easy enough. Intermediary model creation will
+work thanks to automatic underlying field creation for composite fields
+and traversal in both directions will be supported by the query code.
+
 
 ``__in`` lookups for ``CompositeField``
 =======================================
@@ -422,6 +628,31 @@ timeline. It isn't a necessity, we can always just add a note to the docs
 that ``inspectdb`` just can't detect certain scenarios and ask people to
 edit their models manually.
 
+
+Other considerations
+--------------------
+
+This infrastructure will allow reimplementing the GenericForeignKey as a
+CompositeField at a later stage. Thanks to the modifications in the
+joining code it should also be possible to implement bidirectional generic
+relationship traversal in QuerySet filters. This is, however, out of scope
+of this project.
+
+CompositeFields will have the serialize option set to False to prevent
+their serialization. Otherwise the enclosed fields would be serialized
+twice which would not only infer redundancy but also ambiguity.
+
+Also CompositeFields will be ignored in ModelForms by default, for two
+reasons: 
+- otherwise the same field would be inside the form twice
+- there aren't really any form fields usable for tuples and a fieldset
+  would require even more out-of-scope machinery
+
+The CompositeField will not allow enclosing other CompositeFields. The
+only exception might be the case of composite ForeignKeys which could also
+be implemented after successful finish of this project. With this feature
+the autogenerated intermediary M2M model could make the two ForeignKeys
+its primary key, dropping the need to have a redundant id AutoField.
 
 Updatable primary keys in models
 ================================

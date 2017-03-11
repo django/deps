@@ -97,6 +97,33 @@ to review the work before its eventual inclusion into Django.
 
 New split out Field API
 =========================
+1. BaseField:
+-------------
+Base structure for all Field types in django ORM wheather it is Concrete
+or VirtualField
+
+2. ConcreteField:
+-----------------
+ConcreteField will have all the common attributes of a Regular concrete field
+
+3. Field:
+---------
+Presence base Field class with should refactored using BaseField and ConcreteField.
+If it is decided to provide the optional virtual type to regular fields then VirtualField's features can also be added to specific fields.
+
+4. VirtualField:
+----------------
+A true stand alone virtula field will be added to the system to be used to solve some long standing design limitations of django orm. initially RelationFields, GenericRelations etc will be benefitted by using VirtualFields and later CompositeField
+or any virtual type field can be benefitted from VirtualField.
+
+5. RelationField:
+-----------------
+
+
+6. CompositeField:
+------------------
+A composite field can be implemented based on BaseField and VirtualField to solve
+the CompositeKey/Multi column PrimaryKey issue.
 
 
 Introduce standalone ``VirtualField``
@@ -185,6 +212,9 @@ it in their projects anyway. I still think the change is worth it, but it
 might be a good idea to include a note about the change in the release
 notes. 
 
+
+Changes in ``RelationField``
+=============================
 
 
 Summary of ``CompositeField``

@@ -41,6 +41,30 @@ Key concerns of New Approach to implement ``CompositeField``
 12. Changes in AutoField
 
 
+Porting previous work on top of master
+======================================
+
+The first major task of this project is to take the code written as part
+of GSoC 2013 and sync it with the current state of master. The order in
+which It was implemented two years ago was to implement
+``CompositeField`` first and then a refactor of ``ForeignKey`` which
+is required to make it support ``CompositeField``. This turned out to be
+inefficient with respect to the development process, because some parts of
+the refactor broke the introduced ``CompositeField`` functionality,
+meaning that it was needed effectively reimplement parts of it again.
+
+Also, some abstractions introduced by the refactor made it possible to
+rewrite certain parts in a cleaner way than what was necessary for
+``CompositeField`` alone (e.g. database creation or certain features of
+``model._meta``).
+
+In light of these findings I am convinced that a better approach would be
+to first do the required refactor of ``ForeignKey`` and implement
+CompositeField as the next step. This will result in a better maintainable
+development branch and a cleaner revision history, making it easier to
+review the work before its eventual inclusion into Django.
+
+
 New split out Field API
 =========================
 
@@ -182,27 +206,6 @@ Alternative Approach of compositeFiled
 =======================================
 
 
-Porting previous work on top of master
-======================================
-
-The first major task of this project is to take the code I wrote as part
-of GSoC 2011 and sync it with the current state of master. The order in
-which I implemented things two years ago was to implement
-``CompositeField`` first and then I did a refactor of ``ForeignKey`` which
-is required to make it support ``CompositeField``. This turned out to be
-inefficient with respect to the development process, because some parts of
-the refactor broke the introduced ``CompositeField`` functionality,
-meaning I had to effectively reimplement parts of it again. Also, some
-abstractions introduced by the refactor made it possible to rewrite
-certain parts in a cleaner way than what was necessary for
-``CompositeField`` alone (e.g. database creation or certain features of
-``model._meta``).
-
-In light of these findings I am convinced that a better approach would be
-to first do the required refactor of ``ForeignKey`` and implement
-CompositeField as the next step. This will result in a better maintainable
-development branch and a cleaner revision history, making it easier to
-review the work before its eventual inclusion into Django.
 
 ``__in`` lookups for ``CompositeField``
 =======================================
@@ -359,13 +362,14 @@ timeline. It isn't a necessity, we can always just add a note to the docs
 that ``inspectdb`` just can't detect certain scenarios and ask people to
 edit their models manually.
 
+
 Updatable primary keys in models
 ================================
 
 The algorithm that determines what kind of database query to issue on
-``model.save()`` is a fairly simple and well-documented one [6]_. If a row
-exists in the database with the value of its primary key equal to the
-saved object, it is updated, otherwise a new row is inserted. This
+``model.save()`` is a fairly simple and well-documented one [6]_. If a 
+row exists in the database with the value of its primary key equal to 
+the saved object, it is updated, otherwise a new row is inserted. This
 behavior is intuitive and works well for models where the primary key is
 automatically created by the framework (be it an ``AutoField`` or a parent
 link in the case of model inheritance).
@@ -446,11 +450,4 @@ track of which field depends on which in a graph of potentially unlimited
 size. Compared to this, deletion is simpler as it only needs to find a
 list of all affected model instances as opposed to having to keep track of
 which field to update using which value.
-
-Given the complexity of this problem and the fact that it is not directly
-related to composite fields, this is left as the last feature which will
-be implemented only if I manage to finish everything else on time.
-
-
-# https://people.ksp.sk/~johnny64/GSoC-full-proposal
 

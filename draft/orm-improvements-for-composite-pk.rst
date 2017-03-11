@@ -18,8 +18,31 @@ DEP : ORM Fields and related improvement for composite PK
 
 Abstract
 ========
+Django's ORM is a powerful tool which suits perfectly most use-cases,
+however, there are cases where having exactly one primary key column per
+table induces unnecessary redundancy.
 
-This DEP aims to improve different part of django ORM and other associated parts of django to support composite primary key in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works.
+One such case is the many-to-many intermediary model. Even though the pair
+of ForeignKeys in this model identifies uniquely each relationship, an
+additional field is required by the ORM to identify individual rows. While
+this isn't a real problem when the underlying database schema is created
+by Django, it becomes an obstacle as soon as one tries to develop a Django
+application using a legacy database.
+
+Since there is already a lot of code relying on the pk property of model
+instances and the ability to use it in QuerySet filters, it is necessary
+to implement a mechanism to allow filtering of several actual fields by
+specifying a single filter.
+
+The proposed solution is using Virtualfield type, CompositeField. This field
+type will enclose several real fields within one single object.
+
+
+Motivation
+==========
+This DEP aims to improve different part of django ORM and other associated parts of django to support composite primary key in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
+and design everything as much simple and small as possible to be able to implement separately.
+
 
 Key concerns of New Approach to implement ``CompositeField``
 ==============================================================
@@ -36,9 +59,15 @@ Key concerns of New Approach to implement ``CompositeField``
  
 10. Make changes to migrations framework to work properly with Reafctored Field
    API.
-11. Consider Database Contraints work of lan-foote and 
 
-12. Changes in AutoField
+11. Make sure new class based Index API ise used properly with refactored Field
+   API.
+
+12. Consider Database Contraints work of lan-foote and 
+
+13. SubField/AuxilaryField
+
+14. Update in AutoField
 
 
 Porting previous work on top of master
@@ -69,8 +98,8 @@ New split out Field API
 =========================
 
 
-Introduce ``VirtualField``
-=========================
+Introduce standalone ``VirtualField``
+=====================================
 
 
 

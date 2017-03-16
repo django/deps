@@ -22,6 +22,8 @@ Django's ORM is a powerful tool which suits perfectly most use-cases,
 however, there are cases where having exactly one primary key column per
 table induces unnecessary redundancy.
 
+Django ORM fields does have some historical design decisions like 
+
 One such case is the many-to-many intermediary model. Even though the pair
 of ForeignKeys in this model identifies uniquely each relationship, an
 additional field is required by the ORM to identify individual rows. While

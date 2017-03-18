@@ -42,6 +42,21 @@ The proposed solution is using Virtualfield type, and necessary VirtualField
 desendent Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
 
 
+Notes on Porting previous work on top of master:
+================================================
+Considering the huge changes in ORM internals it is not practical and trivial
+to try and rebase the previous works related to ForeignKey refactor and
+CompositeKey without figuring out new approach on top of master and present
+ORM internals design.
+
+A better approach would be to Improve Field API, RealtionField API and model._meta 
+first.
+Later imlement VirtualField type to first and star refactor of ``ForeignKey``
+and implement CompositeField as the next step. This will result in a better 
+maintainable development branch and a cleaner revision history, making it easier
+to review the work before its eventual inclusion into Django.
+
+
 Abstract
 ==========
 This DEP aims to improve different part of django ORM and other associated parts of django to support Real VirtualField type in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
@@ -53,7 +68,7 @@ To keep thing sane I will try to split the Dep in 3 major Part:
 3. CompositeField API formalization
 
 
-Key concerns of New Approach to implement ``CompositeField``
+Key steps of New Approach to improve ORM Field API internals:
 ==============================================================
 1. Split out Field API logically to separate ConcreteField,
  BaseField etc and change on ORM based on the splitted API.
@@ -90,32 +105,13 @@ Key concerns of New Approach to implement ``CompositeField``
 15. Update in AutoField
 
 
-Porting previous work on top of master
-======================================
-
-The first major task of this project is to take the code written as part
-of GSoC 2013 and compare it aganist master to have Idea of valid part. 
-
-The order in which It was implemented few years ago was to implement
-``CompositeField`` first and then a refactor of ``ForeignKey`` which
-is required to make it support ``CompositeField``. This turned out to be
-inefficient with respect to the development process, because some parts of
-the refactor broke the introduced ``CompositeField`` functionality,
-meaning that it was needed effectively reimplement parts of it again.
-
-Also, some abstractions introduced by the refactor made it possible to
-rewrite certain parts in a cleaner way than what was necessary for
-``CompositeField`` alone (e.g. database creation or certain features of
-``model._meta``).
-
-I am convinced that a better approach would be to Improve Field API and RealtionField API and later imlement VirtualField type to first do the required refactor of ``ForeignKey``
-and implement CompositeField as the next step. This will result in a better 
-maintainable development branch and a cleaner revision history, making it easier
-to review the work before its eventual inclusion into Django.
 
 
-Specification:
+Specifications:
 ===============
+
+Part-1:
+=======
 
 New split out Field API
 =========================
@@ -141,18 +137,14 @@ or any virtual type field can be benefitted from VirtualField.
 5. RelationField:
 -----------------
 
-
-
-
-
-
-
-
 6. CompositeField:
 ------------------
 A composite field can be implemented based on BaseField and VirtualField to solve
 the CompositeKey/Multi column PrimaryKey issue.
 
+
+Part-2:
+=======
 
 Introduce standalone ``VirtualField``
 =====================================
@@ -245,40 +237,10 @@ Changes in ``RelationField``
 =============================
 
 
-Summary of ``CompositeField``
-=============================
-
-
-
-
-Alternative Approach of compositeFiled
-=======================================
 
 
 Implementation
 --------------
-
-
-
-
-CompositeField.primary_key
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As with db_index and unique, the backend table generating code will have
-to be updated to set the PRIMARY KEY to a tuple. In this case, however,
-the impact on the rest of the ORM and some other parts of Django is more
-serious.
-
-A (hopefully) complete list of things affected by this is:
-- the admin: the possibility to pass the value of the primary key as a
-  parameter inside the URL is a necessity to be able to work with a model
-- contenttypes: since the admin uses GenericForeignKeys to log activity,
-  there will have to be some support
-- forms: more precisely, ModelForms and their ModelChoiceFields
-- relationship fields: ForeignKey, ManyToManyField and OneToOneField will
-  need a way to point to a model with a CompositeField as its primary key
-
-Let's look at each one of them in more detail.
 
 Admin
 ~~~~~
@@ -595,91 +557,4 @@ be implemented after successful finish of this project. With this feature
 the autogenerated intermediary M2M model could make the two ForeignKeys
 its primary key, dropping the need to have a redundant id AutoField.
 
-Updatable primary keys in models
-================================
-
-The algorithm that determines what kind of database query to issue on
-``model.save()`` is a fairly simple and well-documented one [6]_. If a 
-row exists in the database with the value of its primary key equal to 
-the saved object, it is updated, otherwise a new row is inserted. This
-behavior is intuitive and works well for models where the primary key is
-automatically created by the framework (be it an ``AutoField`` or a parent
-link in the case of model inheritance).
-
-However, as soon as the primary key is explicitly created, the behavior
-becomes less intuitive and might be confusing, for example, to users of the
-admin. For instance, say we have the following model::
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=47)
-        last_name = models.CharField(max_length=47)
-        shoe_size = models.PositiveSmallIntegerField()
-
-        full_name = models.CompositeField(first_name, last_name,
-                                          primary_key=True)
-
-Then we register the model in the admin using the standard one-liner::
-
-    admin.site.register(Person)
-
-Since we haven't excluded any fields, all three fields will be editable in
-the admin. Now, suppose there's an instance whose ``full_name`` is
-``CompositeValue(first_name='Darth', last_name='Vadur')``. A user decides
-to fix the last name using the admin, hits the “Save” button and instead
-of fixing an existing record, a new one will appear with the new value,
-while the old one remains untouched.  This behavior is clearly broken from
-the point of view of the user.
-
-It can be argued that it is the developer's fault that the database schema
-is poorly chosen and that they expose the primary key to their users.
-While this may be true in some cases, it is still to some extent a
-subjective matter.
-
-Therefore I propose a new behavior for ``model.save()`` where it would
-detect a change in the instance's primary key and in that case issue an
-``UPDATE`` for the right row, i.e. ``WHERE primary_key = previous_value``.
-
-Of course, just going ahead and changing the behavior in this way for all
-models would be backwards incompatible. To do this properly, we would need
-to make this an opt-in feature. This can be achieved in multiple ways.
-
-1) add a keyword argument such as ``update_pk`` to ``Model.save``
-2) add a new option to ``Model.Meta``, ``updatable_pk``
-3) make this a project-wide setting
-
-Option 3 doesn't look pleasant and I think I can safely eliminate that.
-Option 2 is somewhat better, although it adds a new ``Meta`` option.
-Option 1 is the most flexible solution, however, it does not change the
-behavior of the admin, at least not by default. This can be worked around
-by overriding the ``save`` method to use a different default::
-
-    class MyModel(models.Model):
-        def save(self, update_pk=True, **kwargs):
-            kwargs['update_pk'] = update_pk
-            return super(MyModel, self).save(**kwargs)
-
-To avoid the need to repeat this for each model, a class decorator might
-be provided to perform this automatically.
-
-In order to implement this new behavior a little bit of extra complexity
-would have to be added to models. Model instances would need to store the
-last known value of the primary key as retrieved from the database. On
-save it would just find out whether the last known value is present and in
-that case issue an ``UPDATE`` using the old value in the ``WHERE``
-condition.
-
-So far so good, this could be implemented fairly easily. However, the
-problem becomes considerably more difficult as soon as we take into
-account the fact that updating a primary key value may break foreign key
-references. In order to avoid breaking references the ``on_delete``
-mechanism of ``ForeignKey`` would have to be extended to support updates
-as well. This means that the collector used by deletion will need to be
-extended as well.
-
-The problem becomes particularly nasty if we realize that a ``ForeignKey``
-might be part of a primary key, which means the collector needs to keep
-track of which field depends on which in a graph of potentially unlimited
-size. Compared to this, deletion is simpler as it only needs to find a
-list of all affected model instances as opposed to having to keep track of
-which field to update using which value.
 

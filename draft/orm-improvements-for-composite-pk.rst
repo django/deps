@@ -18,12 +18,15 @@ DEP : ORM Fields and related improvement for composite PK
 
 Abstract
 ========
-Django's ORM is a powerful tool which suits perfectly most use-cases,
-however, there are cases where having exactly one primary key column per
+Django's ORM is a simple & powerful tool which suits most use-cases,
+however, there are some historical design decisions like all the fields are
+concreteField by default. This type of design limitation made it difficult
+to add support for composite primarykey or working with relationField/genericRelations
+very inconsistant behaviour.
+
+cases where having exactly one primary key column per
 table induces unnecessary redundancy.
-
-Django ORM fields does have some historical design decisions like 
-
+ 
 One such case is the many-to-many intermediary model. Even though the pair
 of ForeignKeys in this model identifies uniquely each relationship, an
 additional field is required by the ORM to identify individual rows. While
@@ -36,13 +39,13 @@ instances and the ability to use it in QuerySet filters, it is necessary
 to implement a mechanism to allow filtering of several actual fields by
 specifying a single filter.
 
-The proposed solution is using Virtualfield type, CompositeField. This field
-type will enclose several real fields within one single object.
+The proposed solution is using Virtualfield type, and necessary VirtualField desendent
+Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
 
 
 Motivation
 ==========
-This DEP aims to improve different part of django ORM and other associated parts of django to support composite primary key in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
+This DEP aims to improve different part of django ORM and other associated parts of django to support Real VirtualField type in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
 and design everything as much simple and small as possible to be able to implement separately.
 
 

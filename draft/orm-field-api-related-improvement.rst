@@ -26,20 +26,7 @@ behaviour
 This type of design limitation made it difficult to add support for composite primarykey or working with relationField/genericRelations very annoying as it
 produces inconsistant behaviour and a very hard implementation to maintain.
 
-Also there are such case is the many-to-many intermediary model. Even though
-the pair of ForeignKeys in this model identifies uniquely each relationship,
-an additional field is required by the ORM to identify individual rows. While
-this isn't a real problem when the underlying database schema is created
-by Django, it becomes an obstacle as soon as one tries to develop a Django
-application using a legacy database.
-
-Since there is already a lot of code relying on the pk property of model
-instances and the ability to use it in QuerySet filters, it is necessary
-to implement a mechanism to allow filtering of several actual fields by
-specifying a single filter.
-
-The proposed solution is using Virtualfield type, and necessary VirtualField
-desendent Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
+The proposed solution is using Cleanup/provisional RealatedField API, Virtualfield type, and necessary VirtualField desendent Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
 
 
 Notes on Porting previous work on top of master:
@@ -143,6 +130,7 @@ A composite field can be implemented based on BaseField and VirtualField to solv
 the CompositeKey/Multi column PrimaryKey issue.
 
 
+
 Part-2:
 =======
 
@@ -235,12 +223,6 @@ notes.
 
 Changes in ``RelationField``
 =============================
-
-
-
-
-Implementation
---------------
 
 Admin
 ~~~~~
@@ -429,7 +411,7 @@ construction inside expressions. Therefore this lookup type will be left
 out of this project as the mechanism would need much more work to make it
 possible.
 
-``__in`` lookups for ``CompositeField``
+``__in`` lookups for ``VirtualField``
 =======================================
 
 The existing implementation of ``CompositeField`` handles ``__in`` lookups
@@ -471,65 +453,6 @@ any database backend directly, a new flag will be introduced,
 implementation of ``composite_in_sql`` will consult in order to choose
 between the two options.
 
-
-Database introspection, ``inspectdb``
-=====================================
-
-There are three main goals concerning database introspection in this
-project. The first is to ensure the output of ``inspectdb`` remains the
-same as it is now for models with simple primary keys and simple foreign
-key references, or at least equivalent. While this shouldn't be too
-difficult to achieve, it will still be regarded with high importance.
-
-The second goal is to extend ``inspectdb`` to also create a
-``CompositeField`` in models where the table contains a composite primary
-key. This part shouldn't be too difficult,
-``DatabaseIntrospection.get_primary_key_column`` will be renamed to
-``get_primary_key`` which will return a tuple of columns and in case the
-tuple contains more than one element, an appropriate ``CompositeField``
-will be added. This will also require updating
-``DatabaseWrapper.check_constraints`` for certain backends since it uses
-``get_primary_key_column``.
-
-The third goal is to also make ``inspectdb`` aware of composite foreign
-keys. This will need a rewrite of ``get_relations`` which will have to
-return a mapping between tuples of columns instead of single columns. It
-should also ensure each tuple of columns pointed to by a foreign key gets
-a ``CompositeField``. This part will also probably require some changes in
-other backend methods as well, especially since each backend has a unique
-tangle of introspection methods.
-
-This part requires a tremendous amount of work, because practically every
-single change needs to be done four times and needs separate research of
-the specific backend in question. Therefore I can't promise to deliver full support
-for all features mentioned in this section for all backends. I'd say
-backwards compatibility is a requirement, recognition of composite primary
-keys is a highly wanted feature that I'll try to implement for as many
-backends as possible and recognition of composite foreign keys would be a
-nice extra to have for at least one or two backends.
-
-I'll be implementing the features for the individual backends in the
-following order: PostgreSQL, MySQL, SQLite and Oracle. I put PostgreSQL
-first because, well, this is the backend with the best support in Django
-(and also because it is the one where I'd actually use the features I'm
-proposing). Oracle comes last because I don't have any way to test it and
-I'm afraid I'd be stabbing in the dark anyway. Of the two remaining
-backends I put MySQL first for two reasons. First, I don't think people
-need to run ``inspectdb`` on SQLite databases too often (if ever). Second,
-on MySQL the task seems marginally easier as the database has
-introspection features other than just “give me the SQL statement used to
-create this table”, whose parsing is most likely going to be a complete
-mess.
-
-All in all, extending ``inspectdb`` features is a tedious and difficult
-task with shady outcome, which I'm well aware of. Still, I would like to
-try to at least implement the easier parts for the most used backends. It
-might quite possibly turn out that I won't manage to implement more than
-composite primary key detection for PostgreSQL. This is the reason I keep
-this as one of the last features I intend to work on, as shown in the
-timeline. It isn't a necessity, we can always just add a note to the docs
-that ``inspectdb`` just can't detect certain scenarios and ask people to
-edit their models manually.
 
 
 Other considerations

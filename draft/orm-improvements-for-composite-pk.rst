@@ -93,8 +93,7 @@ rewrite certain parts in a cleaner way than what was necessary for
 ``CompositeField`` alone (e.g. database creation or certain features of
 ``model._meta``).
 
-I am convinced that a better approach would be to Improve Field API and later
-imlement VirtualField type to first do the required refactor of ``ForeignKey``
+I am convinced that a better approach would be to Improve Field API and RealtionField API and later imlement VirtualField type to first do the required refactor of ``ForeignKey``
 and implement CompositeField as the next step. This will result in a better 
 maintainable development branch and a cleaner revision history, making it easier
 to review the work before its eventual inclusion into Django.

@@ -7,8 +7,8 @@ DEP : ORM Fields API & Related Improvements
 :Implementation Team: Asif Saif Uddin, django core team
 :Shepherd: Django Core Team
 :Status: Draft
-:Type: Feature
-:Created: 2017-3-2
+:Type: Feature/Cleanup/Optimization
+:Created: 2017-3-18
 :Last-Modified: 2017-00-00
 
 .. contents:: Table of Contents
@@ -16,20 +16,19 @@ DEP : ORM Fields API & Related Improvements
    :local:
 
 
-Abstract
-========
+Background:
+===========
 Django's ORM is a simple & powerful tool which suits most use-cases,
-however, there are some historical design decisions like all the fields are
-concreteField by default. This type of design limitation made it difficult
-to add support for composite primarykey or working with relationField/genericRelations
-very inconsistant behaviour.
+however, there are some historical design limitations and many inconsistant
+implementation in orm relation fields API which produce many inconsistant
+behaviour
 
-cases where having exactly one primary key column per
-table induces unnecessary redundancy.
- 
-One such case is the many-to-many intermediary model. Even though the pair
-of ForeignKeys in this model identifies uniquely each relationship, an
-additional field is required by the ORM to identify individual rows. While
+This type of design limitation made it difficult to add support for composite primarykey or working with relationField/genericRelations very annoying as it
+produces inconsistant behaviour and a very hard implementation to maintain.
+
+Also there are such case is the many-to-many intermediary model. Even though
+the pair of ForeignKeys in this model identifies uniquely each relationship,
+an additional field is required by the ORM to identify individual rows. While
 this isn't a real problem when the underlying database schema is created
 by Django, it becomes an obstacle as soon as one tries to develop a Django
 application using a legacy database.
@@ -39,11 +38,11 @@ instances and the ability to use it in QuerySet filters, it is necessary
 to implement a mechanism to allow filtering of several actual fields by
 specifying a single filter.
 
-The proposed solution is using Virtualfield type, and necessary VirtualField desendent
-Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
+The proposed solution is using Virtualfield type, and necessary VirtualField
+desendent Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
 
 
-Motivation
+Abstract
 ==========
 This DEP aims to improve different part of django ORM and other associated parts of django to support Real VirtualField type in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
 and design everything as much simple and small as possible to be able to implement separately.
@@ -51,28 +50,39 @@ and design everything as much simple and small as possible to be able to impleme
 
 Key concerns of New Approach to implement ``CompositeField``
 ==============================================================
-1. Split out Field API to ConcreteField, BaseField etc and change on ORM based on the splitted API.
-2. Introduce new standalone well defined ``VirtualField``
-3. Incorporate ``VirtualField`` related changes in django
-4. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField`` etc NEW Field API
-5. Figure out other cases where true virtual fields are needed.
-6. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField`` and new Field API based ForeignKey
-7. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
-8. Change ForeignObjectRel subclasses to real field instances. (For example,
+1. Split out Field API logically to separate ConcreteField,
+ BaseField etc and change on ORM based on the splitted API.
+
+2. Change ForeignObjectRel subclasses to real field instances. (For example,
  ForeignKey generates a ManyToOneRel in the related model). The Rel instances are already returned from get_field(), but they aren't yet field subclasses.
-9. Allow direct usage of ForeignObjectRel subclasses. In certain cases it can be advantageous to be able to define reverse relations directly. For example, see ​https://github.com/akaariai/django-reverse-unique.
+
+3. Allow direct usage of ForeignObjectRel subclasses. In certain cases it can be 
+ advantageous to be able to define reverse relations directly. For example,
+ see ​https://github.com/akaariai/django-reverse-unique.
+
+5. Introduce new standalone well defined ``VirtualField``
+
+6. Incorporate ``VirtualField`` related changes in django
+
+7. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField`` etc NEW Field API
+
+8. Figure out other cases where true virtual fields are needed.
+
+9. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField`` and new Field API based ForeignKey
+
+10. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
  
-10. Make changes to migrations framework to work properly with Reafctored Field
+11. Make changes to migrations framework to work properly with Reafctored Field
    API.
 
-11. Make sure new class based Index API ise used properly with refactored Field
+12. Make sure new class based Index API ise used properly with refactored Field
    API.
 
-12. Consider Database Contraints work of lan-foote and 
+13. Consider Database Contraints work of lan-foote and 
 
-13. SubField/AuxilaryField
+14. SubField/AuxilaryField
 
-14. Update in AutoField
+15. Update in AutoField
 
 
 Porting previous work on top of master

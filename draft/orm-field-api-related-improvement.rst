@@ -47,6 +47,11 @@ Abstract
 This DEP aims to improve different part of django ORM and other associated parts of django to support Real VirtualField type in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
 and design everything as much simple and small as possible to be able to implement separately.
 
+To keep thing sane I will try to split the Dep in 3 major Part:
+1. Logical refactor of present Field API and RelationField API
+2. VirtualField Based refactor
+3. CompositeField API formalization
+
 
 Key concerns of New Approach to implement ``CompositeField``
 ==============================================================

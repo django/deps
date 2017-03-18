@@ -114,6 +114,9 @@ maintainable development branch and a cleaner revision history, making it easier
 to review the work before its eventual inclusion into Django.
 
 
+Specification:
+===============
+
 New split out Field API
 =========================
 1. BaseField:
@@ -137,6 +140,12 @@ or any virtual type field can be benefitted from VirtualField.
 
 5. RelationField:
 -----------------
+
+
+
+
+
+
 
 
 6. CompositeField:
@@ -239,45 +248,6 @@ Changes in ``RelationField``
 Summary of ``CompositeField``
 =============================
 
-This section summarizes the basic API as established in the proposal for
-GSoC 2011 [1]_.
-
-A ``CompositeField`` requires a list of enclosed regular model fields as
-positional arguments, as shown in this example::
-
-    class SomeModel(models.Model):
-        first_field = models.IntegerField()
-        second_field = models.CharField(max_length=100)
-        composite = models.CompositeField(first_field, second_field)
-
-The model class then contains a descriptor for the composite field, which
-returns a ``CompositeValue`` which is a customized namedtuple, the
-descriptor accepts any iterable of the appropriate length. An example
-interactive session::
-
-    >>> instance = new SomeModel(first_field=47, second_field="some string")
-    >>> instance.composite
-    CompositeObject(first_field=47, second_field='some string')
-    >>> instance.composite.first_field
-    47
-    >>> instance.composite[1]
-    'some string'
-    >>> instance.composite = (74, "other string")
-    >>> instance.first_field, instance.second_field
-    (74, 'other string')
-
-``CompositeField`` supports the following standard field options:
-``unique``, ``db_index``, ``primary_key``. The first two will simply add a
-corresponding tuple to ``model._meta.unique_together`` or
-``model._meta.index_together``. Other field options don't make much sense
-in the context of composite fields.
-
-Supported ``QuerySet`` filters will be ``exact`` and ``in``. The former
-should be clear enough, the latter is elaborated in a separate section.
-
-It will be possible to use a ``CompositeField`` as a target field of
-``ForeignKey``, ``OneToOneField`` and ``ManyToManyField``. This is
-described in more detail in the following section.
 
 
 
@@ -288,107 +258,8 @@ Alternative Approach of compositeFiled
 Implementation
 --------------
 
-Specifying a CompositeField in a Model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The constructor of a CompositeField will accept the supported options as
-keyword parameters and the enclosed fields will be specified as positional
-parameters. The order in which they are specified will determine their
-order in the namedtuple representing the CompositeField value (i. e. when
-retrieving and assigning the CompositeField's value; see example below).
 
-unique and db_index
-~~~~~~~~~~~~~~~~~~~
-Implementing these will require some modifications in the backend code.
-The table creation code will have to handle virtual fields as well as
-local fields in the table creation and index creation routines
-respectively.
-
-When the code handling CompositeField.unique is finished, the
-models.options.Options class will have to be modified to create a unique
-CompositeField for each tuple in the Meta.unique_together attribute. The
-code handling unique checks in models.Model will also have to be updated
-to reflect the change.
-
-Retrieval and assignment
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-Jacob has actually already provided a skeleton of the code that takes care
-of this as seen in [1]. I'll only summarize the behaviour in a brief
-example of my own.
-
-    class SomeModel(models.Model):
-        first_field = models.IntegerField()
-        second_field = models.CharField(max_length=100)
-        composite = models.CompositeField(first_field, second_field)
-
-    >>> instance = new SomeModel(first_field=47, second_field="some string")
-    >>> instance.composite
-    CompositeObject(first_field=47, second_field='some string')
-    >>> instance.composite.first_field
-    47
-    >>> instance.composite[1]
-    'some string'
-    >>> instance.composite = (74, "other string")
-    >>> instance.first_field, instance.second_field
-    (74, 'other string')
-
-Accessing the field attribute will create a CompositeObject instance which
-will behave like a tuple but also with direct access to enclosed field
-values via appropriately named attributes.
-
-Assignment will be possible using any iterable. The order of the values in
-the iterable will have to be the same as the order in which undelying
-fields have been specified to the CompositeField.
-
-QuerySet filtering
-~~~~~~~~~~~~~~~~~~
-
-This is where the real fun begins.
-
-The fundamental problem here is that Q objects which are used all over the
-code that handles filtering are designed to describe single field lookups.
-On the other hand, CompositeFields will require a way to describe several
-individual field lookups by a single expression.
-
-Since the Q objects themselves have no idea about fields at all and the
-actual field resolution from the filter conditions happens deeper down the
-line, inside models.sql.query.Query, this is where we can handle the
-filters properly.
-
-There is already some basic machinery inside Query.add_filter and
-Query.setup_joins that is in use by GenericRelations, this is
-unfortunately not enough. The optional extra_filters field method will be
-of great use here, though it will have to be extended.
-
-Currently the only parameters it gets are the list of joins the
-filter traverses, the position in the list and a negate parameter
-specifying whether the filter is negated. The GenericRelation instance can
-determine the value of the content type (which is what the extra_filters
-method is used for) easily based on the model it belongs to.
-
-This is not the case for a CompositeField -- it doesn't have any idea
-about the values used in the query. Therefore a new parameter has to be
-added to the method so that the CompositeField can construct all the
-actual filters from the iterable containing the values.
-
-Afterwards the handling inside Query is pretty straightforward. For
-CompositeFields (and virtual fields in general) there is no value to be
-used in the where node, the extra_filters are responsible for all
-filtering, but since the filter should apply to a single object even after
-join traversals, the aliases will be set up while handling the "root"
-filter and then reused for each one of the extra_filters.
-
-This way of extending the extra_filters mechanism will allow the field
-class to create conjunctions of atomic conditions. This is sufficient for
-the "__exact" lookup type which will be implemented.
-
-Of the other lookup types, the only one that looks reasonable is "__in".
-This will, however, have to be represented as a disjunction of multiple
-"__exact" conditions since not all database backends support tuple
-construction inside expressions. Therefore this lookup type will be left
-out of this project as the mechanism would need much more work to make it
-possible.
 
 CompositeField.primary_key
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -492,47 +363,6 @@ work thanks to automatic underlying field creation for composite fields
 and traversal in both directions will be supported by the query code.
 
 
-``__in`` lookups for ``CompositeField``
-=======================================
-
-The existing implementation of ``CompositeField`` handles ``__in`` lookups
-in the generic, backend-independent ``WhereNode`` class and uses a
-disjunctive normal form expression as in the following example::
-
-    SELECT a, b, c FROM tbl1, tbl2
-    WHERE (a = 1 AND b = 2 AND c = 3) OR (a = 4 AND b = 5 AND c = 6);
-
-The problem with this solution is that in cases where the list of values
-contains tens or hundreds of tuples, this DNF expression will be extremely
-long and the database will have to evaluate it for each and every row,
-without a possibility of optimizing the query.
-
-Certain database backends support the following alternative::
-
-    SELECT a, b, c FROM tbl1, tbl2
-    WHERE (a, b, c) IN [(1, 2, 3), (4, 5, 6)];
-
-This would probably be the best option, but it can't be used by SQLite,
-for instance. This is also the reason why the DNF expression was
-implemented in the first place.
-
-In order to support this more natural syntax, the ``DatabaseOperations``
-needs to be extended with a method such as ``composite_in_sql``.
-
-However, this leaves the issue of the inefficient DNF unresolved for
-backends without support for tuple literals. For such backends, the
-following expression is proposed::
-
-    SELECT a, b, c FROM tbl1, tbl2
-    WHERE EXISTS (SELECT a1, b1, c1, FROM (SELECT 1 as a, 2 as b, 3 as c
-                                           UNION SELECT 4, 5, 6)
-                  WHERE a1=1 AND b1=b AND c1=c);
-
-Since both syntaxes are rather generic and at least one of them should fit
-any database backend directly, a new flag will be introduced,
-``DatabaseFeatures.supports_tuple_literals`` which the default
-implementation of ``composite_in_sql`` will consult in order to choose
-between the two options.
 
 
 ``contenttypes`` and ``GenericForeignKey``
@@ -586,6 +416,98 @@ chosen by the database may be specific for each database server. Therefore
 I'm inclined to declare ``GenericRelation`` unsupported for models with a
 composite primary key containing any special columns. This should be
 extremely rare anyway.
+
+
+QuerySet filtering
+~~~~~~~~~~~~~~~~~~
+
+This is where the real fun begins.
+
+The fundamental problem here is that Q objects which are used all over the
+code that handles filtering are designed to describe single field lookups.
+On the other hand, CompositeFields will require a way to describe several
+individual field lookups by a single expression.
+
+Since the Q objects themselves have no idea about fields at all and the
+actual field resolution from the filter conditions happens deeper down the
+line, inside models.sql.query.Query, this is where we can handle the
+filters properly.
+
+There is already some basic machinery inside Query.add_filter and
+Query.setup_joins that is in use by GenericRelations, this is
+unfortunately not enough. The optional extra_filters field method will be
+of great use here, though it will have to be extended.
+
+Currently the only parameters it gets are the list of joins the
+filter traverses, the position in the list and a negate parameter
+specifying whether the filter is negated. The GenericRelation instance can
+determine the value of the content type (which is what the extra_filters
+method is used for) easily based on the model it belongs to.
+
+This is not the case for a CompositeField -- it doesn't have any idea
+about the values used in the query. Therefore a new parameter has to be
+added to the method so that the CompositeField can construct all the
+actual filters from the iterable containing the values.
+
+Afterwards the handling inside Query is pretty straightforward. For
+CompositeFields (and virtual fields in general) there is no value to be
+used in the where node, the extra_filters are responsible for all
+filtering, but since the filter should apply to a single object even after
+join traversals, the aliases will be set up while handling the "root"
+filter and then reused for each one of the extra_filters.
+
+This way of extending the extra_filters mechanism will allow the field
+class to create conjunctions of atomic conditions. This is sufficient for
+the "__exact" lookup type which will be implemented.
+
+Of the other lookup types, the only one that looks reasonable is "__in".
+This will, however, have to be represented as a disjunction of multiple
+"__exact" conditions since not all database backends support tuple
+construction inside expressions. Therefore this lookup type will be left
+out of this project as the mechanism would need much more work to make it
+possible.
+
+``__in`` lookups for ``CompositeField``
+=======================================
+
+The existing implementation of ``CompositeField`` handles ``__in`` lookups
+in the generic, backend-independent ``WhereNode`` class and uses a
+disjunctive normal form expression as in the following example::
+
+    SELECT a, b, c FROM tbl1, tbl2
+    WHERE (a = 1 AND b = 2 AND c = 3) OR (a = 4 AND b = 5 AND c = 6);
+
+The problem with this solution is that in cases where the list of values
+contains tens or hundreds of tuples, this DNF expression will be extremely
+long and the database will have to evaluate it for each and every row,
+without a possibility of optimizing the query.
+
+Certain database backends support the following alternative::
+
+    SELECT a, b, c FROM tbl1, tbl2
+    WHERE (a, b, c) IN [(1, 2, 3), (4, 5, 6)];
+
+This would probably be the best option, but it can't be used by SQLite,
+for instance. This is also the reason why the DNF expression was
+implemented in the first place.
+
+In order to support this more natural syntax, the ``DatabaseOperations``
+needs to be extended with a method such as ``composite_in_sql``.
+
+However, this leaves the issue of the inefficient DNF unresolved for
+backends without support for tuple literals. For such backends, the
+following expression is proposed::
+
+    SELECT a, b, c FROM tbl1, tbl2
+    WHERE EXISTS (SELECT a1, b1, c1, FROM (SELECT 1 as a, 2 as b, 3 as c
+                                           UNION SELECT 4, 5, 6)
+                  WHERE a1=1 AND b1=b AND c1=c);
+
+Since both syntaxes are rather generic and at least one of them should fit
+any database backend directly, a new flag will be introduced,
+``DatabaseFeatures.supports_tuple_literals`` which the default
+implementation of ``composite_in_sql`` will consult in order to choose
+between the two options.
 
 
 Database introspection, ``inspectdb``

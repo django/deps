@@ -8,7 +8,7 @@ DEP : ORM Fields API & Related Improvements
 :Shepherd: Django Core Team
 :Status: Draft
 :Type: Feature/Cleanup/Optimization
-:Created: 2017-3-18
+:Created: 2017-3-5
 :Last-Modified: 2017-00-00
 
 .. contents:: Table of Contents
@@ -23,33 +23,41 @@ however, there are some historical design limitations and many inconsistant
 implementation in orm relation fields API which produce many inconsistant
 behaviour
 
-This type of design limitation made it difficult to add support for composite primarykey or working with relationField/genericRelations very annoying as it
-produces inconsistant behaviour and a very hard implementation to maintain.
+This type of design limitation made it difficult to add support for composite primarykey or working
+with relationField/genericRelations very annoying as they produces inconsistant behaviour and a
+their implementaion is hard to maintain sue to many special casing.
 
-The proposed solution is using Cleanup/provisional RealatedField API, Virtualfield type, and necessary VirtualField desendent Fields[CompositeField]. The Virtual field type will enclose several real fields within one single object.
+In order to fix this design limitations and inconsistant API's the proposed solution is to introduce REAL
+VirtualField types and refactor Fields/RelationFields API based on virtualFields type.
 
 
 Notes on Porting previous work on top of master:
 ================================================
-Considering the huge changes in ORM internals it is not practical and trivial
-to try and rebase the previous works related to ForeignKey refactor and
-CompositeKey without figuring out new approach on top of master and present
-ORM internals design.
+Considering the huge changes in ORM internals it is neither practical nor trivial
+to rebase & port previous works related to ForeignKey refactor and CompositeKey without
+figuring out new approach based on present ORM internals design on top of master.
 
-A better approach would be to Improve Field API, RealtionField API and model._meta 
-first.
-Later imlement VirtualField type to first and star refactor of ``ForeignKey``
-and implement CompositeField as the next step. This will result in a better 
-maintainable development branch and a cleaner revision history, making it easier
-to review the work before its eventual inclusion into Django.
+A better approach would be to Improve Field API, major cleanup of RealtionField API, model._meta,
+and internal field_valaue_cache and related areas first.
 
+Later after completing the major clean ups of Fields/RelationFields a REAL VirtualField type should be
+introduced and VirtualField based refactor of ForeignKey and relationFields should take place.
+
+This appraoch should keep things sane and easier to approach on smaller chunks.
+
+Later any VirtualField derived Field like CompositeField implementation should be less complex after the completion of virtualField based refactors.
 
 Abstract
 ==========
-This DEP aims to improve different part of django ORM and other associated parts of django to support Real VirtualField type in django. There were several attempt to fix this problem and several ways to implement this. There are two existing dep for solving this problem, but the aim of this dep is to incorporate Michal Petrucha's works  suggestions/discussions from other related tickets and lesson learned from previous works. The main motivation of this Dep's approach is to improve django ORM's Field API
-and design everything as much simple and small as possible to be able to implement separately.
+This DEP aims to improve different part of django ORM and ot associated parts of django to support Real VirtualField
+type in django. There were several attempt to fix this problem before. So in this Dep we will try to follow the suggested
+approaches from Michal Patrucha's previous works and suggestions in tickets and IRC chat/mailing list. Few other related
+tickets were also analyzed to find out the proper ways and API design.
 
-To keep thing sane I will try to split the Dep in 3 major Part:
+The main motivation of this Dep's approach is to improve django ORM's Field API and design everything as much simple and small as possible to be able to implement separately.
+
+To keep thing sane it would be bette to split the Dep in 3 major Part:
+
 1. Logical refactor of present Field API and RelationField API
 2. VirtualField Based refactor
 3. CompositeField API formalization
@@ -88,8 +96,6 @@ Key steps of New Approach to improve ORM Field API internals:
 13. Consider Database Contraints work of lan-foote and 
 
 14. SubField/AuxilaryField
-
-15. Update in AutoField
 
 
 
@@ -223,40 +229,6 @@ notes.
 
 Changes in ``RelationField``
 =============================
-
-Admin
-~~~~~
-
-The solution that has been proposed so many times in the past [2], [3] is
-to extend the quote function used in the admin to also quote the comma and
-then use an unquoted comma as the separator. Even though this solution
-looks ugly to some, I don't think there is much choice -- there needs to
-be a way to separate the values and in theory, any character could be
-contained inside a value so we can't really avoid choosing one and
-escaping it.
-
-GenericForeignKeys
-~~~~~~~~~~~~~~~~~~
-
-Even though the admin uses the contenttypes framework to log the history
-of actions, it turns out proper handling on the admin side will make
-things work without the need to modify GenericForeignKey code at all. This
-is thanks to the fact that the admin uses only the ContentType field and
-handles the relations on its own. Making sure the unquoting function
-recreates the whole CompositeObjects where necessary should suffice.
-
-At a later stage, however, GenericForeignKeys could also be improved to
-support composite primary keys. Using the same quoting solution as in the
-admin could work in theory, although it would only allow fields capable of
-storing arbitrary strings to be usable for object_id storage. This has
-been left out of the scope of this project, though.
-
-ModelChoiceFields
-~~~~~~~~~~~~~~~~~
-
-Again, we need a way to specify the value as a parameter passed in the
-form. The same escaping solution can be used even here.
-
 Relationship fields
 ~~~~~~~~~~~~~~~~~~~
 
@@ -362,6 +334,23 @@ composite primary key containing any special columns. This should be
 extremely rare anyway.
 
 
+GenericForeignKeys
+~~~~~~~~~~~~~~~~~~
+
+Even though the admin uses the contenttypes framework to log the history
+of actions, it turns out proper handling on the admin side will make
+things work without the need to modify GenericForeignKey code at all. This
+is thanks to the fact that the admin uses only the ContentType field and
+handles the relations on its own. Making sure the unquoting function
+recreates the whole CompositeObjects where necessary should suffice.
+
+At a later stage, however, GenericForeignKeys could also be improved to
+support composite primary keys. Using the same quoting solution as in the
+admin could work in theory, although it would only allow fields capable of
+storing arbitrary strings to be usable for object_id storage. This has
+been left out of the scope of this project, though.
+
+
 QuerySet filtering
 ~~~~~~~~~~~~~~~~~~
 
@@ -453,6 +442,22 @@ any database backend directly, a new flag will be introduced,
 implementation of ``composite_in_sql`` will consult in order to choose
 between the two options.
 
+ModelChoiceFields
+~~~~~~~~~~~~~~~~~
+
+Again, we need a way to specify the value as a parameter passed in the
+form. The same escaping solution can be used even here.
+
+Admin
+~~~~~
+
+The solution that has been proposed so many times in the past [2], [3] is
+to extend the quote function used in the admin to also quote the comma and
+then use an unquoted comma as the separator. Even though this solution
+looks ugly to some, I don't think there is much choice -- there needs to
+be a way to separate the values and in theory, any character could be
+contained inside a value so we can't really avoid choosing one and
+escaping it.
 
 
 Other considerations

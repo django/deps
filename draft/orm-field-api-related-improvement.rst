@@ -221,6 +221,9 @@ already work on expectation of getting rel instances will likely need updating.
 Those users who subclass Django's fields (or duck-type Django's fields) will
 need updating. Examples of such projects include django-rest-framework and django-taggit.
 
+Proposed API and workd flow for clean ups:
+==========================================
+
 
 
 
@@ -230,6 +233,10 @@ Part-2:
 
 Introduce standalone ``VirtualField``
 =====================================
+what is ``VirtualField``?
+-------------------------
+"A virtual field is a model field which it correlates to one or multiple
+concrete fields, but doesn't add or alter columns in the database."
 
 
 

@@ -58,9 +58,11 @@ The main motivation of this Dep's approach is to improve django ORM's Field API 
 
 To keep thing sane it would be bette to split the Dep in 3 major Part:
 
-1. Logical refactor of present Field API and RelationField API
+1. Logical refactor of present Field API and RelationField API and make 
+ them consistant
+
 2. VirtualField Based refactor
-3. CompositeField API formalization
+
 
 
 Key steps of New Approach to improve ORM Field API internals:
@@ -93,7 +95,7 @@ Key steps of New Approach to improve ORM Field API internals:
 12. Make sure new class based Index API ise used properly with refactored Field
    API.
 
-13. Consider Database Contraints work of lan-foote and 
+13. Consider Database Contraints work 
 
 14. SubField/AuxilaryField
 
@@ -122,18 +124,104 @@ ConcreteField will have all the common attributes of a Regular concrete field
 Presence base Field class with should refactored using BaseField and ConcreteField.
 If it is decided to provide the optional virtual type to regular fields then VirtualField's features can also be added to specific fields.
 
-4. VirtualField:
+4. RelationField:
+-----------------
+
+5. VirtualField:
 ----------------
 A true stand alone virtula field will be added to the system to be used to solve some long standing design limitations of django orm. initially RelationFields, GenericRelations etc will be benefitted by using VirtualFields and later CompositeField
 or any virtual type field can be benefitted from VirtualField.
 
-5. RelationField:
------------------
+Relation Field API clean up:
+============================
 
-6. CompositeField:
-------------------
-A composite field can be implemented based on BaseField and VirtualField to solve
-the CompositeKey/Multi column PrimaryKey issue.
+How relation works in django now:
+=================================
+Before defining clean up mechanism, lets jump into how relations work in django
+
+A relation in Django consits of:
+   - The originating field itself
+   - A descriptor to access the objects of the relation
+   - The descriptor might need a custom manager
+   - Possibly a remote relation field (the field to travel the relation in other direction)
+        Note that this is different from the target and source fields, which define which concrete fields this relation use (essentially, which columns to equate in the JOIN condition)
+   - The remote field can also contain a descriptor and a manager.
+   - For deprecation period, field.rel is a bit like the remote field, but without
+     actually being a field instance. This is created only in the origin field, the remote field doesn't have a rel (as we don't need backwards compatibility
+     for the remote fields)
+
+ The loading order is as follows:
+   - The origin field is created as part of importing the class (or separately
+     by migrations).
+   - The origin field is added to the origin model's meta (the field's contribute_to_class is called).
+   - When both the origin and the remote classes are loaded, the remote field is created and the descriptors are created. The remote field is added to the 
+   target class' _meta
+   - For migrations it is possible that a model is replaced live in the app-cache. For example,
+     assume model Author is changed, and it is thus reloaded. Model Book has foreign key to
+     Author, so its reverse field must be recreated in the Author model, too. The way this is
+     done is that we collect all fields that have been auto-created as relationships into the
+     Author model, and recreate the related field once Author has been reloaded.
+
+ Example:
+
+     class Author(models.Model):
+         pass
+
+     class Book(models.Model):
+         author = models.ForeignKey(Author)
+
+ 1. Author is seen, and thus added to the appconfig.
+ 2. Book is seen, the field author is seen.
+    - The author field is created and assigned to Book's class level variable author.
+    - The author field's rel instance is created at the same time the field is created.
+    - The metaclass loading for models sees the field instance in Book's attrs,
+    and the field is added the class, that is author's contribute_to_class is called.
+    - In the contribute_to_class method, the field is added to Book's meta.
+    - As last step of contribut_to_class method the prepare_remote() method
+      is added as a lazy loaded method. It will be called when both Book and
+      Author are ready. As it happens, they are both ready in the example,
+      so the method is called immediately.If the Author model was defined later
+      than Book, and Book had a string reference to Author, then the method would
+      be called only after Author was ready.
+ 3. The prepare_remote() method is called.
+    - The remote field is created based on attributes of the origin field.
+    The field is added to the remote model (the field's contribute_to_class
+    is called)
+    - The post_relation_ready() method is called for both the origin and the remote field. This will create the descriptor on both the origin and remote field 
+    (unless the remote relation is hidden, in which case no descriptor is created)
+
+Clean up Relation API to make it consistant:
+============================================
+The problem is that when using get_fields(), you'll get either a
+field.rel instance (for reverse side of user defined fields), or
+a real field instance(for example ForeignKey). These behave
+differently, so that the user must always remember which one
+he is dealing with. This creates lots of non-necessary conditioning
+in multiple places of
+Django.
+
+For example, the select_related descent has one branch for descending foreign
+keys and one to one fields, and another branch for descending to reverse one
+to one fields. Conceptually both one to one and reverse one to one fields
+are very similar, so this complication is non-necessary.
+
+The idea is to deprecate field.rel, and instead add field.remote_field.
+The remote_field is just a field subclass, just like everything else
+in Django.
+
+The benefits are:
+Conceptual simplicity - dealing with fields and rels is non-necessaryand confusing. Everything from get_fields() should be a field.
+Code simplicity - no special casing based on if a given relation is described 
+by a rel or not
+Code reuse - ReverseManyToManyField is in most regard exactly like 
+ManyToManyField.
+
+The expected problems are mostly from 3rd party code. Users of _meta that
+already work on expectation of getting rel instances will likely need updating.
+Those users who subclass Django's fields (or duck-type Django's fields) will
+need updating. Examples of such projects include django-rest-framework and django-taggit.
+
+
 
 
 

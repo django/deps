@@ -1,6 +1,6 @@
-=========================================================
-DEP : ORM Fields API & Related Improvements 
-=========================================================
+==============================================================
+DEP : ORM Relation Fields API Improvements using VirtualField
+==============================================================
 
 :DEP: 0201
 :Author: Asif Saif Uddin
@@ -19,49 +19,60 @@ DEP : ORM Fields API & Related Improvements
 Background:
 ===========
 Django's ORM is a simple & powerful tool which suits most use-cases,
-however, there are some historical design limitations and many inconsistant
+however, there are some historical design limitations and inconsistant
 implementation in orm relation fields API which produce many inconsistant
-behaviour
+behaviour.
 
-This type of design limitation made it difficult to add support for composite primarykey or working
-with relationField/genericRelations very annoying as they produces inconsistant behaviour and a
-their implementaion is hard to maintain sue to many special casing.
+This type of design limitation made it difficult to add support for
+composite primarykey or working with relationField/genericRelations
+very annoying as they produces inconsistant behaviour and their
+implementaion is hard to maintain due to many special casing.
 
-In order to fix this design limitations and inconsistant API's the proposed solution is to introduce REAL
-VirtualField types and refactor Fields/RelationFields API based on virtualFields type.
+In order to fix this design limitations and inconsistant API's the proposed
+solution is to introduce REAL VirtualField types and refactor 
+Fields/RelationFields API based on virtualFields type.
 
 
 Notes on Porting previous work on top of master:
 ================================================
-Considering the huge changes in ORM internals it is neither practical nor trivial
-to rebase & port previous works related to ForeignKey refactor and CompositeKey without
-figuring out new approach based on present ORM internals design on top of master.
+Considering the huge changes in ORM internals it is neither practical nor
+trivial to rebase & port previous works related to ForeignKey refactor and CompositeKey without figuring out new approach based on present ORM internals
+design on top of master.
 
-A better approach would be to Improve Field API, major cleanup of RealtionField API, model._meta,
-and internal field_valaue_cache and related areas first.
+A better approach would be to Improve Field API, major cleanup of RealtionField
+API, model._meta and internal field_valaue_cache and related areas first.
 
-Later after completing the major clean ups of Fields/RelationFields a REAL VirtualField type should be
-introduced and VirtualField based refactor of ForeignKey and relationFields should take place.
+After completing the major clean ups of Fields/RelationFields a REAL
+VirtualField type should be introduced and VirtualField based refactor
+of ForeignKey and relationFields could done.
 
 This appraoch should keep things sane and easier to approach on smaller chunks.
 
-Later any VirtualField derived Field like CompositeField implementation should be less complex after the completion of virtualField based refactors.
+Later any VirtualField derived Field like CompositeField implementation
+should be less complex after the completion of virtualField based refactors.
+
 
 Abstract
 ==========
-This DEP aims to improve different part of django ORM and ot associated parts of django to support Real VirtualField
-type in django. There were several attempt to fix this problem before. So in this Dep we will try to follow the suggested
-approaches from Michal Patrucha's previous works and suggestions in tickets and IRC chat/mailing list. Few other related
+This DEP aims to improve different part of django ORM and ot associated
+parts of django to support Real VirtualFieldtype in django. There were
+several attempt to fix this problem before. So in this Dep we will try
+to follow the suggested approaches from Michal Patrucha's previous works
+and suggestions in tickets and IRC chat/mailing list. Few other related
 tickets were also analyzed to find out the proper ways and API design.
 
-The main motivation of this Dep's approach is to improve django ORM's Field API and design everything as much simple and small as possible to be able to implement separately.
+The main motivation of this Dep's approach is to improve django ORM's
+Field API and design everything as much simple and small as possible
+to be able to implement separately.
 
-To keep thing sane it would be bette to split the Dep in 3 major Part:
+To keep thing sane it would be better to split the Dep in 3 major Part:
 
 1. Logical refactor of present Field API and RelationField API and make 
  them consistant
 
-2. VirtualField Based refactor
+2. Fields internal value cache refactor for relation fields
+
+3. VirtualField Based refactor
 
 
 
@@ -98,7 +109,6 @@ Key steps of New Approach to improve ORM Field API internals:
 13. Consider Database Contraints work 
 
 14. SubField/AuxilaryField
-
 
 
 
@@ -375,10 +385,8 @@ and traversal in both directions will be supported by the query code.
 
 
 
-
 ``contenttypes`` and ``GenericForeignKey``
 ==========================================
-
 
 It's fairly easy to represent composite values as strings. Given an
 ``escape`` function which uniquely escapes commas, something like the
@@ -573,11 +581,4 @@ reasons:
 - otherwise the same field would be inside the form twice
 - there aren't really any form fields usable for tuples and a fieldset
   would require even more out-of-scope machinery
-
-The CompositeField will not allow enclosing other CompositeFields. The
-only exception might be the case of composite ForeignKeys which could also
-be implemented after successful finish of this project. With this feature
-the autogenerated intermediary M2M model could make the two ForeignKeys
-its primary key, dropping the need to have a redundant id AutoField.
-
 

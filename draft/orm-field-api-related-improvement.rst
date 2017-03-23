@@ -200,6 +200,81 @@ A relation in Django consits of:
     - The post_relation_ready() method is called for both the origin and the remote field. This will create the descriptor on both the origin and remote field 
     (unless the remote relation is hidden, in which case no descriptor is created)
 
+Another limitation is,
+
+Django supports many-to-one relationships -- the foreign keys live on 
+the "many", and point to the "one".  So, in a simple app where you 
+have Comments that can get Flagged, one Comment can have many Flag's, 
+but each Flag refers to one and only one Comment: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+
+class Flag(models.Model): 
+    comment = models.ForeignKey(Comment) 
+
+However, there are circumstances where it's much more convenient to 
+express the relationship as a one-to-many relationship.  Suppose, for 
+example, you want to have a generic "flagging" app which other models 
+can use: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+    flags = models.OneToMany(Flag) 
+
+That way, if you had a new content type (say, a "Post"), it could also 
+participate in flagging, without having to modify the model definition 
+of "Flag" to add a new foreign key.  Without baking in migrations, 
+there's obviously no way to make the underlying SQL play nice in this 
+circumstance: one-to-many relationships with just two tables can only 
+be expressed in SQL with a reverse foreign key relationship.  However, 
+it's possible to describe OneToMany as a subset of ManyToMany, with a 
+uniqueness constraint on the "One" -- we rely on the join table to 
+handle the relationship: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+    flags = models.ManyToMany(Flag, through=CommentFlag) 
+
+class CommentFlag(models.Model): 
+    comment = models.ForeignKey(Comment) 
+    flag = models.ForeignKey(Flag, unique=True) 
+
+While this works, the query interface remains cumbersome.  To access 
+the comment from a flag, I have to call: 
+
+comment = flag.comment_set.all()[0] 
+
+as the ORM doesn't know for a fact that each flag could only have one 
+comment.  But Django _could_ implement a OneToManyField in this way 
+(using the underlying ManyToMany paradigm), and provide sugar such 
+that this would all be nice and flexible, without having to do cumbersome 
+ORM calls or explicitly define extra join tables: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+    flags = models.OneToMany(Flag) 
+
+class Post(models.Model): 
+    body = models.TextField() 
+    flags = models.OneToMany(Flag) 
+
+# in a separate reusable app... 
+class Flag(models.Model) 
+    reason = models.TextField() 
+    resolved = models.BooleanField() 
+
+# in a view... 
+comment = flag.comment 
+post = flag.post 
+
+It's obviously less database efficient than simple 2-table reverse 
+ForeignKey relationships, as you have to do an extra join on the third 
+table; but you gain semantic clarity and a nice way to use it in 
+reusable apps, so in many circumstances it's worth it. And it's a 
+fair shake clearer than the existing generic foreign key solutions.
+
+
 Clean up Relation API to make it consistant:
 ============================================
 The problem is that when using get_fields(), you'll get either a
@@ -503,6 +578,7 @@ construction inside expressions. Therefore this lookup type will be left
 out of this project as the mechanism would need much more work to make it
 possible.
 
+
 ``__in`` lookups for ``VirtualField``
 =======================================
 
@@ -566,19 +642,4 @@ escaping it.
 Other considerations
 --------------------
 
-This infrastructure will allow reimplementing the GenericForeignKey as a
-CompositeField at a later stage. Thanks to the modifications in the
-joining code it should also be possible to implement bidirectional generic
-relationship traversal in QuerySet filters. This is, however, out of scope
-of this project.
-
-CompositeFields will have the serialize option set to False to prevent
-their serialization. Otherwise the enclosed fields would be serialized
-twice which would not only infer redundancy but also ambiguity.
-
-Also CompositeFields will be ignored in ModelForms by default, for two
-reasons: 
-- otherwise the same field would be inside the form twice
-- there aren't really any form fields usable for tuples and a fieldset
-  would require even more out-of-scope machinery
 

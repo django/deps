@@ -33,50 +33,28 @@ solution is to introduce REAL VirtualField types and refactor
 Fields/RelationFields API based on virtualFields type.
 
 
-Notes on Porting previous work on top of master:
-================================================
-Considering the huge changes in ORM internals it is neither practical nor
-trivial to rebase & port previous works related to ForeignKey refactor and CompositeKey without figuring out new approach based on present ORM internals
-design on top of master.
-
-A better approach would be to Improve Field API, major cleanup of RealtionField
-API, model._meta and internal field_valaue_cache and related areas first.
-
-After completing the major clean ups of Fields/RelationFields a REAL
-VirtualField type should be introduced and VirtualField based refactor
-of ForeignKey and relationFields could done.
-
-This appraoch should keep things sane and easier to approach on smaller chunks.
-
-Later any VirtualField derived Field like CompositeField implementation
-should be less complex after the completion of virtualField based refactors.
-
-
 Abstract
 ==========
 This DEP aims to improve different part of django ORM and ot associated
-parts of django to support Real VirtualFieldtype in django. There were
+parts of django to support Real VirtualField type in django. There were
 several attempt to fix this problem before. So in this Dep we will try
 to follow the suggested approaches from Michal Patrucha's previous works
 and suggestions in tickets and IRC chat/mailing list. Few other related
-tickets were also analyzed to find out the proper ways and API design.
+tickets were also analyzed to find out possible way's of API design.
 
-The main motivation of this Dep's approach is to improve django ORM's
-Field API and design everything as much simple and small as possible
-to be able to implement separately.
 
-To keep thing sane it would be better to split the Dep in 3 major Part:
+To keep thing sane it would be better to split the Dep in some major Parts:
 
-1. Logical refactor of present Field API and RelationField API and make 
- them consistant
+1. Logical refactor of present Field API and RelationField API, to make 
+ them sipler and consistant with _meta API calls
 
-2. Fields internal value cache refactor for relation fields
+2. Fields internal value cache refactor for relation fields (may be)
 
-3. VirtualField Based refactor
+3. VirtualField Based refactor of RelationFields API
 
 
 
-Key steps of New Approach to improve ORM Field API internals:
+Key steps of to follow to improve ORM Field API internals:
 ==============================================================
 1. Split out Field API logically to separate ConcreteField,
  BaseField etc and change on ORM based on the splitted API.
@@ -108,7 +86,7 @@ Key steps of New Approach to improve ORM Field API internals:
 
 13. Consider Database Contraints work 
 
-14. SubField/AuxilaryField
+14. SubField/AuxilaryField [may be]
 
 
 
@@ -642,4 +620,20 @@ escaping it.
 Other considerations
 --------------------
 
+Notes on Porting previous work on top of master:
+================================================
+Considering the huge changes in ORM internals it is neither practical nor
+trivial to rebase & port previous works related to ForeignKey refactor and CompositeKey without figuring out new approach based on present ORM internals
+design on top of master.
 
+A better approach would be to Improve Field API, major cleanup of RealtionField
+API, model._meta and internal field_valaue_cache and related areas first.
+
+After completing the major clean ups of Fields/RelationFields a REAL
+VirtualField type should be introduced and VirtualField based refactor
+of ForeignKey and relationFields could done.
+
+This appraoch should keep things sane and easier to approach on smaller chunks.
+
+Later any VirtualField derived Field like CompositeField implementation
+should be less complex after the completion of virtualField based refactors.

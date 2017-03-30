@@ -11,31 +11,28 @@ DEP : ORM Relation Fields API Improvements using VirtualField
 :Created: 2017-3-5
 :Last-Modified: 2017-00-00
 
-.. contents:: Table of Contents
-   :depth: 3
-   :local:
 
 
 Background:
 ===========
-Django's ORM is a simple & powerful tool which suits most use-cases,
-however, there are some historical design limitations and inconsistant
-implementation in orm relation fields API which produce many inconsistant
-behaviour.
+Django's ORM is a simple & powerful tool which suits most use-cases.
+However, historicaly it has some design limitations and complex internal
+API which makes it not only hard to maintain but also produce inconsistant
+behaviours.
 
 This type of design limitation made it difficult to add support for
 composite primarykey or working with relationField/genericRelations
-very annoying as they produces inconsistant behaviour and their
+very annoying as they don't produce consistant behaviour and their
 implementaion is hard to maintain due to many special casing.
 
-In order to fix this design limitations and inconsistant API's the proposed
-solution is to introduce REAL VirtualField types and refactor 
-Fields/RelationFields API based on virtualFields type.
+In order to fix these design limitations and inconsistancies, the proposed
+solution is to refactor Fields/RelationFields to new simpler API and
+incorporate virtualField type based refctors of RelationFields.
 
 
 Abstract
 ==========
-This DEP aims to improve different part of django ORM and ot associated
+This DEP aims to improve different part of django ORM and associated
 parts of django to support Real VirtualField type in django. There were
 several attempt to fix this problem before. So in this Dep we will try
 to follow the suggested approaches from Michal Patrucha's previous works
@@ -46,11 +43,13 @@ tickets were also analyzed to find out possible way's of API design.
 To keep thing sane it would be better to split the Dep in some major Parts:
 
 1. Logical refactor of present Field API and RelationField API, to make 
- them sipler and consistant with _meta API calls
+ them simpler and consistant with _meta API calls
 
-2. Fields internal value cache refactor for relation fields (may be)
+2. Introduce new sane API for RelationFields [internal/provisional]
 
-3. VirtualField Based refactor of RelationFields API
+3. Fields internal value cache refactor for relation fields (may be)
+
+4. VirtualField Based refactor of RelationFields API
 
 
 
@@ -60,33 +59,37 @@ Key steps of to follow to improve ORM Field API internals:
  BaseField etc and change on ORM based on the splitted API.
 
 2. Change ForeignObjectRel subclasses to real field instances. (For example,
- ForeignKey generates a ManyToOneRel in the related model). The Rel instances are already returned from get_field(), but they aren't yet field subclasses.
+ ForeignKey generates a ManyToOneRel in the related model). The Rel instances
+ are already returned from get_field(), but they aren't yet field subclasses.
 
-3. Allow direct usage of ForeignObjectRel subclasses. In certain cases it can be 
- advantageous to be able to define reverse relations directly. For example,
+3. Allow direct usage of ForeignObjectRel subclasses. In certain cases it
+ can be advantageous to be able to define reverse relations directly. For
+ example,
  see ​https://github.com/akaariai/django-reverse-unique.
 
-5. Introduce new standalone well defined ``VirtualField``
+4. Introduce new standalone well defined ``VirtualField``
 
-6. Incorporate ``VirtualField`` related changes in django
+5. Incorporate ``VirtualField`` related changes in django
 
-7. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField`` etc NEW Field API
+6. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField`` etc NEW Field API
 
-8. Figure out other cases where true virtual fields are needed.
+7. Figure out other cases where true virtual fields are needed.
 
-9. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField`` and new Field API based ForeignKey
+8. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField`` and new Field API based ForeignKey
 
-10. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
+9. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
  
-11. Make changes to migrations framework to work properly with Reafctored Field
+10. Make changes to migrations framework to work properly with Reafctored Field
    API.
+
+11. Migrations work well with VirtualField based refactored API
 
 12. Make sure new class based Index API ise used properly with refactored Field
    API.
 
-13. Consider Database Contraints work 
+13. Query/QuerySets/Expressions work well with new refactored API's
 
-14. SubField/AuxilaryField [may be]
+14. ContentTypes/GenericRelations/GenericForeginKey works well with new Fields API
 
 
 
@@ -605,8 +608,8 @@ ModelChoiceFields
 Again, we need a way to specify the value as a parameter passed in the
 form. The same escaping solution can be used even here.
 
-Admin
-~~~~~
+Admin/ModelForms
+================
 
 The solution that has been proposed so many times in the past [2], [3] is
 to extend the quote function used in the admin to also quote the comma and

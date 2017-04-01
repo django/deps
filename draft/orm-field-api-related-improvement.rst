@@ -30,8 +30,8 @@ solution is to refactor Fields/RelationFields to new simpler API and
 incorporate virtualField type based refctors of RelationFields.
 
 
-Abstract
-==========
+Aim of the Proposal:
+====================
 This DEP aims to improve different part of django ORM and associated
 parts of django to support Real VirtualField type in django. There were
 several attempt to fix this problem before. So in this Dep we will try
@@ -56,29 +56,31 @@ To keep thing sane it would be better to split the Dep in some major Parts:
 Key steps of to follow to improve ORM Field API internals:
 ==============================================================
 1. Split out Field API logically to separate ConcreteField,
- BaseField etc and change on ORM based on the splitted API.
+ BaseField, RelationField etc and adjust codes based on that API.
 
-2. Change ForeignObjectRel subclasses to real field instances. (For example,
- ForeignKey generates a ManyToOneRel in the related model). The Rel instances
- are already returned from get_field(), but they aren't yet field subclasses.
+2. Change ForeignObjectRel subclasses to real field instances. 
+ The Rel instances are already returned from get_field(), but they
+ aren't yet field subclasses. (For example, ForeignKey generates
+ a ManyToOneRel in the related model).
 
-3. Allow direct usage of ForeignObjectRel subclasses. In certain cases it
- can be advantageous to be able to define reverse relations directly. For
- example,
- see ​https://github.com/akaariai/django-reverse-unique.
+3. Allow direct usage of ForeignObjectRel subclasses. In certain cases
+ it could be advantageous to be able to define reverse relations directly.
+ For example,  ​https://github.com/akaariai/django-reverse-unique.
 
-4. Introduce new standalone well defined ``VirtualField``
+4. Introduce new standalone well defined ``VirtualField``.
 
-5. Incorporate ``VirtualField`` related changes in django
+5. Incorporate ``VirtualField`` related changes in django.
 
-6. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField`` etc NEW Field API
+6. Refactor ForeignKey based on ``VirtualField`` and ``ConcreteField``
+ etc new Field API.
 
-7. Figure out other cases where true virtual fields are needed.
+7. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField``
+ and new Field API based ForeignKey.
 
-8. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField`` and new Field API based ForeignKey
-
-9. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
+8. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
  
+9. ContentTypes/GenericRelations/GenericForeginKey works well with new Fields API
+
 10. Make changes to migrations framework to work properly with Reafctored Field
    API.
 
@@ -89,7 +91,9 @@ Key steps of to follow to improve ORM Field API internals:
 
 13. Query/QuerySets/Expressions work well with new refactored API's
 
-14. ContentTypes/GenericRelations/GenericForeginKey works well with new Fields API
+14. refactor GIS framework based on the changes in ORM
+
+15. ModelForms/Admin work well with posposed changes 
 
 
 
@@ -103,8 +107,8 @@ New split out Field API
 =========================
 1. BaseField:
 -------------
-Base structure for all Field types in django ORM wheather it is Concrete
-or VirtualField
+Base structure for all Field types in django ORM wheather it is Concrete,
+relation or VirtualField
 
 2. ConcreteField:
 -----------------
@@ -113,15 +117,21 @@ ConcreteField will have all the common attributes of a Regular concrete field
 3. Field:
 ---------
 Presence base Field class with should refactored using BaseField and ConcreteField.
-If it is decided to provide the optional virtual type to regular fields then VirtualField's features can also be added to specific fields.
+If it is decided to provide the optional virtual type to regular fields then
+VirtualField's features can also be added to specific fields.
 
 4. RelationField:
 -----------------
+Based Field for All relation fields.
 
 5. VirtualField:
 ----------------
-A true stand alone virtula field will be added to the system to be used to solve some long standing design limitations of django orm. initially RelationFields, GenericRelations etc will be benefitted by using VirtualFields and later CompositeField
-or any virtual type field can be benefitted from VirtualField.
+A true stand alone virtula field will be added to the system to be used to solve
+some long standing design limitations of django orm. initially RelationFields,
+GenericRelations etc will be benefitted by using VirtualFields and later
+CompositeField or any virtual type field can be benefitted from VirtualField.
+
+
 
 Relation Field API clean up:
 ============================
@@ -135,10 +145,13 @@ A relation in Django consits of:
    - A descriptor to access the objects of the relation
    - The descriptor might need a custom manager
    - Possibly a remote relation field (the field to travel the relation in other direction)
-        Note that this is different from the target and source fields, which define which concrete fields this relation use (essentially, which columns to equate in the JOIN condition)
+        Note that this is different from the target and source fields, which define which
+        concrete fields this relation use (essentially, which columns to equate in the
+        JOIN condition)
    - The remote field can also contain a descriptor and a manager.
    - For deprecation period, field.rel is a bit like the remote field, but without
-     actually being a field instance. This is created only in the origin field, the remote field doesn't have a rel (as we don't need backwards compatibility
+     actually being a field instance. This is created only in the origin field,
+     the remote field doesn't have a rel (as we don't need backwards compatibility
      for the remote fields)
 
  The loading order is as follows:
@@ -620,13 +633,14 @@ contained inside a value so we can't really avoid choosing one and
 escaping it.
 
 
-Other considerations
---------------------
+GIS Framework:
+==============
 
 Notes on Porting previous work on top of master:
 ================================================
 Considering the huge changes in ORM internals it is neither practical nor
-trivial to rebase & port previous works related to ForeignKey refactor and CompositeKey without figuring out new approach based on present ORM internals
+trivial to rebase & port previous works related to ForeignKey refactor and
+CompositeKey without figuring out new approach based on present ORM internals
 design on top of master.
 
 A better approach would be to Improve Field API, major cleanup of RealtionField

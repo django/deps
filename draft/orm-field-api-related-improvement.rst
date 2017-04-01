@@ -30,6 +30,83 @@ solution is to refactor Fields/RelationFields to new simpler API and
 incorporate virtualField type based refctors of RelationFields.
 
 
+Limitations of ORM that will be taken care of:
+==============================================
+One limitation is,
+
+Django supports many-to-one relationships -- the foreign keys live on 
+the "many", and point to the "one".  So, in a simple app where you 
+have Comments that can get Flagged, one Comment can have many Flag's, 
+but each Flag refers to one and only one Comment: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+
+class Flag(models.Model): 
+    comment = models.ForeignKey(Comment) 
+
+However, there are circumstances where it's much more convenient to 
+express the relationship as a one-to-many relationship.  Suppose, for 
+example, you want to have a generic "flagging" app which other models 
+can use: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+    flags = models.OneToMany(Flag) 
+
+That way, if you had a new content type (say, a "Post"), it could also 
+participate in flagging, without having to modify the model definition 
+of "Flag" to add a new foreign key.  Without baking in migrations, 
+there's obviously no way to make the underlying SQL play nice in this 
+circumstance: one-to-many relationships with just two tables can only 
+be expressed in SQL with a reverse foreign key relationship.  However, 
+it's possible to describe OneToMany as a subset of ManyToMany, with a 
+uniqueness constraint on the "One" -- we rely on the join table to 
+handle the relationship: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+    flags = models.ManyToMany(Flag, through=CommentFlag) 
+
+class CommentFlag(models.Model): 
+    comment = models.ForeignKey(Comment) 
+    flag = models.ForeignKey(Flag, unique=True) 
+
+While this works, the query interface remains cumbersome.  To access 
+the comment from a flag, I have to call: 
+
+comment = flag.comment_set.all()[0] 
+
+as the ORM doesn't know for a fact that each flag could only have one 
+comment.  But Django _could_ implement a OneToManyField in this way 
+(using the underlying ManyToMany paradigm), and provide sugar such 
+that this would all be nice and flexible, without having to do cumbersome 
+ORM calls or explicitly define extra join tables: 
+
+class Comment(models.Model): 
+    text = models.TextField() 
+    flags = models.OneToMany(Flag) 
+
+class Post(models.Model): 
+    body = models.TextField() 
+    flags = models.OneToMany(Flag) 
+
+# in a separate reusable app... 
+class Flag(models.Model) 
+    reason = models.TextField() 
+    resolved = models.BooleanField() 
+
+# in a view... 
+comment = flag.comment 
+post = flag.post 
+
+It's obviously less database efficient than simple 2-table reverse 
+ForeignKey relationships, as you have to do an extra join on the third 
+table; but you gain semantic clarity and a nice way to use it in 
+reusable apps, so in many circumstances it's worth it. And it's a 
+fair shake clearer than the existing generic foreign key solutions.
+
+
 Aim of the Proposal:
 ====================
 This DEP aims to improve different part of django ORM and associated
@@ -51,6 +128,26 @@ To keep thing sane it would be better to split the Dep in some major Parts:
 
 4. VirtualField Based refactor of RelationFields API
 
+
+
+Notes on Porting previous work on top of master:
+================================================
+Considering the huge changes in ORM internals it is neither practical nor
+trivial to rebase & port previous works related to ForeignKey refactor and
+CompositeKey without figuring out new approach based on present ORM internals
+design on top of master.
+
+A better approach would be to Improve Field API, major cleanup of RealtionField
+API, model._meta and internal field_valaue_cache and related areas first.
+
+After completing the major clean ups of Fields/RelationFields a REAL
+VirtualField type should be introduced and VirtualField based refactor
+of ForeignKey and relationFields could done.
+
+This appraoch should keep things sane and easier to approach on smaller chunks.
+
+Later any VirtualField derived Field like CompositeField implementation
+should be less complex after the completion of virtualField based refactors.
 
 
 Key steps of to follow to improve ORM Field API internals:
@@ -194,79 +291,7 @@ A relation in Django consits of:
     - The post_relation_ready() method is called for both the origin and the remote field. This will create the descriptor on both the origin and remote field 
     (unless the remote relation is hidden, in which case no descriptor is created)
 
-Another limitation is,
 
-Django supports many-to-one relationships -- the foreign keys live on 
-the "many", and point to the "one".  So, in a simple app where you 
-have Comments that can get Flagged, one Comment can have many Flag's, 
-but each Flag refers to one and only one Comment: 
-
-class Comment(models.Model): 
-    text = models.TextField() 
-
-class Flag(models.Model): 
-    comment = models.ForeignKey(Comment) 
-
-However, there are circumstances where it's much more convenient to 
-express the relationship as a one-to-many relationship.  Suppose, for 
-example, you want to have a generic "flagging" app which other models 
-can use: 
-
-class Comment(models.Model): 
-    text = models.TextField() 
-    flags = models.OneToMany(Flag) 
-
-That way, if you had a new content type (say, a "Post"), it could also 
-participate in flagging, without having to modify the model definition 
-of "Flag" to add a new foreign key.  Without baking in migrations, 
-there's obviously no way to make the underlying SQL play nice in this 
-circumstance: one-to-many relationships with just two tables can only 
-be expressed in SQL with a reverse foreign key relationship.  However, 
-it's possible to describe OneToMany as a subset of ManyToMany, with a 
-uniqueness constraint on the "One" -- we rely on the join table to 
-handle the relationship: 
-
-class Comment(models.Model): 
-    text = models.TextField() 
-    flags = models.ManyToMany(Flag, through=CommentFlag) 
-
-class CommentFlag(models.Model): 
-    comment = models.ForeignKey(Comment) 
-    flag = models.ForeignKey(Flag, unique=True) 
-
-While this works, the query interface remains cumbersome.  To access 
-the comment from a flag, I have to call: 
-
-comment = flag.comment_set.all()[0] 
-
-as the ORM doesn't know for a fact that each flag could only have one 
-comment.  But Django _could_ implement a OneToManyField in this way 
-(using the underlying ManyToMany paradigm), and provide sugar such 
-that this would all be nice and flexible, without having to do cumbersome 
-ORM calls or explicitly define extra join tables: 
-
-class Comment(models.Model): 
-    text = models.TextField() 
-    flags = models.OneToMany(Flag) 
-
-class Post(models.Model): 
-    body = models.TextField() 
-    flags = models.OneToMany(Flag) 
-
-# in a separate reusable app... 
-class Flag(models.Model) 
-    reason = models.TextField() 
-    resolved = models.BooleanField() 
-
-# in a view... 
-comment = flag.comment 
-post = flag.post 
-
-It's obviously less database efficient than simple 2-table reverse 
-ForeignKey relationships, as you have to do an extra join on the third 
-table; but you gain semantic clarity and a nice way to use it in 
-reusable apps, so in many circumstances it's worth it. And it's a 
-fair shake clearer than the existing generic foreign key solutions.
 
 
 Clean up Relation API to make it consistant:
@@ -691,33 +716,8 @@ form. The same escaping solution can be used even here.
 Admin/ModelForms
 ================
 
-The solution that has been proposed so many times in the past [2], [3] is
-to extend the quote function used in the admin to also quote the comma and
-then use an unquoted comma as the separator. Even though this solution
-looks ugly to some, I don't think there is much choice -- there needs to
-be a way to separate the values and in theory, any character could be
-contained inside a value so we can't really avoid choosing one and
-escaping it.
 
 
 GIS Framework:
 ==============
 
-Notes on Porting previous work on top of master:
-================================================
-Considering the huge changes in ORM internals it is neither practical nor
-trivial to rebase & port previous works related to ForeignKey refactor and
-CompositeKey without figuring out new approach based on present ORM internals
-design on top of master.
-
-A better approach would be to Improve Field API, major cleanup of RealtionField
-API, model._meta and internal field_valaue_cache and related areas first.
-
-After completing the major clean ups of Fields/RelationFields a REAL
-VirtualField type should be introduced and VirtualField based refactor
-of ForeignKey and relationFields could done.
-
-This appraoch should keep things sane and easier to approach on smaller chunks.
-
-Later any VirtualField derived Field like CompositeField implementation
-should be less complex after the completion of virtualField based refactors.

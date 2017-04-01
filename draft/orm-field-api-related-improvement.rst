@@ -73,7 +73,7 @@ class CommentFlag(models.Model):
     flag = models.ForeignKey(Flag, unique=True) 
 
 While this works, the query interface remains cumbersome.  To access 
-the comment from a flag, I have to call: 
+the comment from a flag, have to call: 
 
 comment = flag.comment_set.all()[0] 
 
@@ -132,19 +132,20 @@ To keep thing sane it would be better to split the Dep in some major Parts:
 
 Notes on Porting previous work on top of master:
 ================================================
-Considering the huge changes in ORM internals it is neither practical nor
-trivial to rebase & port previous works related to ForeignKey refactor and
-CompositeKey without figuring out new approach based on present ORM internals
+Considering the huge changes in ORM internals it is neither trivial nor
+practical to rebase & port previous works related to ForeignKey refactor 
+without figuring out new approach based on present ORM internals
 design on top of master.
 
-A better approach would be to Improve Field API, major cleanup of RealtionField
-API, model._meta and internal field_valaue_cache and related areas first.
+A better approach would be to Improve Field API, major cleanup of 
+RealtionField API, model._meta and internal field_valaue_cache and
+related areas first.
 
 After completing the major clean ups of Fields/RelationFields a REAL
 VirtualField type should be introduced and VirtualField based refactor
-of ForeignKey and relationFields could done.
+of ForeignKey and relationFields could have been done.
 
-This appraoch should keep things sane and easier to approach on smaller chunks.
+This appraoch should keep things easier to approach with smaller steps.
 
 Later any VirtualField derived Field like CompositeField implementation
 should be less complex after the completion of virtualField based refactors.
@@ -205,28 +206,28 @@ New split out Field API
 1. BaseField:
 -------------
 Base structure for all Field types in django ORM wheather it is Concrete,
-relation or VirtualField
+RelationField or VirtualField
 
 2. ConcreteField:
 -----------------
-ConcreteField will have all the common attributes of a Regular concrete field
+ConcreteField will extract all the common attributes of a Regular concrete field
 
 3. Field:
 ---------
-Presence base Field class with should refactored using BaseField and ConcreteField.
-If it is decided to provide the optional virtual type to regular fields then
+Field class should be refactored using BaseField and ConcreteField. If it
+is decided to provide the optional virtual type to regular fields then
 VirtualField's features can also be added to specific fields.
 
 4. RelationField:
 -----------------
-Based Field for All relation fields.
+Base Field for All relation fields extended from new BaseField class.
 
 5. VirtualField:
 ----------------
-A true stand alone virtula field will be added to the system to be used to solve
-some long standing design limitations of django orm. initially RelationFields,
-GenericRelations etc will be benefitted by using VirtualFields and later
-CompositeField or any virtual type field can be benefitted from VirtualField.
+A true stand alone virtula field will be added to solve some long standing
+design limitations of django orm. initially RelationFields, GenericRelations
+etc will be benefitted by using VirtualFields and later CompositeField or
+any virtual type field can be benefitted from VirtualField.
 
 
 
@@ -281,14 +282,15 @@ A relation in Django consits of:
     - As last step of contribut_to_class method the prepare_remote() method
       is added as a lazy loaded method. It will be called when both Book and
       Author are ready. As it happens, they are both ready in the example,
-      so the method is called immediately.If the Author model was defined later
-      than Book, and Book had a string reference to Author, then the method would
+      so the method is called immediately. If the Author model was defined later
+      than Book and Book had a string reference to Author, then the method would
       be called only after Author was ready.
  3. The prepare_remote() method is called.
     - The remote field is created based on attributes of the origin field.
     The field is added to the remote model (the field's contribute_to_class
     is called)
-    - The post_relation_ready() method is called for both the origin and the remote field. This will create the descriptor on both the origin and remote field 
+    - The post_relation_ready() method is called for both the origin and the remote field.
+    This will create the descriptor on both the origin and remote field 
     (unless the remote relation is hidden, in which case no descriptor is created)
 
 
@@ -301,8 +303,7 @@ field.rel instance (for reverse side of user defined fields), or
 a real field instance(for example ForeignKey). These behave
 differently, so that the user must always remember which one
 he is dealing with. This creates lots of non-necessary conditioning
-in multiple places of
-Django.
+in multiple places of Django.
 
 For example, the select_related descent has one branch for descending foreign
 keys and one to one fields, and another branch for descending to reverse one
@@ -314,7 +315,8 @@ The remote_field is just a field subclass, just like everything else
 in Django.
 
 The benefits are:
-Conceptual simplicity - dealing with fields and rels is non-necessaryand confusing. Everything from get_fields() should be a field.
+Conceptual simplicity - dealing with fields and rels is non-necessaryand confusing.
+Everything from get_fields() should be a field.
 Code simplicity - no special casing based on if a given relation is described 
 by a rel or not
 Code reuse - ReverseManyToManyField is in most regard exactly like 
@@ -323,7 +325,9 @@ ManyToManyField.
 The expected problems are mostly from 3rd party code. Users of _meta that
 already work on expectation of getting rel instances will likely need updating.
 Those users who subclass Django's fields (or duck-type Django's fields) will
-need updating. Examples of such projects include django-rest-framework and django-taggit.
+need updating. Examples of such projects include django-rest-framework and
+django-taggit.
+
 
 Proposed API and workd flow for clean ups:
 ==========================================
@@ -598,23 +602,6 @@ composite primary key containing any special columns. This should be
 extremely rare anyway.
 
 
-GenericForeignKeys
-~~~~~~~~~~~~~~~~~~
-
-Even though the admin uses the contenttypes framework to log the history
-of actions, it turns out proper handling on the admin side will make
-things work without the need to modify GenericForeignKey code at all. This
-is thanks to the fact that the admin uses only the ContentType field and
-handles the relations on its own. Making sure the unquoting function
-recreates the whole CompositeObjects where necessary should suffice.
-
-At a later stage, however, GenericForeignKeys could also be improved to
-support composite primary keys. Using the same quoting solution as in the
-admin could work in theory, although it would only allow fields capable of
-storing arbitrary strings to be usable for object_id storage. This has
-been left out of the scope of this project, though.
-
-
 QuerySet filtering
 ~~~~~~~~~~~~~~~~~~
 
@@ -668,44 +655,6 @@ possible.
 ``__in`` lookups for ``VirtualField``
 =======================================
 
-The existing implementation of ``CompositeField`` handles ``__in`` lookups
-in the generic, backend-independent ``WhereNode`` class and uses a
-disjunctive normal form expression as in the following example::
-
-    SELECT a, b, c FROM tbl1, tbl2
-    WHERE (a = 1 AND b = 2 AND c = 3) OR (a = 4 AND b = 5 AND c = 6);
-
-The problem with this solution is that in cases where the list of values
-contains tens or hundreds of tuples, this DNF expression will be extremely
-long and the database will have to evaluate it for each and every row,
-without a possibility of optimizing the query.
-
-Certain database backends support the following alternative::
-
-    SELECT a, b, c FROM tbl1, tbl2
-    WHERE (a, b, c) IN [(1, 2, 3), (4, 5, 6)];
-
-This would probably be the best option, but it can't be used by SQLite,
-for instance. This is also the reason why the DNF expression was
-implemented in the first place.
-
-In order to support this more natural syntax, the ``DatabaseOperations``
-needs to be extended with a method such as ``composite_in_sql``.
-
-However, this leaves the issue of the inefficient DNF unresolved for
-backends without support for tuple literals. For such backends, the
-following expression is proposed::
-
-    SELECT a, b, c FROM tbl1, tbl2
-    WHERE EXISTS (SELECT a1, b1, c1, FROM (SELECT 1 as a, 2 as b, 3 as c
-                                           UNION SELECT 4, 5, 6)
-                  WHERE a1=1 AND b1=b AND c1=c);
-
-Since both syntaxes are rather generic and at least one of them should fit
-any database backend directly, a new flag will be introduced,
-``DatabaseFeatures.supports_tuple_literals`` which the default
-implementation of ``composite_in_sql`` will consult in order to choose
-between the two options.
 
 ModelChoiceFields
 ~~~~~~~~~~~~~~~~~

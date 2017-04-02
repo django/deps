@@ -493,23 +493,13 @@ corresponding to the local one. I'm open to other suggestions on this.
 There will also be a way to override the default names using a new field
 option "enclosed_fields". This option will expect a tuple of fields each
 of whose corresponds to one individual field in the same order as
-specified in the target CompositeField. This option will be ignored for
+specified in the target Field. This option will be ignored for
 non-composite ForeignKeys.
 
-The trickiest part, however, will be relation traversals in QuerySet
-lookups. Currently the code in models.sql.query.Query that creates joins
-only joins on single columns. To be able to span a composite relationship
-the code that generates joins will have to recognize column tuples and add
-a constraint for each pair of corresponding columns with the same aliases
-in all conditions.
 
 For the sake of completeness, ForeignKey will also have an extra_filters
 method allowing to filter by a related object or its primary key.
 
-With all this infrastructure set up, ManyToMany relationships using
-composite fields will be easy enough. Intermediary model creation will
-work thanks to automatic underlying field creation for composite fields
-and traversal in both directions will be supported by the query code.
 
 
 Changes in ``ForeignKey``
@@ -582,6 +572,7 @@ where ``place_ptr`` is a ``OneToOneField`` and ``chef`` is a
 ==========================================
 Following the refactor of Fields API and introduction of true
 VirtualField type, this part will also be refactored.
+
 
 
 

@@ -215,7 +215,7 @@ Base Field for All relation fields extended from new BaseField class.
 
 5. VirtualField:
 ----------------
-A true stand alone virtula field will be added to solve some long standing
+A true stand alone VirtualField will be added to solve some long standing
 design limitations of django orm. initially RelationFields, GenericRelations
 etc will be benefitted by using VirtualFields and later CompositeField or
 any virtual type field can be benefitted from VirtualField.
@@ -346,11 +346,11 @@ A relational field consist of:
  The name of the field. This is the key of the field in _meta.get_field() calls, and
  thus this is also the name used in ORM queries.
  
- .. attribute:: attname
+ .. attribute:: attr_name
  
- ForeignKeys have the concrete value in field.attname, and the model instance in
+ ForeignKeys have the concrete value in field.attr_name, and the model instance in
  field.name. For example Author.book_id contains an integer, and Author.book contains
- a book instance. Attname is the book_id value.
+ a book instance. attr_name is the book_id value.
  
  .. method:: get_query_name()
  
@@ -385,7 +385,6 @@ A relational field consist of:
  Same as self.remote_field.model.
  
  
- ******************************** RANDOM DESIGN DOCUMENTATION ***********************
  Abstract models and relational fields:
   - If an abstract model defines a relation to non-abstract model, we must not add the remote
     field.
@@ -401,8 +400,12 @@ Introduce standalone ``VirtualField``
 =====================================
 what is ``VirtualField``?
 -------------------------
-"A virtual field is a model field which it correlates to one or multiple
-concrete fields, but doesn't add or alter columns in the database."
+A VirtualField is a model field type which co-relates to one or multiple
+concrete fields, but doesn't add or alter columns in the database.
+
+ORM or migrations certainly can't ignore ForeignKey once it becomes virtual;
+instead, migrations will have to hide any auto-generated auxiliary concrete
+fields to make migrations backwards-compatible.
 
 
 

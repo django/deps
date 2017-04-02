@@ -415,88 +415,6 @@ concrete fields, but doesn't add or alter columns in the database."
 
 
 
-Changes in ``ForeignKey``
-=========================
-
-Currently ``ForeignKey`` is a regular concrete field which manages both
-the raw value stored in the database and the higher-level relationship
-semantics. Managing the raw value is simple enough for simple
-(single-column) targets. However, in the case of a composite target field,
-this task becomes more complex. The biggest problem is that many parts of
-the ORM work under the assumption that for each database column there is a
-model field it can assign the value from the column to. While it might be
-possible to lift this restriction, it would be a really complex project by
-itself.
-
-On the other hand, there is the abstraction of virtual fields working on
-top of other fields which is required for this project anyway. The way
-forward would be to use this abstraction for relationship fields.
-Currently, ``ForeignKey`` (and by extension ``OneToOneField``) is the only
-field whose ``name`` and ``attname`` differ, where ``name`` stores the
-value dictated by the semantics of the field and ``attname`` stores the
-raw value from the database.
-
-We can use this to our advantage and put an auxiliary field into the
-``attname`` of each ``ForeignKey``, which would be of the same database
-type as the target field, and turn ``ForeignKey`` into a virtual field on
-top of the auxiliary field. This solution has the advantage that it
-offloads the need to manage the raw database value off ``ForeignKey`` and
-uses a field specifically intended for the task.
-
-In order to keep this backwards compatible and avoid the need to
-explicitly create two fields for each ``ForeignKey``, the auxiliary field
-needs to be created automatically during the phase where a model class is
-created by its metaclass. Initially I implemented this as a method on
-``ForeignKey`` which takes the target field and creates its copy, touches
-it up and adds it to the model class. However, this requires performing
-special tasks with certain types of fields, such as ``AutoField`` which
-needs to be turned into an ``IntegerField`` or ``CompositeField`` which
-requires copying its enclosed fields as well.
-
-A better approach is to add a method such as ``create_auxiliary_copy`` on
-``Field`` which would create all new field instances and add them to the
-appropriate model class.
-
-One possible problem with these changes is that they change the contents
-of ``_meta.fields`` in each model out there that contains a relationship
-field. For example, if a model contains the following fields::
-
-    ['id',
-     'name',
-     'address',
-     'place_ptr',
-     'rating',
-     'serves_hot_dogs',
-     'serves_pizza',
-     'chef']
-
-where ``place_ptr`` is a ``OneToOneField`` and ``chef`` is a
-``ForeignKey``, after the change it will contain the following list::
-
-    ['id',
-     'name',
-     'address',
-     'place_ptr',
-     'place_ptr_id',
-     'rating',
-     'serves_hot_dogs',
-     'serves_pizza',
-     'chef',
-     'chef_id']
-
-This causes a lot of failures in the Django test suite, because there are
-a lot of tests relying on the contents of ``_meta.fields`` or other
-related attributes/properties. (Actually, this example is taken from one
-of these tests,
-``model_inheritance.tests.ModelInheritanceTests.test_multiple_table``.)
-Fixing these is fairly simple, all they need is to add the appropriate
-``__id`` fields. However, this raises a concern of how ``_meta`` is
-regarded. It has always been a private API officially, but everyone uses
-it in their projects anyway. I still think the change is worth it, but it
-might be a good idea to include a note about the change in the release
-notes. 
-
-
 Changes in ``RelationField``
 =============================
 Relationship fields
@@ -549,19 +467,78 @@ work thanks to automatic underlying field creation for composite fields
 and traversal in both directions will be supported by the query code.
 
 
+Changes in ``ForeignKey``
+=========================
+
+Currently ``ForeignKey`` is a regular concrete field which manages both
+the raw value stored in the database and the higher-level relationship
+semantics. Managing the raw value is simple enough for simple
+(single-column) targets. The biggest problem is that many parts of
+the ORM work under the assumption that for each database column there is a
+model field it can assign the value from the column to. While it might be
+possible to lift this restriction, it would be a really complex project by
+itself.
+
+On the other hand, there is the abstraction of virtual fields working on
+top of other fields which is required for this project anyway. The way
+forward would be to use this abstraction for relationship fields.
+Currently, ``ForeignKey`` (and by extension ``OneToOneField``) is the only
+field whose ``name`` and ``attname`` differ, where ``name`` stores the
+value dictated by the semantics of the field and ``attname`` stores the
+raw value from the database.
+
+We can use this to our advantage and put an auxiliary field into the
+``attname`` of each ``ForeignKey``, which would be of the same database
+type as the target field, and turn ``ForeignKey`` into a virtual field on
+top of the auxiliary field. This solution has the advantage that it
+offloads the need to manage the raw database value off ``ForeignKey`` and
+uses a field specifically intended for the task.
+
+In order to keep this backwards compatible and avoid the need to
+explicitly create two fields for each ``ForeignKey``, the auxiliary field
+needs to be created automatically during the phase where a model class is
+created by its metaclass. 
+
+A better approach could be to add a method such as ``create_auxiliary_copy``
+on ``Field`` which would create all new field instances and add them to the
+appropriate model class.
+
+One possible problem with these changes is that they change the contents
+of ``_meta.fields`` in each model out there that contains a relationship
+field. For example, if a model contains the following fields::
+
+    ['id',
+     'name',
+     'address',
+     'place_ptr',
+     'rating',
+     'serves_hot_dogs',
+     'serves_pizza',
+     'chef']
+
+where ``place_ptr`` is a ``OneToOneField`` and ``chef`` is a
+``ForeignKey``, after the change it will contain the following list::
+
+    ['id',
+     'name',
+     'address',
+     'place_ptr',
+     'place_ptr_id',
+     'rating',
+     'serves_hot_dogs',
+     'serves_pizza',
+     'chef',
+     'chef_id']
+
+
+
 
 ``contenttypes`` and ``GenericForeignKey``
 ==========================================
 
-It's fairly easy to represent composite values as strings. Given an
-``escape`` function which uniquely escapes commas, something like the
-following works quite well::
-
-    ",".join(escape(value) for value in composite_value)
-
-However, in order to support JOINs generated by ``GenericRelation``, we
-need to be able to reproduce exactly the same encoding using an SQL
-expression which would be used in the JOIN condition.
+However, in order to support JOINs generated by ``GenericRelation``,
+we need to be able to reproduce exactly the same encoding using an
+SQL expression which would be used in the JOIN condition.
 
 Luckily, while thus encoded strings need to be possible to decode in
 Python (for example, when retrieving the related object using
@@ -569,27 +546,6 @@ Python (for example, when retrieving the related object using
 this isn't necessary at the database level. Using SQL we only ever need to
 perform this in one direction, that is from a tuple of values into a
 string.
-
-That means we can use a generalized version of the function
-``django.contrib.admin.utils.quote`` which replaces each unsafe
-character with its ASCII value in hexadecimal base, preceded by an escape
-character. In this case, only two characters are unsafe -- comma (which is
-used to separate the values) and an escape character (which I arbitrarily
-chose as '~').
-
-To reproduce this encoding, all values need to be cast to strings and then
-for each such string two calls to the ``replace`` functions are made::
-
-    replace(replace(CAST (`column` AS text), '~', '~7E'), ',', '~2C')
-
-According to available documentation, all four supported database backends
-provide the ``replace`` function. [2]_ [3]_ [4]_ [5]_
-
-Even though the ``replace`` function seems to be available in all major
-database servers (even ones not officially supported by Django, including
-MSSQL, DB2, Informix and others), this is still probably best left to the
-database backend and will be implemented as
-``DatabaseOperations.composite_value_to_text_sql``.
 
 One possible pitfall of this implementation might be that it may not work
 with any column type that isn't an integer or a text string due to a
@@ -605,12 +561,8 @@ extremely rare anyway.
 QuerySet filtering
 ~~~~~~~~~~~~~~~~~~
 
-This is where the real fun begins.
-
 The fundamental problem here is that Q objects which are used all over the
 code that handles filtering are designed to describe single field lookups.
-On the other hand, CompositeFields will require a way to describe several
-individual field lookups by a single expression.
 
 Since the Q objects themselves have no idea about fields at all and the
 actual field resolution from the filter conditions happens deeper down the

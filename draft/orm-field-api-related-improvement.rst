@@ -110,32 +110,10 @@ fair shake clearer than the existing generic foreign key solutions.
 Aim of the Proposal:
 ====================
 This DEP aims to improve different part of django ORM and associated
-parts of django to support Real VirtualField type in django. There were
-several attempt to fix this problem before. So in this Dep we will try
-to follow the suggested approaches from Michal Patrucha's previous works
-and suggestions in tickets and IRC chat/mailing list. Few other related
-tickets were also analyzed to find out possible way's of API design.
-
-
-To keep thing sane it would be better to split the Dep in some major Parts:
-
-1. Logical refactor of present Field API and RelationField API, to make 
- them simpler and consistant with _meta API calls
-
-2. Introduce new sane API for RelationFields [internal/provisional]
-
-3. Fields internal value cache refactor for relation fields (may be)
-
-4. VirtualField Based refactor of RelationFields API
-
-
-
-Notes on Porting previous work on top of master:
-================================================
-Considering the huge changes in ORM internals it is neither trivial nor
-practical to rebase & port previous works related to ForeignKey refactor 
-without figuring out new approach based on present ORM internals
-design on top of master.
+parts of django to support Real VirtualField type in django. So in this
+Dep we will try to follow the suggested approaches from Michal Patrucha's
+previous works and suggestions in tickets and IRC chat/mailing list.
+Related tickets were also analyzed to find out possible way's of API design.
 
 A better approach would be to Improve Field API, major cleanup of 
 RealtionField API, model._meta and internal field_valaue_cache and
@@ -149,6 +127,19 @@ This appraoch should keep things easier to approach with smaller steps.
 
 Later any VirtualField derived Field like CompositeField implementation
 should be less complex after the completion of virtualField based refactors.
+
+To keep thing sane it would be better to split the Dep in some major Parts:
+
+1. Logical refactor of present Field API and RelationField API, to make 
+ them simpler and consistant with _meta API calls
+
+2. Introduce new sane API for RelationFields [internal/provisional]
+
+3. Fields internal value cache refactor for relation fields (may be)
+
+4. VirtualField Based refactor of RelationFields API
+
+
 
 
 Key steps of to follow to improve ORM Field API internals:
@@ -564,44 +555,6 @@ QuerySet filtering
 The fundamental problem here is that Q objects which are used all over the
 code that handles filtering are designed to describe single field lookups.
 
-Since the Q objects themselves have no idea about fields at all and the
-actual field resolution from the filter conditions happens deeper down the
-line, inside models.sql.query.Query, this is where we can handle the
-filters properly.
-
-There is already some basic machinery inside Query.add_filter and
-Query.setup_joins that is in use by GenericRelations, this is
-unfortunately not enough. The optional extra_filters field method will be
-of great use here, though it will have to be extended.
-
-Currently the only parameters it gets are the list of joins the
-filter traverses, the position in the list and a negate parameter
-specifying whether the filter is negated. The GenericRelation instance can
-determine the value of the content type (which is what the extra_filters
-method is used for) easily based on the model it belongs to.
-
-This is not the case for a CompositeField -- it doesn't have any idea
-about the values used in the query. Therefore a new parameter has to be
-added to the method so that the CompositeField can construct all the
-actual filters from the iterable containing the values.
-
-Afterwards the handling inside Query is pretty straightforward. For
-CompositeFields (and virtual fields in general) there is no value to be
-used in the where node, the extra_filters are responsible for all
-filtering, but since the filter should apply to a single object even after
-join traversals, the aliases will be set up while handling the "root"
-filter and then reused for each one of the extra_filters.
-
-This way of extending the extra_filters mechanism will allow the field
-class to create conjunctions of atomic conditions. This is sufficient for
-the "__exact" lookup type which will be implemented.
-
-Of the other lookup types, the only one that looks reasonable is "__in".
-This will, however, have to be represented as a disjunction of multiple
-"__exact" conditions since not all database backends support tuple
-construction inside expressions. Therefore this lookup type will be left
-out of this project as the mechanism would need much more work to make it
-possible.
 
 
 ``__in`` lookups for ``VirtualField``

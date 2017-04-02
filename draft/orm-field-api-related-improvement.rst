@@ -109,19 +109,17 @@ fair shake clearer than the existing generic foreign key solutions.
 
 Aim of the Proposal:
 ====================
-This DEP aims to improve different part of django ORM and associated
-parts of django to support Real VirtualField type in django. So in this
-Dep we will try to follow the suggested approaches from Michal Patrucha's
-previous works and suggestions in tickets and IRC chat/mailing list.
-Related tickets were also analyzed to find out possible way's of API design.
+This DEP aims to improve django ORM internal Field and related Fields
+private api to provide a sane API and mechanism for relation fileds.
+Parts of it also propose to introduce true VirtualField type in django. 
 
-A better approach would be to Improve Field API, major cleanup of 
-RealtionField API, model._meta and internal field_valaue_cache and
-related areas first.
+To acheive these goals, a better approach would be to Improve Field API,
+major cleanup of RealtionField API, model._meta and internal field_valaue_cache
+and related areas first.
 
-After completing the major clean ups of Fields/RelationFields a REAL
-VirtualField type should be introduced and VirtualField based refactor
-of ForeignKey and relationFields could have been done.
+After completing the major clean ups of Fields/RelationFields a standalone
+VirtualField and VirtualField based refactors of ForeignKey and relationFields
+and other parts of orm/contenttypes etc could have been done.
 
 This appraoch should keep things easier to approach with smaller steps.
 
@@ -131,18 +129,22 @@ should be less complex after the completion of virtualField based refactors.
 To keep thing sane it would be better to split the Dep in some major Parts:
 
 1. Logical refactor of present Field API and RelationField API, to make 
- them simpler and consistant with _meta API calls
+ them simpler and return consistant result with _meta API calls.
 
 2. Introduce new sane API for RelationFields [internal/provisional]
 
-3. Fields internal value cache refactor for relation fields (may be)
+3. Make it possible to use Reverse relation directly if necessary.
 
-4. VirtualField Based refactor of RelationFields API
+4. Take care of Fields internal value cache for relation fields. [may be] 
+
+5. VirtualField Based refactor of RelationFields API
+
+6. ContentTypes refactor.
 
 
 
 
-Key steps of to follow to improve ORM Field API internals:
+Key steps to refactor ORM Fields API internals:
 ==============================================================
 1. Split out Field API logically to separate ConcreteField,
  BaseField, RelationField etc and adjust codes based on that API.
@@ -166,23 +168,25 @@ Key steps of to follow to improve ORM Field API internals:
 7. Refactor all RelationFields [OneToOne, ManyToMany...] based on ``VirtualField``
  and new Field API based ForeignKey.
 
-8. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
+8. AuxiliaryField
+
+9. Refactor GenericForeignKey based on ``VirtualField`` based refactored ForeignKey 
  
-9. ContentTypes/GenericRelations/GenericForeginKey works well with new Fields API
+10. ContentTypes/GenericRelations/GenericForeginKey works well with new Fields API
 
-10. Make changes to migrations framework to work properly with Reafctored Field
+11. Make changes to migrations framework to work properly with Reafctored Field
    API.
 
-11. Migrations work well with VirtualField based refactored API
+12. Migrations work well with VirtualField based refactored API
 
-12. Make sure new class based Index API ise used properly with refactored Field
+13. Make sure new class based Index API ise used properly with refactored Field
    API.
 
-13. Query/QuerySets/Expressions work well with new refactored API's
+14. Query/QuerySets/Expressions work well with new refactored API's
 
-14. refactor GIS framework based on the changes in ORM
+15. refactor GIS framework based on the changes in ORM
 
-15. ModelForms/Admin work well with posposed changes 
+16. ModelForms/Admin work well with posposed changes 
 
 
 
@@ -407,6 +411,57 @@ ORM or migrations certainly can't ignore ForeignKey once it becomes virtual;
 instead, migrations will have to hide any auto-generated auxiliary concrete
 fields to make migrations backwards-compatible.
 
+A virtualField class could be like the following
+
+
+class VirtualField(Field):
+    """
+    Base class for field types with no direct database representation.
+    """
+    def __init__(self, **kwargs):
+        kwargs.setdefault('serialize', False)
+        kwargs.setdefault('editable', False)
+        super().__init__(**kwargs)
+
+    def db_type(self, connection):
+        """
+        By default no db representation, and thus also no db_type.
+        """
+        return None
+
+    def contribute_to_class(self, cls, name):
+        super().contribute_to_class(cls, name)
+
+    def get_column(self):
+        return None
+
+    @cached_property
+    def fields(self):
+        return []
+
+    @cached_property
+    def concrete_fields(self):
+        return [f
+                for myfield in self.fields
+                for f in myfield.concrete_fields]
+
+    def resolve_concrete_values(self, data):
+        if data is None:
+            return [None] * len(self.concrete_fields)
+        if len(self.concrete_fields) > 1:
+            if not isinstance(data, (list, tuple)):
+                raise ValueError(
+                    "Can't resolve data that isn't list or tuple to values for field %s" %
+                    self.name)
+            elif len(data) != len(self.concrete_fields):
+                raise ValueError(
+                    "Invalid amount of values for field %s. Required %s, got %s." %
+                    (self.name, len(self.concrete_fields), len(data)))
+            return data
+        else:
+            return [data]
+
+
 
 
 Changes in ``RelationField``
@@ -414,15 +469,11 @@ Changes in ``RelationField``
 Relationship fields
 ~~~~~~~~~~~~~~~~~~~
 
-This turns out to be, not too surprisingly, the toughest problem. The fact
-that related fields are spread across about fifteen different classes,
-most of which are quite nontrivial, makes the whole bundle pretty fragile,
-which means the changes have to be made carefully not to break anything.
-
-What we need to achieve is that the ForeignKey, ManyToManyField and
-OneToOneField detect when their target field is a CompositeField in
-several situations and act accordingly since this will require different
-handling than regular fields that map directly to database columns.
+The fact that related fields are spread across about fifteen different
+classes, most of which are quite nontrivial, makes the whole bundle
+pretty fragile, which means the changes have to be made carefully not
+to break anything. This will require different handling than regular
+fields that map directly to database columns.
 
 The first one to look at is ForeignKey since the other two rely on its
 functionality, OneToOneField being its descendant and ManyToManyField

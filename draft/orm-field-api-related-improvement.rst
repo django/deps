@@ -54,9 +54,9 @@ class Comment(models.Model):
     text = models.TextField() 
     flags = models.OneToMany(Flag) 
 
-That way, if you had a new content type (say, a "Post"), it could also 
+That way, if we had a new content type (say, a "Post"), it could also 
 participate in flagging, without having to modify the model definition 
-of "Flag" to add a new foreign key.  Without baking in migrations, 
+of "Flag" to add a new foreign key. Without baking in migrations, 
 there's obviously no way to make the underlying SQL play nice in this 
 circumstance: one-to-many relationships with just two tables can only 
 be expressed in SQL with a reverse foreign key relationship.  However, 
@@ -78,7 +78,7 @@ the comment from a flag, have to call:
 comment = flag.comment_set.all()[0] 
 
 as the ORM doesn't know for a fact that each flag could only have one 
-comment.  But Django _could_ implement a OneToManyField in this way 
+comment. But Django can implement a OneToManyField in this way 
 (using the underlying ManyToMany paradigm), and provide sugar such 
 that this would all be nice and flexible, without having to do cumbersome 
 ORM calls or explicitly define extra join tables: 
@@ -216,6 +216,7 @@ VirtualField's features can also be added to specific fields.
 4. RelationField:
 -----------------
 Base Field for All relation fields extended from new BaseField class.
+In new class hirerarchy RelationFields will be Virtual.
 
 5. VirtualField:
 ----------------
@@ -322,6 +323,17 @@ already work on expectation of getting rel instances will likely need updating.
 Those users who subclass Django's fields (or duck-type Django's fields) will
 need updating. Examples of such projects include django-rest-framework and
 django-taggit.
+
+While the advised approach was:
+1. Find places where rield.remote_field responds to different API than Field.
+Fix these one at a time while trying to have backwards compat, even if the
+API isn't public.
+
+2. In addition, simplifications to the APIs are welcome, as is a high level 
+documentation of how related fields actually work.
+
+3. We need to try to keep backwards compat as many projects are forced to
+use the private APIs. But most of all, do small incremental changes.
 
 
 Proposed API and workd flow for clean ups:

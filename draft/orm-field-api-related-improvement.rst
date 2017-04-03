@@ -325,6 +325,7 @@ need updating. Examples of such projects include django-rest-framework and
 django-taggit.
 
 While the advised approach was:
+
 1. Find places where rield.remote_field responds to different API than Field.
 Fix these one at a time while trying to have backwards compat, even if the
 API isn't public.
@@ -334,6 +335,14 @@ documentation of how related fields actually work.
 
 3. We need to try to keep backwards compat as many projects are forced to
 use the private APIs. But most of all, do small incremental changes.
+
+
+I would like to try the more direct approach. The reasons are,
+
+1. Define clear definition of relation fields class hierarchy and naming.
+ at present the class names for reverse relation and backreference is
+ quite confusing, like BackReference of any relation class is being called
+
 
 
 Proposed API and workd flow for clean ups:
@@ -502,12 +511,6 @@ default names: "fkname_targetname" where "fkname" is the name of the
 ForeignKey field and "targetname" is the name of the remote field name
 corresponding to the local one. I'm open to other suggestions on this.
 
-There will also be a way to override the default names using a new field
-option "enclosed_fields". This option will expect a tuple of fields each
-of whose corresponds to one individual field in the same order as
-specified in the target Field. This option will be ignored for
-non-composite ForeignKeys.
-
 
 For the sake of completeness, ForeignKey will also have an extra_filters
 method allowing to filter by a related object or its primary key.
@@ -596,15 +599,10 @@ code that handles filtering are designed to describe single field lookups.
 
 
 
-``__in`` lookups for ``VirtualField``
-=======================================
-
-
 ModelChoiceFields
 ~~~~~~~~~~~~~~~~~
 
-Again, we need a way to specify the value as a parameter passed in the
-form. The same escaping solution can be used even here.
+As the virtualField itself won't be backed by any real db field
 
 Admin/ModelForms
 ================

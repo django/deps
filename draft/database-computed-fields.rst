@@ -48,9 +48,9 @@ The proposed API would be :
 .. code-block:: python
 
     class Book(models.Model):
-        always_readonly = models.IntegerField(readonly=True)  # or "all"
-        readonly_at_creation = models.IntegerField(readonly="create")
-        readonly_at_update = models.IntegerField(readonly="update")
+        always_readonly = models.IntegerField(readonly=True)
+        readonly_at_creation = models.IntegerField(readonly=models.CREATE)
+        readonly_at_update = models.IntegerField(readonly=models.UPDATE)
 
         # And of course
         not_readonly = models.IntegerField(readonly=False)
@@ -66,9 +66,9 @@ Using the value
 
 ``readonly`` will be implemented by modifying the SQL compilers to make them "forget" about readonly fields, specifically for ``INSERT`` and ``UPDATE`` queries.
 
-In the ``SQLInsertCompiler`` class, the ``as_sql`` method manipulates ``self.query.fields``. We would change the implementation so that it would ignore the readonly fields (those whose readonly value is either ``True`` or ``"create"``).
+In the ``SQLInsertCompiler`` class, the ``as_sql`` method manipulates ``self.query.fields``. We would change the implementation so that it would ignore the readonly fields (those whose readonly value is either ``True`` or ``models.CREATE``).
 
-In the ``SQLUpdateCompiler`` class, the ``as_sql`` method manipulates ``self.query.values`` which is a list of tuples whose first values are ``Field`` instances. We would change the implementation so that it would ignore the readonly fields (those whose readonly value is either ``True`` or ``"update"``).
+In the ``SQLUpdateCompiler`` class, the ``as_sql`` method manipulates ``self.query.values`` which is a list of tuples whose first values are ``Field`` instances. We would change the implementation so that it would ignore the readonly fields (those whose readonly value is either ``True`` or ``models.UPDATE``).
 
 Warning for misuses
 ^^^^^^^^^^^^^^^^^^^
@@ -92,6 +92,12 @@ Empty queries
 
 If a query becomes empty because all its fields are actually readonly, it should not be executed. This is already the case in the compilers, but this behaviour will be kept.
 
+Model forms
+^^^^^^^^^^^
+
+By default, readonly fields (create and/or update) will be marked as ``editable=False``.
+
+
 Auto-Refresh
 ------------
 
@@ -109,18 +115,13 @@ The proposed API would be:
 .. code-block:: python
 
     class Book(models.Model):
-        refresh = models.IntegerField(auto_refresh=True)  # or "all"
-        refresh_at_creation = models.IntegerField(auto_refresh="create")
-        refresh_at_update = models.IntegerField(auto_refresh="update")
+        refresh = models.IntegerField(auto_refresh=True)
+        refresh_at_creation = models.IntegerField(auto_refresh=models.CREATE)
 
         # And of course
         no_refresh = models.IntegerField(auto_refresh=False)
         no_refresh_either = models.IntegerField()
 
-
-At this step, a complete implementation specification is not proposed, but existing Pull Requests (see `Existing works`_) may provide good leads on how to complete this DEP.
-
-The ``refresh_from_db`` Model instance method will have an optional keyword argument named ``readonly`` that will allow refreshing all the auto-refresh fields in one go.
 
 Motivation
 ==========

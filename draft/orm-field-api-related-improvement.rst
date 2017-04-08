@@ -339,9 +339,16 @@ use the private APIs. But most of all, do small incremental changes.
 
 I would like to try the more direct approach. The reasons are,
 
-1. Define clear definition of relation fields class hierarchy and naming.
- at present the class names for reverse relation and backreference is
- quite confusing, like BackReference of any relation class is being called
+1. Define clear definition of relation fields class hierarchy and naming
+ At present the class names for reverse relation and backreference is
+ quite confusing. Like RemoteField is actually holding the information about
+ any Fields relation which are now
+
+2. I have plan to introduce OneToManyField which can be used directly
+ and will be the main ReverseForeignKey
+
+3. 
+
 
 
 
@@ -349,8 +356,8 @@ Proposed API and workd flow for clean ups:
 ==========================================
 Relational field API
 ====================
-Currently the main use case is that we have a single place where I
-can check that we don't define redundant APIs for related fields.
+Currently the main use case is that we have a single place where
+can be checked that we don't define redundant APIs for related fields.
 
 Structure of a relational field
 -------------------------------
@@ -358,7 +365,7 @@ Structure of a relational field
 A relational field consist of:
  
    - The user created field
-   - Possibly of a remote field, which is auto-created by the user created field
+   - Possibly of a remote_field, which is auto-created by the user created field
  
  Both the created field and the remote field can possibly add a descriptor to
  the field's model.
@@ -415,7 +422,9 @@ A relational field consist of:
     field.
   - If an model defines a relation to abstract model, this should just fail (check this!)
 
+This was basically taken from a old work on Relational API clean up, but not well tested.
 
+I believe I can adjust these later.
 
 
 Part-2:
@@ -496,24 +505,22 @@ pretty fragile, which means the changes have to be made carefully not
 to break anything. This will require different handling than regular
 fields that map directly to database columns.
 
+For that reason the Relational API will be cleaned up to return consistant
+result and later VirtualField based refactor will take place.
+
 The first one to look at is ForeignKey since the other two rely on its
 functionality, OneToOneField being its descendant and ManyToManyField
 using ForeignKeys in the intermediary model. Once the ForeignKeys work,
-OneToOneField should require minimal to no changes since it inherits
+OneToOneField should require minimal changes since it inherits
 almost everything from ForeignKey.
 
-The easiest part is that for composite related fields, the db_type will be
-None since the data will be stored elsewhere.
 
 ForeignKey and OneToOneField will also be able to create the underlying
 fields automatically when added to the model. I'm proposing the following
-default names: "fkname_targetname" where "fkname" is the name of the
+default names: "fk_targetname" where "fkname" is the name of the
 ForeignKey field and "targetname" is the name of the remote field name
 corresponding to the local one. I'm open to other suggestions on this.
 
-
-For the sake of completeness, ForeignKey will also have an extra_filters
-method allowing to filter by a related object or its primary key.
 
 
 
@@ -611,4 +618,7 @@ Admin/ModelForms
 
 GIS Framework:
 ==============
+
+
+
 

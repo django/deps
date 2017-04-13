@@ -15,8 +15,7 @@ DEP : ORM Relation Fields API Improvements using VirtualField
 
 Background:
 ===========
-Django's ORM is a simple & powerful tool which suits most use-cases.
-However, historicaly it has some design limitations and complex internal
+Historically Django's ORM  has some design limitations and complex internal
 API which makes it not only hard to maintain but also produce inconsistant
 behaviours.
 

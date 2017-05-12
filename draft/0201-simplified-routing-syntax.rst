@@ -3,13 +3,13 @@ DEP 0201: Simplified routing syntax
 ===================================
 
 :DEP: 0201
-:Author: Tom Christie, Sjoerd Job Postmus
-:Implementation Team: Tom Christie, Sjoerd Job Postmus
-:Shepherd: Tim Graham
+:Author: Tom Christie, Sjoerd Job Postmus, Aymeric Augustin
+:Implementation Team: Sjoerd Job Postmus
+:Shepherd: Aymeric Augustin
 :Status: Draft
 :Type: Feature
 :Created: 2016-10-19
-:Last-Modified: 2016-10-20
+:Last-Modified: 2017-05-12
 
 .. contents:: Table of Contents
    :depth: 3
@@ -34,7 +34,7 @@ configuration...
 
 .. code-block:: python
 
-    urlpatterns = [     
+    urlpatterns = [
         url(r'^articles/2003/$', views.special_case_2003),
         url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
         url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
@@ -64,7 +64,7 @@ interface to our developers...
 
 .. code-block:: python
 
-    urlpatterns = [     
+    urlpatterns = [
         path('articles/2003/', views.special_case_2003),
         path('articles/<int:year>/', views.year_archive),
         path('articles/<int:year>/<int:month>/', views.month_archive),
@@ -113,7 +113,7 @@ uses:
 The naming question would be:
 
 * What should the new style be called? Would we keep ``url``, or would we need
-to introduce a different name to avoid confusion?
+  to introduce a different name to avoid confusion?
 * Where should the new style be imported from?
 
 Our constraints here are that the existing naming makes sense, but we also need

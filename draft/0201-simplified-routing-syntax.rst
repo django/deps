@@ -145,24 +145,40 @@ it on the deprecation path at a later date.
 Converters
 ----------
 
-Flask supports the `following converters <http://flask.pocoo.org/docs/0.11/quickstart/#variable-rules>`_.
+Django will support the following converters out of the box:
 
 ``string``
-    Accepts any text without a slash (the default)
+    Accepts any text without a slash (this is the default converter)
 ``int``
-    Accepts integers
-``float``
-    Like ``int`` but for floating point values
+    Accepts non-negative integers
 ``path``
-    Like the default but also accepts slashes
+    Accepts any text
+``slug``
+    Accepts ASCII-only slugs, based on the same definition as ``SlugField``
 ``uuid``
-    Accepts UUID strings
+    Accepts UUIDs
 
-Furthermore, an interface for implementing custom converters should exist. We
-could use the same API as Flask's ``BaseConverter`` for this purpose. The
-registration of custom converters could be handled as a Django setting,
-``CUSTOM_URL_CONVERTERS``. The default set of converters should probably 
-*always* be included.
+Furthermore, an interface for registering custom converters is provided:
+
+.. code-block:: python
+
+    from django.urls import register_converter
+
+    register_converter(Converter, 'conv')
+
+Users are expected to call ``register_converter`` in their URLconf module, to
+make sure converters are registered before the URLconf is loaded.
+
+``register_converter`` may also be used as a decorator:
+
+.. code-block:: python
+
+    @register_converter('conv')
+    class Converter:
+        ...
+
+No ``unregister_converter`` function will be implemented because there's no
+clear use case.
 
 Failure to perform a type conversion against a captured string should result in
 an ``Http404`` exception being raised.

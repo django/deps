@@ -130,17 +130,20 @@ A consistently named regex specific import would also be introduced...
 
 .. code-block:: python
 
-    from django.urls import path_regex
+    from django.urls import re_path
 
 The name ``path`` makes semantic sense here, because it actually does represent
 a URL component, rather than a complete URL.
 
 The existing import of ``from django.conf.urls import url`` would become a shim
-for the more explicit ``from django.urls import path_regex``.
+for the more explicit ``from django.urls import re_path``.
 
-Given that it is currently used in 100% of Django projects, the smooth path for
-users would be to not deprecate its usage immediately, but to consider placing
-it on the deprecation path at a later date.
+Given that it is currently used in 100% of Django projects, the smooth path
+for users would be to not deprecate ``django.conf.urls.url`` immediately, but
+to mark it as deprecated in version 3.0 (after 2.2 LTS) and remove it in 4.0
+(after 3.2 LTS). Hopefully many projects will migrate to ``django.urls.path``
+(the carrot) before being forced to migrate to ``django.urls.re_path`` (the
+stick).
 
 Converters
 ----------
@@ -240,7 +243,7 @@ One option could be:
   corresponding to capture group names and the corresponding values being
   instances of ``BaseConverter`` (or something that duck-types the same way).
 * The type specifiers as supplied in the arguments to ``path`` will be used to
-  build the ``converters`` argument for ``path_regex``.
+  build the ``converters`` argument for ``re_path``.
 
 Type conversions and ``reverse``
 --------------------------------
@@ -286,7 +289,7 @@ There is a decidedly edge-case deprecation that this would introduce in that
 existing projects that happen to *intentionally* include an unachored URL regex
 would raise a ``ConfigurationError`` when upgraded. However this is a loud and
 documentable error, with a simple resolution. (Change the import to
-``from django.urls import path_regex``.)
+``from django.urls import re_path``.)
 
 Internal ``RegexURLPattern`` API
 ================================
@@ -321,7 +324,7 @@ The following independent tasks can be identified:
   arguments.
 * Add support for the new style ``path`` function, with an underlying
   implementation based on the regex urls.
-* Add ``path_regex``, with ``from django.conf.urls import url`` becoming a shim
+* Add ``re_path``, with ``from django.conf.urls import url`` becoming a shim
   for it.
 * Add support for registering custom converters, as defined in the Django
   settings.

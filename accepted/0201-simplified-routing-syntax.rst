@@ -19,18 +19,16 @@ Abstract
 ========
 
 This DEP aims to introduce a simpler and more readable routing syntax to
-Django. Additionally the new syntax would support type coercion of URL
-parameters.
+Django. Additionally the new syntax supports type coercion of URL parameters.
 
-We would plan for this to become the new convention by default, but would do so
-in a backwards compatible manner, leaving the existing regex based syntax as an
-option.
+We plan for this to become the new convention by default, but in a backwards
+compatible manner, leaving the existing regex based syntax as an option.
 
 Motivation
 ==========
 
 Here's a section directly taken from Django's documentation on URL
-configuration...
+configuration:
 
 .. code-block:: python
 
@@ -43,7 +41,7 @@ configuration...
 
 There are two aspects to this that we'd like to improve on:
 
-* The Regex based URL syntax is unnecessarily verbose and complex for the vast
+* The regex-based URL syntax is unnecessarily verbose and complex for the vast
   majority of use-cases.
 * The existing URL resolver system does not handle typecasting, meaning that
   all URL parameters are treated as string literals.
@@ -56,11 +54,11 @@ provide for typecasting of the URL parameters that are passed to views.
 The existing syntax would remain available, and there would be no plans to
 place it on a deprecation path. Indeed, the underlying implementation for the
 typed URL syntax would actually be to use expand the typed URLs out into the
-existing Regex style, although this would largely remain an implementation
+existing regex style, although this would largely remain an implementation
 detail, rather than an exposed bit of API.
 
 The end result is that we would like to be able to present the following
-interface to our developers...
+interface to our developers:
 
 .. code-block:: python
 
@@ -71,9 +69,9 @@ interface to our developers...
         path('articles/<int:year>/<int:month>/<int:day>/', views.article_detail),
     ]
 
-The ``path()`` argument would also accept arguments without a converter prefix,
-in which case the converter would default to "string", accepting any text
-except a ``'/'``.
+The ``path()`` argument would also accept arguments without a converter
+prefix, in which case the converter would default to ``string``, accepting any
+text except a ``'/'``.
 
 For example:
 
@@ -81,21 +79,13 @@ For example:
 
     urlpatterns = [
         path('users/', views.user_list),
-        path('users/<id>/', views.user_detail),
+        path('users/<name>/', views.user_detail),
     ]
 
-For further background, please see the `"Challenge teaching Django to beginners: urls.py" <https://groups.google.com/forum/#!topic/django-developers/u6sQax3sjO4>`_ discussion group thread.
-
-Core vs Third-Party
-===================
-
-In our consideration this feature should be included in core Django rather than
-as a third-party app, because it adds significant value and readability.
-
-It is far more valuable when presented to the community as *the new standard*,
-rather than as an alternative style that can be bolted on. If presented as a
-third-party add-on then the expense of a codebase going against the standard
-URL convention will likely always prevent widespread uptake.
+For further background, please see the
+`Challenge teaching Django to beginners: urls.py
+<https://groups.google.com/forum/#!topic/django-developers/u6sQax3sjO4>`_
+discussion group thread.
 
 Specification
 =============
@@ -103,30 +93,30 @@ Specification
 Imports
 -------
 
-The naming for the import needs to be decided on. The existing URL configuration
-uses:
+The existing URL configuration uses:
 
 .. code-block:: python
 
     from django.conf.urls import url
 
-The naming question would be:
+The naming questions are:
 
-* What should the new style be called? Would we keep ``url``, or would we need
-  to introduce a different name to avoid confusion?
+* What should the new style be called? Would we keep ``url``, or would we
+  introduce a different name to avoid confusion?
 * Where should the new style be imported from?
 
-Our constraints here are that the existing naming makes sense, but we also need
-to ensure that we don't break backwards compatiblility.
+Our constraints here are that the existing naming makes sense, but we also
+need to minimize confusion, especially during the transition period, and to
+ensure that we don't break backwards compatiblility.
 
-Our proposal is that we should use a diffrent name and that the new style should
-be imported as...
+We propose to use a different name and to take this opportunity to simplify
+the import path:
 
 .. code-block:: python
 
     from django.urls import path
 
-A consistently named regex specific import would also be introduced...
+The regex version would be renamed consistently and made available as:
 
 .. code-block:: python
 
@@ -135,8 +125,8 @@ A consistently named regex specific import would also be introduced...
 The name ``path`` makes semantic sense here, because it actually does represent
 a URL component, rather than a complete URL.
 
-The existing import of ``from django.conf.urls import url`` would become a shim
-for the more explicit ``from django.urls import re_path``.
+The existing import of ``from django.conf.urls import url`` would become a
+shim for the more explicit ``from django.urls import re_path``.
 
 Given that it is currently used in 100% of Django projects, the smooth path
 for users would be to not deprecate ``django.conf.urls.url`` immediately, but
@@ -161,7 +151,7 @@ Django will support the following converters out of the box:
 ``uuid``
     Accepts UUIDs
 
-Furthermore, an interface for registering custom converters is provided:
+Furthermore, an interface for registering custom converters will be provided:
 
 .. code-block:: python
 
@@ -189,10 +179,10 @@ as if the given path does not match the URL.
 Definining type conversions
 ---------------------------
 
-A converter is an object with three attributes/methods.
+A converter is an object with three attributes or methods.
 
 ``regex``
-    The pattern use in place of the type-specifier.
+    The pattern to use in place of the type specifier.
 ``to_python``
     How to convert the string from the URL to a Python object.
 ``to_url``
@@ -223,22 +213,24 @@ caught.
 
 The method ``to_url`` will always be called, no matter the type of ``value``.
 In particular, it will be called even when ``value`` is a string. This allows
-one to implement---for instance---a ``base64`` converter or a converter that
-works wth signed values as handled by ``django.core.signing.TimestampSigner``.
+one to implement—for instance—a ``base64`` converter or a converter that works
+with signed values as handled by ``django.core.signing.TimestampSigner``. The
+return value of ``to_url`` must not be URL-encoded.
 
 Adding type conversion to the existing system
 ---------------------------------------------
 
-Adding a new URL syntax is easy enough, as they can be mapped onto the existing
-Regex syntax. The more involved piece of work would be providing for type
-conversion with the existing regex system. It is our proposal that the type
-conversion (at first) only works for named capture groups. This because the
-``path`` function only builds named capture groups.
+Adding the new URL syntax is easy enough, as it can be mapped onto the
+existing regex syntax. The more involved piece of work is providing for type
+conversion with the existing regex system.
 
-One option could be:
+We propose that the type conversion (at first) only works for named capture
+groups. This because the ``path`` function only builds named capture groups.
 
-* Add a new ``converters`` argument to the ``url`` function. This argument is
-  intended to be a private-but-stable API, rather than documented.
+In practice, this means:
+
+* Adding a new ``converters`` argument to the ``url`` function. This argument
+  is intended to be a private-but-stable API, rather than documented.
 * The value of the ``converters`` argument is a dictionary, with keys
   corresponding to capture group names and the corresponding values being
   instances of ``BaseConverter`` (or something that duck-types the same way).
@@ -258,29 +250,20 @@ of ``force_text`` in ``_reverse_with_prefix``. The downside is that the
 conversion now has to happen inside a loop, instead of only once, which might
 have performance drawbacks.
 
-Internal ``RegexURLPattern`` API
-================================
-
-New style URLs should make the original string available to introspection using
-a ``.path`` attribute on the path instance.
-
-They should be implemented as a ``TypedURLPattern`` that subclasses
-``RegexURLPattern``.
-
-These are aspects of the internal API, and would not be documented behaviour.
+Implementation
+==============
 
 Documentation
-=============
+-------------
 
-The new style syntax would present a cleaner interface to developers. It would
-be beneficial for us to introduce the newer syntax as the primary style, with
-the existing regex style as a secondary option.
+The new style syntax presents a cleaner interface to developers. It will be
+beneficial for us to introduce the newer syntax as the primary style, with the
+existing regex style as a secondary option.
 
-It is suggested that we should update all URL examples accross the
-documentation to use the new style.
+All URL examples accross the documentation will be updated to the new style.
 
-Implementation tasks
-====================
+Tasks
+-----
 
 The following independent tasks can be identified:
 
@@ -299,8 +282,50 @@ The following independent tasks can be identified:
 * Update existing URL cases in the documentation throughout.
 * Update the tests throughout, updating to the new style wherever possible.
 
+Internal ``RegexURLPattern`` API
+--------------------------------
+
+New style URLs should make the original string available to introspection using
+a ``.path`` attribute on the path instance.
+
+They should be implemented as a ``TypedURLPattern`` that subclasses
+``RegexURLPattern``.
+
+These are aspects of the internal API, and would not be documented behaviour.
+
+Rationale
+=========
+
+Core vs Third-Party
+-------------------
+
+This feature should be included in core Django rather than as a third-party
+app because it adds significant value and readability.
+
+It is far more valuable when presented to the community as *the new standard*,
+rather than as an alternative style that can be bolted on. If presented as a
+third-party add-on then the expense of a codebase going against the standard
+URL convention will likely always prevent widespread uptake.
+
+Some contributors would prefer a more generic, pluggable URL routing system.
+The authors of this DEP believe implementing this feature directly in Django
+is a better trade-off. A longer argumentation is available in `this message
+<https://groups.google.com/d/msg/django-developers/D44LSp0bPg8/hKybIqNiBAAJ>`_
+to the discussion group.
+
+Related projects
+----------------
+
+Marten Kenbeek has been working on `refactoring the dispatcher API
+<https://github.com/knbk/django/tree/dispatcher_api>`_. That effort is
+currently stalled and there is no schedule for completing it.
+
+It tackles the problem at a different level. It aims to make it possible to
+replace the whole URL resolver. As a consequence, it's fairly independent
+from this DEP, which proposes much more limited and pragmatic changes.
+
 Routing on different aspects
-============================
+----------------------------
 
 `Django Hosts <http://django-hosts.readthedocs.io/en/latest/>`_ allows for
 routing based on the host aspect of a request. Django Channels has a message

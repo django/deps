@@ -258,39 +258,6 @@ of ``force_text`` in ``_reverse_with_prefix``. The downside is that the
 conversion now has to happen inside a loop, instead of only once, which might
 have performance drawbacks.
 
-Preventing unintended errors
-----------------------------
-
-*The following behaviour is not necessary, and we might not choose to add
-this. However, it is worth considering a way to guard against user error...*
-
-Even with differently named functions there remains some potential for user
-error. For example:
-
-* A developer using Django's new URL system accidentally uses
-  ``from django.conf.urls import url``, and fails to notice the error. They are
-  unaware that they are using regex URLs, not typed URLs, and cannot determine
-  why the project is not working as expected.
-* A developer who is continuing to use regex URLs incorrectly uses the
-  ``fram django.urls import path`` and fails to notice the error. They are
-  unaware that they are using typed URLs, not regex URLs, and cannot determine
-  why the project is not working as expected.
-
-One way to guard against this would be to:
-
-* Enforce that new style ``path()`` arguments must not start with a leading
-  ``'^'``.
-* Enforce that old style ``url()`` arguments must start with a leading ``'^'``.
-
-This behaviour would ensure that the two different cases could not be used
-incorrectly.
-
-There is a decidedly edge-case deprecation that this would introduce in that
-existing projects that happen to *intentionally* include an unachored URL regex
-would raise a ``ConfigurationError`` when upgraded. However this is a loud and
-documentable error, with a simple resolution. (Change the import to
-``from django.urls import re_path``.)
-
 Internal ``RegexURLPattern`` API
 ================================
 

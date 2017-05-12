@@ -183,8 +183,8 @@ make sure converters are registered before the URLconf is loaded.
 No ``unregister_converter`` function will be implemented because there's no
 clear use case.
 
-Failure to perform a type conversion against a captured string should result in
-an ``Http404`` exception being raised.
+Failure to perform a type conversion against a captured string is interpreted
+as if the given path does not match the URL.
 
 Definining type conversions
 ---------------------------

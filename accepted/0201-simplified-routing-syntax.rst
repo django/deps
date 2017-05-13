@@ -151,6 +151,9 @@ Django will support the following converters out of the box:
 ``uuid``
     Accepts UUIDs
 
+Failure to perform a type conversion against a captured string is interpreted
+as if the given path does not match the URL.
+
 Furthermore, an interface for registering custom converters will be provided:
 
 .. code-block:: python
@@ -170,16 +173,26 @@ make sure converters are registered before the URLconf is loaded.
     class Converter:
         ...
 
-No ``unregister_converter`` function will be implemented because there's no
-clear use case.
+Since the set of converters a project may need seems relatively narrow, there
+are no provisions for avoiding name clashes at this point. Namespacing would
+make converter names in URL patterns long, at the expense of readability.
 
-Failure to perform a type conversion against a captured string is interpreted
-as if the given path does not match the URL.
+If name conflicts turned out to be a problem for pluggable apps, then a
+``converters`` keyword argument could be added to the ``path()`` function. It
+would allow specifying converters for each pattern, overriding any globally
+declared converters with conflicting names.
+
+Providing a ``register_converter`` function rather than a global setting keeps
+the global state within the ``django.urls`` module and minimizes the distance
+between where converters are declared and where they're used.
+
+No ``unregister_converter`` function will be implemented because there's no
+clear use case at this point. It could be added if the need arises.
 
 Definining type conversions
 ---------------------------
 
-A converter is an object with three attributes or methods.
+A converter is a class with one attribute and two methods.
 
 ``regex``
     The pattern to use in place of the type specifier.
@@ -268,16 +281,18 @@ Tasks
 The following independent tasks can be identified:
 
 * Implement several ``Converters``, and document the API.
-* Implement the ``converters`` argument. This adds the low-level API support
-  for type coercion. Ensure that lookups perform type coercion, and
-  correspondingly, that calls to ``reverse`` work correctly with typed
-  arguments.
 * Add support for the new style ``path`` function, with an underlying
   implementation based on the regex urls.
 * Add ``re_path``, with ``from django.conf.urls import url`` becoming a shim
   for it.
-* Add support for registering custom converters, as defined in the Django
-  settings.
+* Implement the ``converters`` argument. This adds the low-level API support
+  for type coercion. Ensure that lookups perform type coercion, and
+  correspondingly, that calls to ``reverse`` work correctly with typed
+  arguments.
+* Add support for registering custom converters.
+* Add dedicated tests for both the old and new style, so there's adequate
+  coverage. Currently only URL reversing is tested. URL resolution is only
+  exercised as a side effect of unrelated tests.
 * Document the new style URL configuration.
 * Update existing URL cases in the documentation throughout.
 * Update the tests throughout, updating to the new style wherever possible.

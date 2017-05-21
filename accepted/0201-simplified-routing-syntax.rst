@@ -293,6 +293,7 @@ The following independent tasks can be identified:
 * Add dedicated tests for both the old and new style, so there's adequate
   coverage. Currently only URL reversing is tested. URL resolution is only
   exercised as a side effect of unrelated tests.
+* Ensure the 404 debug page shows URLs in a style that matches the URLconf.
 * Document the new style URL configuration.
 * Update existing URL cases in the documentation throughout.
 * Update the tests throughout, updating to the new style wherever possible.

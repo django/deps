@@ -143,7 +143,7 @@ Django will support the following converters out of the box:
 ``string``
     Accepts any text without a slash (this is the default converter)
 ``int``
-    Accepts non-negative integers
+    Accepts integers
 ``path``
     Accepts any text
 ``slug``

@@ -181,8 +181,8 @@ between where converters are declared and where they're used.
 No ``unregister_converter`` function will be implemented because there's no
 clear use case at this point. It could be added if the need arises.
 
-Definining type conversions
----------------------------
+Defining type conversions
+-------------------------
 
 A converter is a class with one attribute and two methods.
 
@@ -265,7 +265,7 @@ The new style syntax presents a cleaner interface to developers. It will be
 beneficial for us to introduce the newer syntax as the primary style, with the
 existing regex style as a secondary option.
 
-All URL examples accross the documentation will be updated to the new style.
+All URL examples across the documentation will be updated to the new style.
 
 Tasks
 -----
@@ -274,7 +274,7 @@ The following independent tasks can be identified:
 
 * Implement several ``Converters``, and document the API.
 * Add support for the new style ``path`` function, with an underlying
-  implementation based on the regex urls.
+  implementation based on the regex URLs.
 * Add ``re_path``, with ``from django.conf.urls import url`` becoming a shim
   for it.
 * Implement the ``converters`` argument. This adds the low-level API support
@@ -340,9 +340,9 @@ routing based on the host aspect of a request. Django Channels has a message
 routing layer, which can inspect different aspects of the messages.
 
 While it would be a good idea to see if the routing layer can be augmented to
-remove the need for django-hosts and be useful for Channels, it is our opinion
-that these are orthogonal concerns. Due to the expected implementation burden
-to also support these concerns, it is our preference that this is to be
+remove the need for ``django-hosts`` and be useful for Channels, it is our
+opinion that these are orthogonal concerns. Due to the expected implementation
+burden to also support these concerns, it is our preference that this is to be
 reconsidered at a later point in time, as to not delay the progress on the
 simplified routing syntax.
 

@@ -165,14 +165,6 @@ Furthermore, an interface for registering custom converters will be provided:
 Users are expected to call ``register_converter`` in their URLconf module, to
 make sure converters are registered before the URLconf is loaded.
 
-``register_converter`` may also be used as a decorator:
-
-.. code-block:: python
-
-    @register_converter('conv')
-    class Converter:
-        ...
-
 Since the set of converters a project may need seems relatively narrow, there
 are no provisions for avoiding name clashes at this point. Namespacing would
 make converter names in URL patterns long, at the expense of readability.

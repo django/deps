@@ -6,10 +6,10 @@ DEP 0201: Simplified routing syntax
 :Author: Tom Christie, Sjoerd Job Postmus, Aymeric Augustin
 :Implementation Team: Sjoerd Job Postmus
 :Shepherd: Aymeric Augustin
-:Status: Accepted
+:Status: Final
 :Type: Feature
 :Created: 2016-10-19
-:Last-Modified: 2017-05-12
+:Last-Modified: 2017-09-30
 
 .. contents:: Table of Contents
    :depth: 3

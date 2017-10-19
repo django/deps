@@ -21,7 +21,7 @@ Abstract
 Define a new type of virtual field which maps onto one or more concrete
 database fields in the model's table. These fields can be used to define
 table constraints which span multiple columns with greater locality than if the
-same constraints were created using the current ``index_togther`` or
+same constraints were created using the current ``index_together`` or
 ``unique_together`` APIs.
 
 Specification
@@ -34,10 +34,10 @@ A ``CompositeField`` is a new virtual field type which combines multiple columns
 on a model's table into a single object, which is accessible from model
 instances.
 
-The value of a ``CompositeField`` on a model instance is an unordered  python
-``dict``, mapping subfield names to their respective values on the model. This
-may seem restrictive, but an API which provides the ability to store the values
-of composite fields as aribitrary python objects is proposed as part of DEP 192.
+The value of a ``CompositeField`` on a model instance is a ``dict``, mapping
+subfield names to their respective values on the model. This may seem
+restrictive, but an API which provides the ability to store the values of
+composite fields as arbitrary Python objects is proposed as part of DEP 192.
 
 
 Subfield
@@ -73,12 +73,12 @@ dataflow problems.
 Observer
 ~~~~~~~~
 
-An observer is an informal python interface which specifies a type as able to
+An observer is an informal Python interface which specifies a type as able to
 respond to a change in a bound property of an observable it is watching. Any
 class which implements the following methods will be considered a conforming
 observer.
 
-.. code:: Python
+.. code:: python
 
     class Observer(object):
         def watch(self, observable, bound=None):
@@ -86,7 +86,7 @@ observer.
             Add `self` to the list of observers of `observable`.
 
             If `observable` is a `dict`, `bound` is a set of items to watch.
-            If `observable` is a `tuple`, `bound` is a set of indicies to watch.
+            If `observable` is a `tuple`, `bound` is a set of indices to watch.
             Otherwise, `bound` is a set of attribute names.
 
             If `attrs` is `None`, the observer is notified for every change of
@@ -105,7 +105,7 @@ observer.
 Changes to fields
 ~~~~~~~~~~~~~~~~~
 
-All django fields (except relations) will be updated to implement the observer
+All Django fields (except relations) will be updated to implement the observer
 interface. ``notify_change`` will be implemented so that when the ``bound_name``
 matches the name of the field, the field's value will be updated on the model.
 
@@ -129,7 +129,7 @@ Providing a constraint that spans multiple columns
 A new top-level function will be added to the models API with the following
 signature
 
-.. code:: Python
+.. code:: python
 
     def constrain(*fields, unique=False, index=True)
 
@@ -205,7 +205,7 @@ column subsets (DEP 192) and the future implementation of multi-column primary
 keys.
 
 
-Backwards Incompatability
+Backwards Incompatibility
 =========================
 
 Deprecation of Model.Meta.index_together and Model.Meta.unique_together?

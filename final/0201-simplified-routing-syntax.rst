@@ -107,7 +107,7 @@ The naming questions are:
 
 Our constraints here are that the existing naming makes sense, but we also
 need to minimize confusion, especially during the transition period, and to
-ensure that we don't break backwards compatiblility.
+ensure that we don't break backwards compatibility.
 
 We propose to use a different name and to take this opportunity to simplify
 the import path:

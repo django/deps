@@ -27,7 +27,7 @@ Motivation
 ==========
 
 Currently, Django has an all-or-nothing policy; that is, features are either
-undocumented and thus considered outside of Django's backwards-compatability
+undocumented and thus considered outside of Django's backwards-compatibility
 policy and subject to change at any time, or they are documented and considered
 stable and subject to the three-release deprecation cycle that Django has.
 
@@ -43,7 +43,7 @@ anyway.
 
 Instead, an Experimental designation will allow APIs to be included in Django
 and released without being beholden to the full deprecation cycle. They will
-still be included in the security policy and backwards compatability will
+still be included in the security policy and backwards compatibility will
 be kept on a best-efforts basis, but not guaranteed. Effort will be taken to
 communicate to users that the APIs in question are not stable to avoid
 inadvertent use.

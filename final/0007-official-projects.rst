@@ -248,7 +248,7 @@ project must maintain the following things:
 * Release notes for each major release with backwards-incompatibility sections
   and information about which versions of Django they support.
 
-* compatibility with the current release and current LTS release of Django,
+* Compatibility with the current release and current LTS release of Django,
   within a month of the Django release coming out (LTS compatibility may be
   with an older but still maintained version)
 

@@ -616,24 +616,6 @@ the global namespace:
 The ``'environment'`` option would be set to
 ``<project_name>.jinja2.environment``.
 
-Dummy backend
--------------
-
-This backend is built on top of `Template strings`_. It's a proof of concept.
-
-It doesn't accept any options. Its configuration looks as follows:
-
-.. code:: python
-
-    TEMPLATES = [
-        {
-            'BACKEND': 'django.template.backends.dummy.TemplateStrings',
-            'NAME': 'dummy',
-            'DIRS': [],
-            'APP_DIRS': False,
-        },
-    ]
-
 Shortcuts
 ---------
 

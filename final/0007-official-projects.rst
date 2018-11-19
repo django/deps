@@ -245,11 +245,11 @@ project must maintain the following things:
 * Tracking and response to security issues on par with Django's official
   security policy.
 
-* Release notes for each major release with backwards-incompatability sections
+* Release notes for each major release with backwards-incompatibility sections
   and information about which versions of Django they support.
 
-* Compatability with the current release and current LTS release of Django,
-  within a month of the Django release coming out (LTS compatability may be
+* Compatibility with the current release and current LTS release of Django,
+  within a month of the Django release coming out (LTS compatibility may be
   with an older but still maintained version)
 
 * Responding to contributions made in the way suggested by the project's
@@ -261,7 +261,7 @@ made to find new maintainers or a new Shepherd to bring the project up to
 par; if it does not get there after two months, it should be retired according
 to the section below.
 
-Official projects do not have to maintain a similar backwards-compatability
+Official projects do not have to maintain a similar backwards-compatibility
 policy to the core Django repository, nor are they subject to the same
 contribution patterns and guidelines as the core repository; how these work are
 up to the Maintenance Team.

@@ -133,7 +133,7 @@ their number at three.
 
 Releasers will issue new releases of Django under the following
 circumstances, using the terminology for releases outlined at
-<https://docs.djangoproject.com/en/2.1/internals/release-process/>:
+<https://docs.djangoproject.com/en/dev/internals/release-process/>:
 
 * Scheduled patch releases of supported versions of Django, on or
   about the first day of each calendar month, unless directed to wait
@@ -296,7 +296,7 @@ following process:
    favor). Each member should also provide, along with their vote,
    their rationale for voting as they did.
 
-4. Once sufficient vites in either direction have been cast to form a
+4. Once sufficient votes in either direction have been cast to form a
    majority of the Technical Board, a call will be made for the
    remaining memebers to cast their votes. They shall have until the
    normal close of voting (one week from the question being put to the

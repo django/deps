@@ -24,7 +24,7 @@ user's application. Similarly handling requests which do not Accept text/html is
 again left up to the user. Without some of the basic utilities in Django, users
 instead look to external applications such as django-rest-framework, django-tastypie,
 piston, django-nap or any number of applications from https://www.djangopackages.com/grids/g/api/.
-Most of these reuseable applications have invented their own method for handling
+Most of these reusable applications have invented their own method for handling
 this problem and each could benefit from standardization in this area while continuing
 to provide utilities in related areas such as how resources are defined, linked
 and validated. These applications will serve as a place for Django to start

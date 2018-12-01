@@ -69,7 +69,7 @@ Acknowledgment
 ==============
 
 The proposed API in this DEP is modelled on Pyramid's `Tween`_
-concept. The author and implementor of this DEP developed a very similar
+concept. The author and implementer of this DEP developed a very similar
 idea independently at a Django sprint before reading about Tweens.
 
 .. _Tween: http://docs.pylonsproject.org/projects/pyramid/en/latest/narr/hooks.html#registering-tweens
@@ -210,7 +210,7 @@ Backwards Compatibility
 =======================
 
 "New-style" middleware factories cannot inter-operate
-backwards-compatibly in a single mixed list with old-style middlewares,
+backwards-compatibility in a single mixed list with old-style middlewares,
 because the short-circuiting semantics of the two differ. This is why a
 new ``MIDDLEWARE`` setting is introduced to contain the new-style
 middleware factories. If the ``MIDDLEWARE`` setting is provided (it will

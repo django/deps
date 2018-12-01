@@ -146,10 +146,10 @@ Author
 Implementation Team
     The **Implementation Team** are the people (or single person) who will
     actually implement the thing being proposed. A DEP may have multiple
-    implementors (and the best DEPs probably will).
+    implementers (and the best DEPs probably will).
 
     Feature DEPs must have an implementation team to be submitted. Informational
-    DEPs generally don't have implementors, and Process DEPs sometimes will.
+    DEPs generally don't have implementers, and Process DEPs sometimes will.
 
 Shepherd
     The **Shepherd** is the Core Developer who will be the primary reviewer
@@ -161,7 +161,7 @@ Shepherd
     the code into the project. 
 
 It's normal for a single person to fulfill multiple roles -- in most cases the
-Author will be an/the Implementor, and it's not uncommon for the implementation
+Author will be an/the Implementer, and it's not uncommon for the implementation
 team to include the Shepherd as well. It's unusual but acceptable for a single
 person to fulfill all roles, though this generally only happens when that person
 is a long-time committer.
@@ -476,7 +476,7 @@ Relative to the PEP process, we made the following changes in DEPs:
 - DEPs explicitly require identifying a few roles (Author, Implementation Team,
   and Shepherd) before submission and throughout the process. With PEPs, most
   are authored and implemented by the same person, but the same doesn't seem to
-  be true of DEPs (so far), hence the "implementor" role. As for the "shepherd":
+  be true of DEPs (so far), hence the "implementer" role. As for the "shepherd":
   the BDFL or BDFL-delegate tends to be much more hands-on than the Technical
   Board, so the role of commenting and critiquing will be fulfilled by the
   shepherd, rather than the board. Further, we've observed that features are

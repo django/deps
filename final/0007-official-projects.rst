@@ -135,7 +135,7 @@ Maintenance Team
 
 Shepherd
     The **Shepherd** is the Core Developer who will be the primary point of
-    contact for the project with the Core Team in Django, who will liase with
+    contact for the project with the Core Team in Django, who will liaise with
     the Technical Board for the final vote, and who will assist in moving and
     running the project under official Django ownership and infrastructure.
     They can also be part of the Maintenance Team.
@@ -212,7 +212,7 @@ or failure of the project's adoption proposal.
 Adoption
 --------
 
-If the project's adoption proposal is sucessful, then steps should be taken
+If the project's adoption proposal is successful, then steps should be taken
 to make it an official Django project:
 
 * The repository should be moved under the "django" organization on GitHub,

@@ -154,7 +154,7 @@ Value transformation functions
 ------------------------------
 
 Composite fields declare two transformation functions, ``value_from_dict`` and
-``value_to_dict``. These functions are intended to be overidden by subclasses
+``value_to_dict``. These functions are intended to be overridden by subclasses
 of CompositeField to marshal the value of the field to and from python objects.
 These methods are named differently to the value transformation functions on
 `Field`, due to the mismatch of parameter types and returned values.
@@ -179,7 +179,7 @@ restrictions:
   If the value returned by ``value_from_dict`` is not ``None`` or an object
   which extends ``ObservableMixin``, a ``ValueError`` is raised.
 
-Restrictions on sublcassing of composite fields
+Restrictions on subclassing of composite fields
 -----------------------------------------------
 
 Subclassing of ``CompositeField`` is allowed provided that only one superclass
@@ -198,7 +198,7 @@ fields.
     >>> class B(A):
     ...    b_field = models.IntegerField()
 
-    TypeError: At most one class in the inheritance heirarchy of B can define a
+    TypeError: At most one class in the inheritance hierarchy of B can define a
                subfield.
 
 
@@ -252,7 +252,7 @@ domain.
 
 However, in practice, there are often cases where one or more related field
 definitions which would naturally define a python object, but for which it would
-be impractical or inefficient to define as a seperate model.
+be impractical or inefficient to define as a separate model.
 
 This specification attempts to provide an API for defining these types of
 abstractions to the django orm.
@@ -277,7 +277,7 @@ when constructing a composite field with ``null=True``, however the failure to
 make the change explicit could lead to unintentional dropping of constraints on
 the table, an undesirable behaviour.
 
-The current appropach is to disallow ``value_to_dict`` from returning ``None``
+The current approach is to disallow ``value_to_dict`` from returning ``None``
 and to use the returned value to construct the ``isnull`` query.
 
 

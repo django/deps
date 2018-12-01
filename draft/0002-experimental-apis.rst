@@ -89,7 +89,7 @@ Rationale
 
 It might be possible to raise silent warnings if people use experimental
 features (similar to the silent ``PendingDeprecationWarning``), but the value
-of such a feature to stop people using them unknowngly (if they knew enough
+of such a feature to stop people using them unknowingly (if they knew enough
 to turn on the warnings, they probably know what's experimental) and the
 additional code complexity this results in means it's not considered here.
 

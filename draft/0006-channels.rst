@@ -18,7 +18,7 @@ DEP 0006: Channels
 Abstract
 ========
 
-Historically, Django's request handing has been very simplistic, built around
+Historically, Django's request handling has been very simplistic, built around
 the concept of requests and responses: the browser makes a request, Django
 calls a view, and the view returns a response back to the browser.
 
@@ -107,7 +107,7 @@ few different things:
 .. [#] Daphne is implemented in Python on top of `Autobahn
        <http://autobahn.ws/>`_ and `Twisted
        <https://twistedmatrix.com/trac/>`_, and seems to perform very
-       well. However, since the interface server runs completely independetly
+       well. However, since the interface server runs completely independently
        of the worker servers, this implementation can easily be changed without
        affecting the underlying Django apps.
 
@@ -190,7 +190,7 @@ Here's what one of the consumers looks like::
         Group('chat-'+label).send({'text': json.dumps(m.as_dict())})
 
 Notice that this looks fairly similar to an HTTP view, except that instead of a
-request in recieves a message, and it doesn't return a response. Channels are
+request in receives a message, and it doesn't return a response. Channels are
 uni-directional, so to send data back to the browser we need to send it on a
 *response channel*. In this case, we broadcast to a `group
 <https://channels.readthedocs.io/en/latest/getting-started.html#groups>`_,
@@ -254,15 +254,15 @@ We propose the following integration plan:
 * Remove the "provisional" label in Django 1.11 (which is an LTS release)
 
 .. [#] We may want to move these components under the Django github org to
-       signify their "more official" status. Since that's an that's orthagonal
-       to the technical work proposed by this DEP, this DEP takes no position
-       on this question.
+       signify their "more official" status. Since that's orthogonal to the
+       technical work proposed by this DEP, this DEP takes no position on this
+       question.
 
 
 Motivation
 ==========
 
-The primary motivation for channels is that of a percieved gap in Django's
+The primary motivation for channels is that of a perceived gap in Django's
 abilities; as the Web grows and evolves, the original view-based design has
 lasted surprisingly well, but is starting to chafe when presented with some of
 the new technologies the web is growing, particularly WebSockets.
@@ -446,7 +446,7 @@ without a significant performance hit, either by coordination or session
 stickiness. For this reason, channels leaves the non-global-ordering,
 simultaneous style as the default, and provides a decorator,
 ``enforce_ordering``, that provides one of two levels of ordering and
-exclusivity guarantees at different levels of performance degredation.
+exclusivity guarantees at different levels of performance degradation.
 
 
 Alternatives
@@ -456,7 +456,7 @@ There are many alternative architectures to the ones proposed by this DEP, and
 each has their advantages and disadvantages. Channels does not intend to make
 it impossible to use these; indeed, if someone wishes to run an evented system,
 it is designed so that the message formats, consumer and routing abstraction is
-re-useable.
+reusable.
 
 However, based on several years of prototypes, design work, and the existing
 design of Django, it is the authors' belief that this design represents the

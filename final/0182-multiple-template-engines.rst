@@ -285,7 +285,7 @@ ship templates.
 
 These basic features should be provided by all template engines according to
 the values of ``DIRS`` and ``APP_DIRS``. Each engine should define a
-conventional name for the subdirectory contaning its templates inside an
+conventional name for the subdirectory containing its templates inside an
 installed application. Django searches templates first in directories listed
 in ``DIRS`` and then in installed applications if ``APP_DIRS`` is ``True``.
 

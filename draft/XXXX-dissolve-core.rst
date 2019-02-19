@@ -9,7 +9,7 @@ DEP XXXX: DEP template
 :Status: Draft
 :Type: Process
 :Created: 2018-09-22
-:Last-Modified: 2018-11-19
+:Last-Modified: 2019-02-19
 
 .. contents:: Table of Contents
    :depth: 3
@@ -27,10 +27,10 @@ For clarity, this DEP uses the following terms to refer to existing
 groups:
 
 * "Django core": the set of people who have or have had permission to
-  push to <https://github.com/django/django/>, or who have been
-  members of the django-core mailing list, the #django-core IRC
-  channel, or identified as members of "Django core" on the
-  djangoproject.com website.
+  push to <https://github.com/django/django/> or the previous
+  Subversion repository, or who have been members of the django-core
+  mailing list, the #django-core IRC channel, or identified as members
+  of "Django core" on the djangoproject.com website.
 
 * "DSF Board": the Board of Directors of the Django Software
   Foundation.
@@ -71,20 +71,24 @@ as three specialized roles.
 
 The full details follow below, but a short description is:
 
-* Anyone who joins the django-developers mailing list is a member of
-  the Framework team, and can take part in discussion, decision-making
-  and elections.
+* Membership in the Framework team is generally open to the public
+  (with the primary exception of individuals ineligible due to actions
+  of the Code of Conduct committee of the Dajgno Software Foundation,
+  or removal by the Technical Board), and members can take part in
+  discussion and decision-making, and vote in elections of the
+  Framework team.
 
-* A new role, Merger, exists and will consist of being responsible for
+* A new role, Merger, will consist of being responsible for
   merging pull requests.
 
-* A second new role, Releaser, exists and will consist of being
-  responsible for issuing new packaged releases of Django.
+* A second new role, Releaser, will consist of being responsible for
+  issuing new packaged releases of Django.
 
-* Decision-making will occur on the django-developers mailing list,
-  with participation open to anyone. Decisions will be made by voting,
-  with Mergers keeping track of votes to determine if a consensus
-  exists toward a particular decision.
+* Technical decision-making will occur on the django-developers
+  mailing list, with participation open to any member of the Framework
+  team. Decisions will be made by voting, with Mergers keeping track
+  of votes to determine if a consensus exists toward a particular
+  decision.
 
 * A Technical Board, elected by the Framework team, will exist as a
   tie-breaker and to provide oversight of the Mergers.
@@ -100,12 +104,13 @@ person who merges pull requests to https://github.com/django/django/.
 The set of Mergers should be small; the ideal would be between three
 and five people, in order to spread the workload and avoid
 over-burdening or burning out any individual Merger. In light of that,
-the current Django Fellows will become the first set of Mergers, and
-recruitment shall begin imediately thereafter to bring the number of
-Mergers up to at least three. It shall not be a requirement that a
-Merger also be a Django Fellow, but the Django Software Foundation
-shall have the power to use funding of Fellow positions as a way to
-make the role of Merger sustainable.
+the current Django Fellows will become the first set of
+Mergers. Thereafter, the Technical Board will select Mergers as
+necessary to maintain their number at a minimum of three.
+
+It shall not be a requirement that a Merger also be a Django Fellow,
+but the Django Software Foundation shall have the power to use funding
+of Fellow positions as a way to make the role of Merger sustainable.
 
 
 New role: Releaser
@@ -122,14 +127,13 @@ Package Index, and to djangoproject.com.
 
 A person may serve in the role of Releaser and Merger simultaneously.
 
-A person who has the role of Releaser will *not* automatically be
-granted access to push code to <https://github.com/django/django/>.
+The initial set of Releasers will consist of the Django
+Fellows. Thereafter, the Technical Board will select Releasers as
+necessary to maintain their number at a minimum of three.
 
-The initial set of Releasers will consist of the Django Fellows, and
-one additional person chosen by the Technical Board from among those
-who currently have permission to issue releases of Django. Thereafter,
-the Technical Board will select Releasers as necessary to maintain
-their number at three.
+It shall not be a requirement that a Releaser also be a Django Fellow,
+but the Django Software Foundation shall have the power to use funding
+of Fellow positions as a way to make the role of Releaser sustainable.
 
 Releasers will issue new releases of Django under the following
 circumstances, using the terminology for releases outlined at
@@ -141,13 +145,14 @@ circumstances, using the terminology for releases outlined at
 
 * Security releases, at the request of the Django security team.
 
-* Feature releases, at the request of the Technical Board.
+* Feature releases, when the Technical Board agrees that the feature
+  release is ready.
 
 * Alpha and beta releases at scheduled times to be determined by the
   Framework team.
 
 * Release candidate releases at scheduled times to be determined by
-  the Technical Board.
+  the Framework team.
 
 
 Repurposed role: Technical Board
@@ -164,10 +169,9 @@ The Technical Board will consist of five members, elected from among
 the membership of the Framework team. To be qualified for election to
 the Technical Board, a member of the Framework team must demonstrate:
 
-* A history of technical contributions to Django. This should involve
-  some minimum number of merged contributions; at least five, and
-  probably ten, with the first merged contribution occurring at least
-  18 months prior to election to the Technical Board.
+* A history of technical contributions to Django or the Django
+  ecosystem. This history should begin at least 18 months prior to the
+  individual's election to the Technical Board.
 
 * A history of participation in Django's development outside of
   contributions merged to the <https://github.com/django/django/>
@@ -182,7 +186,7 @@ How code is added to Django
 ---------------------------
 
 Any Merger may, on their own initiative, merge any pull request other
-than one authored by that Marger. Mergers will be trusted to use their
+than one authored by that Merger. Mergers will be trusted to use their
 judgment in deciding whether to merge any given pull request.
 
 Mergers should, however, wait to merge any pull request which adds a
@@ -202,10 +206,10 @@ The only other methods for adding code to Django are:
   by the security team, it can and shall be merged by a Merger on the
   designated disclosure date.
 
-* When a release of Django is ready, Mergers may also make such
-  commits as are necessary to carry out the mechanics of releasing
-  Django (such as changing version numbers in configuration files,
-  creating or updating release branches and tags, and so on).
+* When a release of Django is ready, Mergers and Releasers may also
+  make such commits as are necessary to carry out the mechanics of
+  releasing Django (such as changing version numbers in configuration
+  files, creating or updating release branches and tags, and so on).
 
 
 The Framework team
@@ -215,7 +219,10 @@ The process of adding code to Django will be governed by a Framework
 team. Membership in this team is open to anyone who wants it, and the
 business of the Framework team will be carried out in public on the
 django-developers mailing list. Membership in the Framework team shall
-be conferred automatically upon joining that mailing list.
+be conferred automatically upon joining that mailing list, and
+includes the right to vote in technical decisions. Voting privileges
+for elections of the Technical Board will be conferred as explained
+below, in the section regarding elections of the Technical Board.
 
 The Framework team shall operate on a consensus model. Whenever any
 member of the Framework team wishes to get feedback on code, design
@@ -236,6 +243,24 @@ Mergers shall use the results of votes cast in the discussion as a
 guide to their actions; their judgment will be trusted in determining
 whether a consensus has formed for or against.
 
+A member of the Framework team can be removed in either of two ways:
+
+* By becoming ineligible due to action of the Code of Conduct
+  committee of the Django Software Foundation, or
+
+* By unanimous vote of the Technical Board.
+
+A person removed from the Framework team may be removed from the
+django-developers mailing list, and have their permissions to interact
+in other technical spaces (such as the bug tracker, or GitHub)
+revoked.
+
+No vote of the Technical Board shall be required to remove a person
+from the django-developers mailing list, or revoke their access to
+other technical spaces, in the event that the designated
+administrators of those spaces feel a person has engaged in spamming
+behavior.
+
 
 Role of the Technical Board in decision-making
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,17 +268,9 @@ Role of the Technical Board in decision-making
 The Technical Board will provide oversight of the release
 process. While some releases (monthly patch releases, and alpha/beta
 versions of feature releases) will occur on pre-determined schedules,
-the following release decisions will be made by the Technical Board:
-
-* Release candidates for feature releases.
-
-* Feature releases.
-
-For these, the Mergers and Releasers shall have the prerogative to ask
-the Technical Board for a determination of release readiness. Any
-Merger or Releaser may make this request, on the django-developers
-list. After such a request, the Technical Board shall have one week to
-make a decision, using the voting process outlined below.
+feature releaes of Django will occur once the Technical Board has
+approved, by public vote, the state of the codebae for the proposed
+release.
 
 The Technical Board shall have the prerogative to set the dates of its
 own elections, or to fill vacancies in the Technical Board, using the
@@ -261,15 +278,19 @@ voting process outlined below, but subject to the constraints
 specified elsewhere in this document on eligibility, the selection
 process, and the frequency of elections.
 
-The Technical Board shall also appoint Releasers as needed to fill
-vacancies in that role, using the voting process outlined
-below. Nominations to fill the role of Releaser can be suggested by
-any member of the Framework team, but only formally put to the
-Technical Board by a member of the Technical Board.
+The Technical Board shall also appoint Releasers and Mergers as needed
+to fill vacancies in that role, using the voting process outlined
+below. Nominations to fill these roles can be suggested by any member
+of the Framework team, but only formally put to the Technical Board by
+a member of the Technical Board.
 
-Once a process for selecting Mergers has been determined, the
-Technical Board may participate in that process as needed, including
-voting using the process outlined below.
+If the Technical Board feels that a member of the Framework team has
+acted in bad faith incompatble with continued membership, or in a
+manner otherwise disruptive to the development of Django, any member
+of the Technical Board may nominate that person for removal from the
+Framework team. The Technical Board shall then vote on the matter, and
+a unanimous vote in favor of removal will result in that person's
+removal, either for a set time or permanently.
 
 The Technical Board shall also act as a tie-breaker in the event that
 a discussion of the Framework team fails to achieve consensus. If any
@@ -300,7 +321,7 @@ following process:
    majority of the Technical Board, a call will be made for the
    remaining memebers to cast their votes. They shall have until the
    normal close of voting (one week from the question being put to the
-   Technical Board) in which to do so).
+   Technical Board) in which to do so.
 
 5. If the voting period closes without all members of the Technical
    Board having voted, but with a majority of the members voting for
@@ -326,25 +347,37 @@ revisit a prior question at any time, but the Technical Board may
 refuse the request.
 
 
-Process of selecting Mergers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Process of selecting Mergers and Releasers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As noted above, the initial set of Mergers will be the current Django
-Fellows. The Framework team shall then work to select at least one
-additional Merger, and shall at all times attempt to maintain a roster
-of at least three Mergers.
+As noted above, the initial set of Mergers and Releasers will be the
+current Django Fellows. The Framework team shall then work to select
+at least one additional Merger, and shall at all times attempt to
+maintain a roster of at least three Mergers, ans as many Releasers as
+are deemed necessary to meet needs.
 
-Upon adoption of this proposal, the initial set of Mergers, and the
-Technical Board, shall work together to design a process for selecting
-future Mergers, and prior to adoption of that process, shall post it
-to the django-developers mailing list for feedback and voting. The
-consensus model described above will be used to determine whether to
-adopt the process, but in the event of no clear consensus the result
-shall be that the process is not adopted, and a new process shall be
-drafted taking into account the feedback obtained from discussion.
+The selection process for either role shall occur as follows:
 
-Whatever process is adopted, no person shall simultaneously serve as a
-Merger and as a member of the Technical Board.
+* Any member of the Framework team may suggest a person for
+  consideration.
+
+* The Technical Board shall consider the suggestions put forth, and
+  then any member of the Technical Board may formally nominate a
+  person for the role to be filled.
+
+* The Technical Board will then vote on the nomination, and the result
+  of that vote shall either grant the role to the person nominated (if
+  a majority are in favor), or not (if a majority are against).
+
+The following restrictions will apply to nominations:
+
+* No person shall simultaneously serve as a Merger and as a member of
+  the Technical Board.
+
+* No person who is ineligible to participate in public Django spaces
+  due to action of the Code of Conduct committee of the Django
+  Software Foundation may serve in the role of Releaser or the role of
+  Merger.
 
 Mergers may resign their role at any time, but are encouraged to
 provide some advance notice in order to allow the selection of a
@@ -361,35 +394,12 @@ Otherwise, a Merger may only be removed by:
 * Becoming disqualified due to actions taken by the Code of Conduct
   committee of the Django Software Foundation, or
 
-* By a unanimous vote of the Technical Board.
+* A unanimous vote of the Technical Board.
 
-
-Process of selecting Releasers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As noted above, the initial set of Releasers will be the current
-Django Fellows, plus one additional person, chosen by the Technical
-Board, from among those people who currently have permission to issue
-releases of Django.
-
-Releasers may resign their role at any time, but are encouraged to
-provide some advance notice in order to allow the selection of a
-replacement. When a vacancy occurs among the Releasers, it shall be
-filled by a decision of the Technical Board, using the voting process
-outlined above.
-
-Termination of the contract of a Django Fellow by the Django Software
-Foundation will temporarily suspend a Releaser's role until such time
-as the Technical Board can convene to determine a course of action;
-they may, by majority vote, choose to retain the Releaser in that
-role, or to remove the Releaser.
-
-Otherwise, a Releaser may only be removed by:
-
-* Becoming disqualified due to actions taken by the Code of Conduct
-  committee of the Django Software Foundation, or
-
-* By a unanimous vote of the Technical Board.
+A simple majority vote of the Technical Board may, at the request of a
+member of the Technical Board, temporarily suspend a person from the
+role of Releaser or Merger until such time as discussion and voting
+can take place regarding permanent removal.
 
 
 Process of selecting the Technical Board
@@ -402,10 +412,10 @@ election immediately, or wait until the next scheduled election (see
 below for how often Technical Board elections shall occur).
 
 Members of the Framework team are not required to vote in elections
-for the Technical Board, but any member of the Framework team may vote
-in any election. Although the Technical Board is subject to certain
-qualifications, no history of technical contributions to Django shall
-be required of voters.
+for the Technical Board, but any registered voting member of the
+Framework team may vote in any election. Although the Technical Board
+is subject to certain qualifications, no history of technical
+contributions to Django shall be required of voters.
 
 The DSF Board will act as a neutral arbiter and judge of technical
 board elections. Members of the DSF Board can stand for election to
@@ -424,12 +434,11 @@ The process of electing a Technical Board shall be as follows:
    mailing list to announce an election.
 
 2. As soon as the election is announced, registration of voters will
-   open. Any member of the Framework team may register to vote in the
-   election; members must register for each election in which they
-   wish to participate. The registration form and roll of voters will
-   be overseen by the DSF Board. The DSF Board may challenge and
-   reject the registration of voters it believes are registering in
-   bad faith.
+   open. Any member of the Framework team who has not previously
+   registered to vote may do so. The registration form and roll of
+   voters will be overseen by the DSF Board. The DSF Board may
+   challenge and reject the registration of voters it believes are
+   registering in bad faith.
 
 3. Registration of voters will close two weeks after the announcement
    of the election. At that point, registration of candidates will
@@ -448,7 +457,12 @@ The process of electing a Technical Board shall be as follows:
    provide a voting form accessible to registered voters, and shall be
    the custodian of the votes.
 
-5. The election will end one week after it begins. The DSF Board shall
+5. Voting shall be by secret ballot. Each voter will be presented with
+   a ballot containing the roster of candidates, and any relevant
+   materials regarding the candidates, in a randomized order. Each
+   voter may vote for up to five candidates on the ballot.
+
+6. The election will end one week after it begins. The DSF Board shall
    tally the votes and produce a summary, including the total number
    of votes cast and the number received by each candidate. This
    summary shall be ratified by a majority vote of the DSF Board, then
@@ -480,17 +494,22 @@ board once elected, unless it is determined by a unanimous vote of the
 other Technical Board members and the DSF Board that they did not
 possess the appropriate qualifications for the Technical Board, or
 they become disqualified due to actions taken by the Code of Conduct
-committee of the Django Software Foundation.
+committee of the Django Software Foundation. In the event that a vote
+is held to determine whether a person did not possess the relevant
+qualifications, that person shall bbe barred from taking pert in the
+vote in both the Technical Board and, if that person is also a member
+of the DSF Board, the Technical Board shall not consider that person's
+vote in the DSF Board for purposes of determining unanimity.
 
 
 Motivation
 ==========
 
 The state of Django core is, at best, stagnant. New members are added
-at a very slow rate, and most existing members rarely if ever make use
-of their ability to push code to Django. Furthermore, the current
-state of Django's codebase seems not to be amenable to ongoing
-recruitment of new members to Django core; several people have
+at a very slow rate, and most people who have been members now rarely
+if ever make use of their ability to push code to Django. Furthermore,
+the current state of Django's codebase seems not to be amenable to
+ongoing recruitment of new members to Django core; several people have
 expressed the opinion (or variations on it) that most of the types of
 issues traditionally used as an entry route to core are now resolved,
 and it's unclear what the path to core membership would look like
@@ -504,10 +523,13 @@ is likely a necessary step toward other initiatives which could
 resolve it.
 
 The primary goal of this proposal is to remove the perceived status
-associated with being able to push code to the primary Django
+associated with permission to push code to the primary Django
 source-code repository, and to re-frame the ability to push code to
 that repository as more of a bureaucratic role which carries with it
-no special privileges or status of any sort.
+no special privileges or status of any sort. Recognition of
+contributions to Django or the Django ecosystem should be handled by
+some type of status or award to be made by the Django Software
+Foundation, rather than by push permission to a repository.
 
 
 Rationale
@@ -516,8 +538,10 @@ Rationale
 Dissolving or reorganizing Django core is a recurring issue within
 Django core, the broader community of Django developers, and the
 DSF. In particular, there seems to be a consensus to remove the
-perceived bump in status asociated with membership in Django
-core. This DEP attempts to act on that consensus by providing a
+perceived bump in status asociated with membership in Django core,
+especially as many people who could claim this membership are no
+longer active in contributing to or shepherding the development of
+Django. This DEP attempts to act on that consensus by providing a
 concrete proposal.
 
 

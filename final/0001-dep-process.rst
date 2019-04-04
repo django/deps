@@ -215,7 +215,7 @@ committing and pushing a new DEP. However, when doing so they need to take on
 the tasks normally handled by the reviewer described above. This includes
 ensuring the initial version meets the expected standards for submitting a DEP.
 Of course, committers may still choose to submit DEPs as a pull request to
-benfit from peer review.
+benefit from peer review.
 
 Discussion, development, and updates
 ------------------------------------
@@ -439,7 +439,7 @@ a competing DEP.
 
 If you are interested in assuming ownership of a DEP, first try to contact the
 original author and ask for permission. If they approve, ask them to open a pull
-request transfering the DEP to you. If the original author doesn't respond to
+request transferring the DEP to you. If the original author doesn't respond to
 email within a few weeks, contact django-developers.
 
 

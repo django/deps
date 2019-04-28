@@ -210,9 +210,9 @@ Generally, the way Black fits expressions on a single line seems to be a
 sticking point. Many developers feel strongly about retaining control over
 vertical formatting.
 
-These issues don't seem critical enough to rule out Black. At worst, it could
-be disabled locally with ``# fmt: off`` and ``# fmt: on`` if it gets the
-formatting of a block of code egregiously wrong.
+These issues don't seem critical enough to rule out Black. As a last resort,
+Black could be disabled locally with ``# fmt: off`` and ``# fmt: on`` if it
+gets the formatting of a block of code egregiously wrong.
 
 Others explained that, after an initial knee-jerk reaction against change,
 they started to like Black's choices. For example:
@@ -338,9 +338,13 @@ Implementing this change requires:
 1. Updating the `coding style`_:
 
    * Adding documentation about Black, similar to the existing documentation
-     about isort;
+     about isort. The doc will make it clear that the ``# fmt: off`` escape
+     hatch is allowed only in extreme cases where Black produces unreadable
+     code, not whenever someone disagrees with the style choices of Black.
+
    * Updating explanations around :PEP:`8` and flake8 — they cover a lot more
-     that code formatting so they remain useful even with Black;
+     that code formatting so they remain useful even with Black.
+
    * Removing other references to code formatting, like the specification of
      the favorite hanging indent style and chained calls style.
 

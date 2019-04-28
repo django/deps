@@ -336,12 +336,12 @@ Implementing this change requires:
 
 1. Updating the `coding style`_:
 
-  * Adding documentation about Black, similar to the existing documentation
-    about isort;
-  * Updating explanations around :PEP:`8` and flake8 — they cover a lot more
-    that code formatting so they remain useful even with Black;
-  * Removing other references to code formatting, like the specification of
-    the favorite hanging indent style and chained calls style.
+   * Adding documentation about Black, similar to the existing documentation
+     about isort;
+   * Updating explanations around :PEP:`8` and flake8 — they cover a lot more
+     that code formatting so they remain useful even with Black;
+   * Removing other references to code formatting, like the specification of
+     the favorite hanging indent style and chained calls style.
 
 .. _coding style: https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/
 
@@ -351,23 +351,23 @@ Implementing this change requires:
 
 3. Formatting the code. This will be done in three steps for each branch:
 
-  * Identify if Black produces an egregiously bad result on some files. For
-    example, the date and time formats files were noted as possible problems.
-    Exclude these files with ``# fmt: off`` and ``# fmt: on`` comments.
+   * Identify if Black produces an egregiously bad result on some files. For
+     example, the date and time formats files were noted as possible problems.
+     Exclude these files with ``# fmt: off`` and ``# fmt: on`` comments.
 
-  * Run Black on the entire Django code repository and make a single commit.
-    Since the change will be fully automated, there won't be anything to
-    review, so it's easier to make just one commit. That commit will be easy
-    to identify as non-significant in the future.
+   * Run Black on the entire Django code repository and make a single commit.
+     Since the change will be fully automated, there won't be anything to
+     review, so it's easier to make just one commit. That commit will be easy
+     to identify as non-significant in the future.
 
-  * Attempt to refactor excluded files, perhaps by moving comments, no that
-    Black can do a decent job on them. Commit this separately. This isn't
-    strictly necessary. It can be done at any later point.
+   * Attempt to refactor excluded files, perhaps by moving comments, no that
+     Black can do a decent job on them. Commit this separately. This isn't
+     strictly necessary. It can be done at any later point.
 
 4. Enforcing Black in CI. This means:
 
-   - Adding a black builder to Jenkins, based on the isort builder;
-   - Adding a black job to tox.ini.
+   * Adding a black builder to Jenkins, based on the isort builder;
+   * Adding a black job to tox.ini.
 
 Copyright
 =========

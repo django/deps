@@ -239,7 +239,8 @@ Django uses single and double quotes inconsistently. Some parts of Django —
 including parts I wrote more recently — use single quotes for machine-readable
 identifiers and double quotes for human-readable language. In hindsight, this
 convention is too hard to enforce to be worth the effort, all the more since
-it isn't generalized.
+it isn't generalized. Going forwards, normalizing to double quotes like Black
+does by default will keep things simple.
 
 My best guess is that Black will make code formatting a bit better on average,
 despite occasional sub-optimal results. Others may feel more strongly about
@@ -355,7 +356,9 @@ Implementing this change requires:
      example, the date and time formats files were noted as possible problems.
      Exclude these files with ``# fmt: off`` and ``# fmt: on`` comments.
 
-   * Run Black on the entire Django code repository and make a single commit.
+   * Run Black on the entire Django code repository and make a single commit,
+     which will look like this: https://github.com/hermansc/django/pull/1.
+
      Since the change will be fully automated, there won't be anything to
      review, so it's easier to make just one commit. That commit will be easy
      to identify as non-significant in the future.

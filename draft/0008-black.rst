@@ -4,7 +4,7 @@ DEP 0008: Formatting Code with Black
 
 :DEP: 0008
 :Author: Aymeric Augustin
-:Implementation Team: Aymeric Augustin, Carlton Gibson, Florian Apolloner, Markus Holtermann
+:Implementation Team: Aymeric Augustin, Carlton Gibson, Florian Apolloner, Herman Schistad, Markus Holtermann
 :Shepherd: Andrew Godwin
 :Status: Draft
 :Type: Process

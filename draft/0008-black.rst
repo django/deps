@@ -265,7 +265,7 @@ many lines without altering their meaning. This will pollute the git history.
 However, formatting changes already happen alongside new features and bug
 fixes, adding a steady stream of pollution. Adopting Black will eliminate
 future code reformatting, making the git history cleaner looking forwards.
-Besides, GitHub has a "see the blame before this commit" button to jump easily
+Besides, GitHub has a "View blame prior to this change" button to jump easily
 through refactoring commits.
 
 This commit will also be disruptive for open pull requests. One way to update
@@ -343,7 +343,7 @@ Implementing this change requires:
      code, not whenever someone disagrees with the style choices of Black.
 
    * Updating explanations around :PEP:`8` and flake8 — they cover a lot more
-     that code formatting so they remain useful even with Black.
+     than code formatting so they remain useful even with Black.
 
    * Removing other references to code formatting, like the specification of
      the favorite hanging indent style and chained calls style.
@@ -367,7 +367,7 @@ Implementing this change requires:
      review, so it's easier to make just one commit. That commit will be easy
      to identify as non-significant in the future.
 
-   * Attempt to refactor excluded files, perhaps by moving comments, no that
+   * Attempt to refactor excluded files, perhaps by moving comments, so that
      Black can do a decent job on them. Commit this separately. This isn't
      strictly necessary. It can be done at any later point.
 

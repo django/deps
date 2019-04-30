@@ -265,10 +265,13 @@ many lines without altering their meaning. This will pollute the git history.
 However, formatting changes already happen alongside new features and bug
 fixes, adding a steady stream of pollution. Adopting Black will eliminate
 future code reformatting, making the git history cleaner looking forwards.
-Besides, GitHub has a "View blame prior to this change" button to jump easily
-through refactoring commits.
 
-This commit will also be disruptive for open pull requests. One way to update
+Besides, GitHub has a "View blame prior to this change" button to jump easily
+through refactoring commits. git-hyer-blame was also suggested as a way to
+ignore non-significant commits, although it requires some setup and doesn't
+integrate with IDEs.
+
+Reformatting will also be disruptive for open pull requests. One way to update
 them is to run Black on modified files, keep a copy aside, start a new branch
 from master, move the modified files back into place, and commit the result.
 
@@ -302,6 +305,12 @@ Django's current style. I don't think that's worth pursuing for three reasons:
 * Black produces formatting that is so close to Django's current standards
   that there seems to be very little value in tuning a yapf configuration to
   produce something even closer.
+
+It was also suggested to build a tool that could only reformat statements
+modified by a given commit. This would resolve the concerns about polluting
+the git history while preserving many benefits of this proposal, even if
+making non-standard tool part of the workflow isn't ideal. Unfortunately, no
+such tool exists and no one is volunteering to build it.
 
 Summary
 -------

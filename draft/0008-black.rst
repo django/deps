@@ -267,7 +267,7 @@ fixes, adding a steady stream of pollution. Adopting Black will eliminate
 future code reformatting, making the git history cleaner looking forwards.
 
 Besides, GitHub has a "View blame prior to this change" button to jump easily
-through refactoring commits. git-hyer-blame was also suggested as a way to
+through refactoring commits. git-hyper-blame was also suggested as a way to
 ignore non-significant commits, although it requires some setup and doesn't
 integrate with IDEs.
 

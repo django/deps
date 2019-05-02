@@ -20,7 +20,7 @@ Abstract
 
 This DEP proposes to enforce code formatting with Black_ in Django.
 
-.. _Black: https://github.com/ambv/black
+.. _Black: https://github.com/python/black/
 
 Foreword
 ========

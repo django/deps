@@ -953,12 +953,12 @@ likely that we could raise a decent amount of money for this project.
 It's also worth thinking about *who* can help contribute to this project. Async
 is still a relatively new area of Python, and many Django contributors - old
 and new - don't have much experience with it. We must budget not only for
-people experienced with Django/async to run the project, we must also allow for
+people experienced with Django/async to run the project, but also allow for
 training and onboarding of contributors.
 
 The nature of the work allows it to be highly parallelizable past the initial
 work on the HTTP/middleware/view flow, and so we should make sure that anyone
-who is interested can help out as part of that smaller "working group", rather
+who is interested can help out as part of a smaller "working group", rather
 than having to understand the whole system.
 
 I don't claim to have an answer as to who should run this project, how many
@@ -969,7 +969,7 @@ salary), but I do know that paid contributions will make a large difference.
 
 The project would succeed on volunteer power alone, but it will be a lot slower
 and, I expect, a lot less effective at responding to changes and discoveries
-along the way, and we may also lose users from Django if it slows down too much.
+along the way, and we may also lose users from Django if it takes too long.
 
 
 Backwards Compatibility

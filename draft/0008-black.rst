@@ -9,7 +9,7 @@ DEP 0008: Formatting Code with Black
 :Status: Draft
 :Type: Process
 :Created: 2019-04-27
-:Last-Modified: 2019-04-28
+:Last-Modified: 2019-05-10
 
 .. contents:: Table of Contents
    :depth: 3
@@ -20,7 +20,7 @@ Abstract
 
 This DEP proposes to enforce code formatting with Black_ in Django.
 
-.. _Black: https://github.com/python/black/
+.. _Black: https://github.com/python/black
 
 Foreword
 ========
@@ -311,6 +311,9 @@ modified by a given commit. This would resolve the concerns about polluting
 the git history while preserving many benefits of this proposal, even if
 making non-standard tool part of the workflow isn't ideal. Unfortunately, no
 such tool exists and no one is volunteering to build it.
+
+Finally, as Black is maintained in the Python GitHub organization, it has a
+good chance of becoming a standard tool of the Python community.
 
 Summary
 -------

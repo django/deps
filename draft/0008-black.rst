@@ -252,13 +252,14 @@ best attempt at consensus would be to state that the formatting produced by
 Black doesn't make a decisive change, positive or negative, to our ability to
 maintain Django.
 
+Timeline
+--------
+
+At this time, Black is in beta. The formatting it produces could still change.
+This DEP will be implemented once Black is stable.
+
 Other concerns
 --------------
-
-At the time of writing, Black is in beta, meaning that the formatting it
-produces could still change. Its 1.0 version is expected any time now. When
-this DEP is accepted (if it is), Black should be stable, most likely without
-significant changes from the current beta.
 
 Reformatting the entire code base with Black will touch most files and change
 many lines without altering their meaning. This will pollute the git history.

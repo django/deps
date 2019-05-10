@@ -205,10 +205,9 @@ of humanity must have received similar criticism at some point.)
 Several developers report that, in their experience, Black made code
 formatting worse and decreased readability. Concrete examples shown in the
 discussion were short lists, which Black reformats when they fit on a single
-line, and vertically aligned comments, which Black is unable to preserve.
-Generally, the way Black fits expressions on a single line seems to be a
-sticking point. Many developers feel strongly about retaining control over
-vertical formatting.
+line, and vertically aligned comments, which Black is unable to preserve. This
+is `being addressed <https://github.com/python/black/pull/826/files>`_ in
+Black and is expected to be resolved before Black becomes stable.
 
 These issues don't seem critical enough to rule out Black. As a last resort,
 Black could be disabled locally with ``# fmt: off`` and ``# fmt: on`` if it

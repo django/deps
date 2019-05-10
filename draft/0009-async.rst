@@ -61,7 +61,7 @@ The Web has changed, and Django must change with it - but by bringing our core
 ideals of being approachable, safe by default, and flexible as projects grow and
 their needs change. In a world of hosted datastores, service-oriented
 architecture, and backend as the bastion of complex business logic,
-the native ability to run things in parallel efficiently is key.
+the native ability to run things concurrently is key.
 
 This DEP outlines the plan I think will get us there. It's a vision I very
 much believe in, and which I will work to help us achieve to the best of my
@@ -172,7 +172,7 @@ on that below).
 Running code in threads is likely not going to increase performance - the
 overhead added will probably decrease it very slightly in the
 case where you're just running normal, linear code - but it will enable
-developers to start running things in parallel easily and get used to designing
+developers to start running things concurrently and get used to designing
 code around these new possibilities.
 
 In addition, there are several parts of Django that are sensitive to being run
@@ -188,7 +188,7 @@ to run in a pool of threads, keeping the apparent behavior of the ORM and other
 thread-sensitive parts correct. All parts of Django that we suspect need this
 requirement, including the entire ORM, will use a version of ``sync_to_async``
 that respects this, so we are safe by default. Users will be able to selectively
-disable it to run queries in parallel - see "The ORM" below for more details.
+disable it to run queries concurrently - see "The ORM" below for more details.
 
 Async Native
 ~~~~~~~~~~~~
@@ -322,7 +322,7 @@ in its own event loop using ``async_to_sync``.
 Asynchronous views will continue to be wrapped in an ``atomic()`` block by
 default - while this reduces immediate performance gains, as it will lock all
 ORM queries to a single subthread (see "The ORM" below), it is what our users
-will expect and much safer. If they want to run ORM queries in parallel, they
+will expect and much safer. If they want to run ORM queries concurrently, they
 will have to explicitly opt out of having the transaction around the view using
 the existing ``non_atomic_requests`` mechanism, though we will need to improve
 the documentation around it.
@@ -417,7 +417,7 @@ thread-safety.
 What this implies is that, overall, we need a context-manager like solution to
 opening and closing the need for a database connection, much like ``atomic()``.
 This will enable us to enforce serial calling and sticky threads within that
-context, and allow users to make several in parallel if they wish to open
+context, and allow users to make several contexts if they wish to open
 multiple connections. It also gives us a potential route out of the magical
 ``connections`` global if we want to develop it further.
 
@@ -449,7 +449,7 @@ against those connections.
 An example of how this API might look::
 
     async def get_authors(pattern):
-        # Create a new context to call in parallel
+        # Create a new context to call concurrently
         async with db.new_connections():
             return [
                 author.name
@@ -457,7 +457,7 @@ An example of how this API might look::
             ]
 
     async def get_books(pattern):
-        # Create a new context to call in parallel
+        # Create a new context to call concurrently
         async with db.new_connections():
             return [
                 book.title
@@ -465,7 +465,7 @@ An example of how this API might look::
             ]
 
     async def my_view(request):
-        # Query authors and books in parallel
+        # Query authors and books concurrently
         task_authors = asyncio.create_task(get_authors("an"))
         task_books = asyncio.create_task(get_books("di"))
         return render(
@@ -729,14 +729,14 @@ We're not just adding async to Django to make it nebulously "faster" - the goal
 is to unlock capabilities that our users - those who develop on top of Django -
 simply have not had access to before.
 
-The key part of this is allowing our users to run things in parallel. Be it
+The key part of this is allowing our users to run things concurrently. Be it
 database queries, requests to external APIs, or calling out to a series of
-microservices, most Django projects have to do parallel work at some point
+microservices, most Django projects have to do concurrent work at some point
 during a view.
 
-Very few frameworks have even come close to making parallelism accessible and
+Very few frameworks have even come close to making concurrency accessible and
 safe, and Django has the ability to cross this boundary. If we can make running
-database queries in parallel as easy as using Django's ORM is now, we can
+database queries concurrently as easy as using Django's ORM is now, we can
 raise the bar of what it means to have a framework that lets you write a fast
 web app.
 
@@ -926,6 +926,30 @@ others to succeed. At the same time, a lot of the restructuring of Django that
 is being done would still be applicable to another async solution; if the
 situation were to change later on, the work needed to adapt to a different
 async runtime would not be nearly as involved as this initial transition.
+
+Greenlets/Gevent
+~~~~~~~~~~~~~~~~
+
+It's worth talking about greenlets and Gevent specifically, as they are an
+implementation of concurrent Python code that does not use the Python async
+syntax.
+
+While the idea of having methods and functions seems attractive at first, there
+are many subtle problems with the greenlet-based approach. The lack of an
+explicit ``yield`` or ``await`` means that a complex API like Django's basically
+becomes unpredictable as to knowing if it will block the current execution
+context or not. This then leads to a much higher risk of race conditions and
+deadlocks without careful programming, something I have experienced first-hand.
+
+The problems with coroutines sharing database connections mentioned above would
+also happen with greenlets. We would have to greenlet-safe the entire Django
+ORM and still do something similar to the new-connection-context handler you
+see above.
+
+In addition, the third-party support for this style of concurrency is much
+weaker. While moving Django to it might cause a "halo effect" and cause a
+resurgence in popularity of gevent, this would likely not be enough to support
+all the libraries we would need.
 
 
 Funding

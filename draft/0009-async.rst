@@ -91,9 +91,9 @@ compatible with a synchronous server.
 Threading around the ORM is tricky, and requires a new concept of connection
 contexts and sticky threads for running synchronous ORM code in.
 
-A lot of Django will continue to be synchronous, and our goal will be to support
-users writing views in both styles, letting them choose the best style for the
-view they are working on.
+A lot of Django will continue to be synchronous, and our priority will be to
+support users writing views in both styles, letting them choose the best style
+for the view they are working on.
 
 Some features, like templating and cache backends, will need their own
 separate DEPs and research to be fully async. This DEP mostly focuses on the
@@ -102,12 +102,13 @@ HTTP-middleware-view flow and the ORM.
 There will be full backwards compatibility. A standard Django 2.2 project
 should load and run in async Django (be that 3.0 or 3.1) with no changes.
 
-The project is designed to be done in small, iterative parts and landed to
+This proposal is designed to be done in small, iterative parts and landed to
 Django's ``master`` branch progressively to avoid the problems of a long-running
 fork, and to allow us to change course as we discover issues.
 
 This is a good opportunity to bring on new contributors. We should fund the
-project to make it happen faster. Funding will be at a scale we are not used to.
+project to make it happen faster. Funding will have to be at a scale we are
+not used to.
 
 
 Specification
@@ -203,7 +204,7 @@ Not all features will necessarily need to get to the third stage, and be
 natively async, quickly. We can focus our efforts on the parts that we can do
 well and that have third-party library support, while helping the rest of the
 Python ecosystem on things that we need more groundwork on to make natively
-asynchronous.
+asynchronous; that is explored further below.
 
 This general overview works on nearly all features on Django that need to be
 async, with the exceptions mostly being places where the Python language itself
@@ -249,8 +250,8 @@ True threadlocals, on the other hand, can continue to just work purely based
 on the current thread. We must be more careful, though, to prevent cross-thread
 leakage of these objects; when a view no longer runs in the same thread, but
 instead spawns a thread per ORM call (while the ORM is in the "sync native,
-async wrapper" stage), some things that were previously possible with the
-``connection`` object will no longer be possible.
+async wrapper" stage), some things that were possible in synchronous mode will
+not be possible in asynchronous mode.
 
 These will require individual attention, and the banning of some previously
 possible operations if you are in async mode; the cases we know about are
@@ -761,7 +762,7 @@ web app.
 
 The other part to remember is the ability to hold open connections for a long
 time without wasting resources. Even without WebSockets, there are still a lot
-of long-poll connections, or server-sent-events. Asynchronous Django would allow
+of long-poll connections, or server-sent events. Asynchronous Django would allow
 our users to write applications to handle these scenarios without having to
 think about reverse proxies to offload traffic to while it's waiting.
 

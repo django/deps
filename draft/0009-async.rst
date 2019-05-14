@@ -449,7 +449,7 @@ Whenever a ``new_connections()`` block is entered, Django sets a new context
 with new database connections. Any transactions that were running outside the
 block continue; any ORM calls inside the block operate on a new database
 connection and will see the database from that perspective. If the database
-has transaction islation enabled, as most do by default, this means that the
+has transaction isolation enabled, as most do by default, this means that the
 new connections inside the block may not see changes made by any uncommitted
 transactions outside it.
 

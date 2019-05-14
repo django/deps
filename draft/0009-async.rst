@@ -134,7 +134,8 @@ which are single-threaded as they are run in a management command.
 
 Every single feature that is converted to be async internally will also present
 a synchronous interface that is backwards-compatible with the API as it stands
-today (in 2.2), at least for the normal deprecation period.
+today (in 2.2), for the foreseeable future - we might change the sync APIs over
+time to make them line up better, but sync APIs are not going away.
 
 An overview of how this is achieved technically is below, followed by specific
 implementation details for specific areas. It is not exhaustive to all Django
@@ -319,10 +320,10 @@ fashion. The base handler will need to be the first part of Django that is
 natively asynchronous, and we will need to modify the WSGI handler to call it
 in its own event loop using ``async_to_sync``.
 
-Asynchronous views will continue to be wrapped in an ``atomic()`` block by
-default - while this reduces immediate performance gains, as it will lock all
-ORM queries to a single subthread (see "The ORM" below), it is what our users
-will expect and much safer. If they want to run ORM queries concurrently, they
+Asynchronous views will continue to be wrapped in an ``atomic()`` block if
+``ATOMIC_REQUESTS`` is ``True``. While this reduces performance gains, as it
+locks all ORM queries to a single thread (see "The ORM" below), it is what our
+users will expect and much safer. If they want to run queries concurrently, they
 will have to explicitly opt out of having the transaction around the view using
 the existing ``non_atomic_requests`` mechanism, though we will need to improve
 the documentation around it.
@@ -366,7 +367,7 @@ initialize each middleware with a placeholder get_response that instead feeds
 control back out into the handler, and handles both the passing of data between
 the middleware and the view as well as exception propagation. In some ways, this
 will end up looking more like Django 1.0 era middleware again from an internal
-perspective.
+perspective, though of course the user-facing API will remain the same.
 
 We have the option of deprecating synchronous middleware, but I recommend
 against doing this in the short term. If and when we got to the end of the
@@ -441,10 +442,22 @@ happens when you nest them inside each other.
 
 Instead, I propose that we create a ``db.new_connections()`` context manager
 that enables this behavior, and have it create a new connection whenever
-it is called, allowing arbitrary nesting of ``atomic()`` within it. Whenever a
-``new_connections()`` block is entered, the transactions do not persist inside,
-but transactions can be made inside the ``new_connections()`` block and run
-against those connections.
+it is called, allowing arbitrary nesting of ``atomic()`` within it.
+
+Whenever a ``new_connections()`` block is entered, Django sets a new context
+with new database connections. Any transactions that were running outside the
+block continue; any ORM calls inside the block operate on a new database
+connection and will see the database from that perspective. If the database
+has transaction islation enabled, as most do by default, this means that the
+new connections inside the block may not see changes made by any uncommitted
+transactions outside it.
+
+On top of this, the connections inside this ``new_connections`` block can
+themselves use ``atomic()`` to start additional transactions on those new
+connections. Any nesting of these two context managers will be allowed, but
+every time ``new_connections`` is used the transactions that were already open
+are "paused" and do not affect ORM calls until the ``new_connections`` block
+is exited.
 
 An example of how this API might look::
 
@@ -579,7 +592,7 @@ While the basic form library has no need for async support, form validation and
 saving are user-overrideable, and both this code as well as several parts of
 ``ModelForm`` use the ORM to talk to the database.
 
-This means that, at some point, the ``valid`` methods and ``save``, at
+This means that, at some point, the ``clean`` methods and ``save``, at
 minimum, need to be able to be called in an async fashion. Like templating,
 however, I believe this is something that is not critical to achieve as part of
 a first wave, and so can be addressed with its own working group and DEP.
@@ -694,6 +707,12 @@ in that case, we should not be afraid to leave it as natively synchronous but
 with a supported async wrapper that runs it safely in a threadpool. The goal
 is to enable async for the developers who use Django, not to make Django itself
 a perfect, async-only project.
+
+Several of the projects mentioned will likely end up with their own DEPs for
+implementation, including the caching layer, templating, email, and forms. The
+natively-async database layer may also require an async version of DBAPI - this
+is something that at least needs some discussion with core Python and maybe a
+PEP, though there's been some work towards this already.
 
 
 Motivation
@@ -864,6 +883,34 @@ That said, there are always going to be problems we never anticipated. This DEP
 is less clear on implementation than most, because it must be - as we make
 progress towards an async-capable Django, we'll learn more about the problems
 we encounter and be able to course-correct.
+
+This way of implementing support may also result in slightly slower performance
+for fully-synchronous users. The introduction of asynchronous-native code
+into Django is likely to slow down performance for those users who remain on
+WSGI and all-synchronous views, as an async loop will have to be started
+whenever they need to run code implemented natively in async. The performance
+goal here is a drop of 10% or less - if the drop is too severe, we can dedicate
+engineering time to improving it. The plan is not to implement async at the cost
+of synchronous support.
+
+It's also very much worth thinking about what happens if progress on the project
+is abandoned (because of contributors being unavailable, a changing Python
+ecosystem, or other reasons). The iterative design means that in this case,
+Django is unlikely to end up in a bad state; there might be a few merged changes
+that should be reverted, but the intention is to keep Django's policy of the
+``master`` branch always being shippable to reduce the impact of such an event.
+
+Besides, even if we just get asynchronous views working and none of the rest of
+Django (no ORM, no templates, etc.), this will still be a successful project;
+that alone unlocks a lot of potential and unlocks a large amount of the existing
+Python asynchronous ecosystem.
+
+The other potential long-term effect of this project is that it might consume
+people and energy that could have been used for other Django projects,
+essentially "burning out" some contributors. While this is a risk we should
+always be aware of, approaching this project with sustainability and funding in
+mind will minimise this, and will hopefully turn this project into a large
+net positive gain for people and energy instead.
 
 
 Alternatives

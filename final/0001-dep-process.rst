@@ -71,7 +71,7 @@ The Technical Board
     <https://docs.djangoproject.com/en/dev/internals/organization/#technical-
     board>`_, the group of experienced and active committers who steer technical
     choices. Django's documentation lists `the current Technical Board
-    membership https://www.djangoproject.com/foundation/teams
+    membership <https://www.djangoproject.com/foundation/teams
     /#technical-board-team>`_.
 
 Core Developers

@@ -71,15 +71,14 @@ The Technical Board
     <https://docs.djangoproject.com/en/dev/internals/organization/#technical-
     board>`_, the group of experienced and active committers who steer technical
     choices. Django's documentation lists `the current Technical Board
-    membership <https://docs.djangoproject.com/en/dev/internals/roles
-    /#technical-board>`_.
+    membership https://www.djangoproject.com/foundation/teams
+    /#technical-board-team>`_.
 
 Core Developers
     Similarly, there are several references to **Core Developers** (sometimes
     "core devs"). This refers to the members of Django's `core team
     <https://docs.djangoproject.com/en/dev/internals/organization/#core-team>`_,
-    and specifically those with `commit access
-    <https://docs.djangoproject.com/en/dev/internals/roles/#committers>`_.
+    and specifically those with commit access.
 
 At a very high level, the DEP submission process looks like this:
 

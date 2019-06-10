@@ -1,15 +1,15 @@
 ================================
-DEP XXXX: Dissolving Django Core
+DEP 0010: Dissolving Django Core
 ================================
 
-:DEP: XXXX
+:DEP: 0010
 :Author: James Bennett
 :Implementation Team: James Bennett, others to be determined
 :Shepherd: Aymeric Augustin
 :Status: Draft
 :Type: Process
 :Created: 2018-09-22
-:Last-Modified: 2019-02-19
+:Last-Modified: 2019-06-10
 
 .. contents:: Table of Contents
    :depth: 3

@@ -1,6 +1,6 @@
-======================
-DEP XXXX: DEP template
-======================
+================================
+DEP XXXX: Dissolving Django Core
+================================
 
 :DEP: XXXX
 :Author: James Bennett

@@ -73,7 +73,7 @@ The full details follow below, but a short description is:
 
 * Membership in the Framework team is generally open to the public
   (with the primary exception of individuals ineligible due to actions
-  of the Code of Conduct committee of the Dajgno Software Foundation,
+  of the Code of Conduct committee of the Django Software Foundation,
   or removal by the Technical Board), and members can take part in
   discussion and decision-making, and vote in elections of the
   Framework team.
@@ -125,7 +125,7 @@ person who has the authority (and will be granted the necessary
 permissions) to upload packaged releases of Django to the Python
 Package Index, and to djangoproject.com.
 
-A person may serve in the role of Releaser and Merger simultaneously.
+A person may serve in the roles of Releaser and Merger simultaneously.
 
 The initial set of Releasers will consist of the Django
 Fellows. Thereafter, the Technical Board will select Releasers as
@@ -171,7 +171,7 @@ the Technical Board, a member of the Framework team must demonstrate:
 
 * A history of technical contributions to Django or the Django
   ecosystem. This history should begin at least 18 months prior to the
-  individual's election to the Technical Board.
+  individual's candidacy for the Technical Board.
 
 * A history of participation in Django's development outside of
   contributions merged to the <https://github.com/django/django/>
@@ -285,7 +285,7 @@ of the Framework team, but only formally put to the Technical Board by
 a member of the Technical Board.
 
 If the Technical Board feels that a member of the Framework team has
-acted in bad faith incompatble with continued membership, or in a
+acted in bad faith incompatible with continued membership, or in a
 manner otherwise disruptive to the development of Django, any member
 of the Technical Board may nominate that person for removal from the
 Framework team. The Technical Board shall then vote on the matter, and
@@ -339,8 +339,8 @@ these decisions.
 
 Members of the Framework team may request that the Technical Board
 revisit or reconsider a prior question, but not until at least six
-months have elapsed since the time of the Technical Board's vote on
-that question.
+months have elapsed since the time of the Technical Board's most
+recent vote on that question.
 
 Members of the Technical Board may request that the Technical Board
 revisit a prior question at any time, but the Technical Board may
@@ -353,7 +353,7 @@ Process of selecting Mergers and Releasers
 As noted above, the initial set of Mergers and Releasers will be the
 current Django Fellows. The Framework team shall then work to select
 at least one additional Merger, and shall at all times attempt to
-maintain a roster of at least three Mergers, ans as many Releasers as
+maintain a roster of at least three Mergers, and as many Releasers as
 are deemed necessary to meet needs.
 
 The selection process for either role shall occur as follows:
@@ -489,14 +489,14 @@ is otherwise qualified for the Technical Board) to serve until such
 time as at least three elected members are able to serve again, or the
 next election is held.
 
-Members of the Technical Board cannot be removed from the technical
-board once elected, unless it is determined by a unanimous vote of the
+Members of the Technical Board cannot be removed from the Technical
+Board once elected, unless it is determined by a unanimous vote of the
 other Technical Board members and the DSF Board that they did not
 possess the appropriate qualifications for the Technical Board, or
 they become disqualified due to actions taken by the Code of Conduct
 committee of the Django Software Foundation. In the event that a vote
 is held to determine whether a person did not possess the relevant
-qualifications, that person shall bbe barred from taking pert in the
+qualifications, that person shall be barred from taking pert in the
 vote in both the Technical Board and, if that person is also a member
 of the DSF Board, the Technical Board shall not consider that person's
 vote in the DSF Board for purposes of determining unanimity.
@@ -505,22 +505,33 @@ vote in the DSF Board for purposes of determining unanimity.
 Motivation
 ==========
 
-The state of Django core is, at best, stagnant. New members are added
-at a very slow rate, and most people who have been members now rarely
-if ever make use of their ability to push code to Django. Furthermore,
-the current state of Django's codebase seems not to be amenable to
-ongoing recruitment of new members to Django core; several people have
-expressed the opinion (or variations on it) that most of the types of
-issues traditionally used as an entry route to core are now resolved,
-and it's unclear what the path to core membership would look like
-without such issues as a route to familiarity with contributing to
-Django.
+Django has been a very successful open-source project, but faces
+certain threats to its long-term viability. Among those is the small
+size (relative to the number of users of Django, and even to the
+number of people who participate in the development of Django, either
+on the django-developers mailing list or in the GitHub repository) and
+stagnant nature of Django core. New members are added at a very low
+rate, and most people who have been members now rarely, if ever, make
+use of their ability to push code to Django.
 
-There is also a serious, ongoing lack of diversity in Django core, and
-no clear path to addressing it. The changes proposed here are not
-sufficient to resolve this, but some type of change along these lines
-is likely a necessary step toward other initiatives which could
-resolve it.
+Furthermore, the current state of Django's codebase seems not to be
+amenable to ongoing recruitment of new members to Django core; several
+people have expressed the opinion (or variations on it) that most of
+the types of issues traditionally used as an entry route to core are
+now resolved, and it's unclear what the path to core membership would
+look like without such issues as a route to familiarity with
+contributing to Django.
+
+Finally, the existence of Django core is itself a barrier to
+involvement; it has repeatedly been reported that potential
+contributors are discouraged by the feeling that they are not "good
+enough" to compare to the existing memebrs of Django core, and thus
+could not make worthy contributions. This appears to be most acute
+with recruitment of more diverse contributors to Django; the
+demonstrated reach of the Django project, especially due to numerous
+workshops and tutorials run around the world, does not match the
+observed demographics of actual contributors of any type, let alone
+members of Django core.
 
 The primary goal of this proposal is to remove the perceived status
 associated with permission to push code to the primary Django
@@ -530,6 +541,13 @@ no special privileges or status of any sort. Recognition of
 contributions to Django or the Django ecosystem should be handled by
 some type of status or award to be made by the Django Software
 Foundation, rather than by push permission to a repository.
+
+It is accepted that this is only the *first* step in a process of
+encouraging and growing the number and diversity of contributors to
+Django, and that further steps will need to be taken. But although it
+is not *sufficient* to solve all of the above problems, this proposal,
+or something similar to it, is *necessary* to begin the process of
+solving these problems.
 
 
 Rationale

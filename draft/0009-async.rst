@@ -238,7 +238,9 @@ Python 3.6, while that feature appears in 3.7. In addition, ``contextvars`` are
 specifically designed to cut out of their context when a switch happens, like
 into a new thread, while we need to persist those values across those boundaries
 to allow the ``sync_to_async`` and ``async_to_sync`` functions to be drop-in
-wrappers.
+wrappers. Once Django supports 3.7 and up only, we could consider using
+``contextvars``, but it would require significant support work to be done in
+Django (and to persist them across thread/coroutine boundaries).
 
 This has already been addressed with the asgiref_ implementation of ``Local``,
 which is a coroutine- and thread-compatible local that provides the seamless
@@ -304,8 +306,8 @@ code reviewing (you must match ``await`` with an ``_async`` method).
 Views & HTTP Handling
 ---------------------
 
-Views are maybe the keystone of this conversion and where we expect most users
-to make the choice between async and sync code.
+Views are maybe the keystone of useful async support and where we expect most
+users to make the choice between async and sync code.
 
 Django will support two kinds of views:
 
@@ -321,13 +323,10 @@ fashion. The base handler will need to be the first part of Django that is
 natively asynchronous, and we will need to modify the WSGI handler to call it
 in its own event loop using ``async_to_sync``.
 
-Asynchronous views will continue to be wrapped in an ``atomic()`` block if
-``ATOMIC_REQUESTS`` is ``True``. While this reduces performance gains, as it
-locks all ORM queries to a single thread (see "The ORM" below), it is what our
-users will expect and much safer. If they want to run queries concurrently, they
-will have to explicitly opt out of having the transaction around the view using
-the existing ``non_atomic_requests`` mechanism, though we will need to improve
-the documentation around it.
+Middleware or settings like ``ATOMIC_REQUESTS`` that cause views to be wrapped
+in non-async-safe code (like an ``atomic()`` block) will continue to work, but
+they'll have speed side-effect (like not allowing parallel ORM calls inside in
+the case of ``atomic()``).
 
 The existing ``StreamingHttpResponse`` class will be modified to be able to take
 either a synchronous or an asynchronous iterator, and then have its internal
@@ -549,7 +548,7 @@ Templating
 ----------
 
 Templating is currently entirely synchronous, and the plan is to leave it this
-way for the near future. Writing an async-capable templating language may be
+way for this first phase. Writing an async-capable templating language may be
 possible, but it would be a significant amount of work, and deserves its own
 discussion and DEP.
 

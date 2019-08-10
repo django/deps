@@ -20,7 +20,7 @@ Abstract
 
 This DEP proposes to enforce code formatting with Black_ in Django.
 
-.. _Black: https://github.com/python/black
+.. _Black: https://github.com/psf/black
 
 Foreword
 ========
@@ -206,7 +206,7 @@ Several developers report that, in their experience, Black made code
 formatting worse and decreased readability. Concrete examples shown in the
 discussion were short lists, which Black reformats when they fit on a single
 line, and vertically aligned comments, which Black is unable to preserve. This
-is `being addressed <https://github.com/python/black/pull/826>`_ in Black and
+is `being addressed <https://github.com/psf/black/pull/826>`_ in Black and
 is expected to be resolved before Black becomes stable.
 
 These issues don't seem critical enough to rule out Black. As a last resort,

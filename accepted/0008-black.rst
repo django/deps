@@ -378,6 +378,11 @@ Implementing this change requires:
      Since the change will be fully automated, there won't be anything to
      review, so it's easier to make just one commit. That commit will be easy
      to identify as non-significant in the future.
+   
+   * Add the whole-repo-refactor commit SHA to a file in the root of the repo,
+     ``.gitblameskip`` or similar, for use with ``git blame`` 's
+     ``--ignore-revs-file`` flag
+     (`docs <https://git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt>`__).
 
    * Attempt to refactor excluded files, perhaps by moving comments, so that
      Black can do a decent job on them. Commit this separately. This isn't

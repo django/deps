@@ -6,7 +6,7 @@ DEP 0006: Channels
 :Author: Jacob Kaplan-Moss, Andrew Godwin
 :Implementation Team: Andrew Godwin et al.
 :Shepherd: Andrew Godwin, Jacob Kaplan-Moss
-:Status: Draft
+:Status: Withdrawn
 :Type: Feature
 :Created: 2016-05-08
 :Last-Modified: 2016-05-08

@@ -6,7 +6,7 @@ DEP 0009: Async-capable Django
 :Author: Andrew Godwin
 :Implementation Team: Andrew Godwin (initially; others later)
 :Shepherd: Andrew Godwin
-:Status: Draft
+:Status: Accepted
 :Type: Feature
 :Created: 2019-05-06
 :Last-Modified: 2019-05-06

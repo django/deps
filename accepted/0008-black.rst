@@ -6,7 +6,7 @@ DEP 0008: Formatting Code with Black
 :Author: Aymeric Augustin
 :Implementation Team: Aymeric Augustin, Carlton Gibson, Florian Apolloner, Herman Schistad, Markus Holtermann
 :Shepherd: Andrew Godwin
-:Status: Draft
+:Status: Accepted
 :Type: Process
 :Created: 2019-04-27
 :Last-Modified: 2019-05-10

@@ -9,7 +9,6 @@ DEP 0201: Simplified routing syntax
 :Status: Final
 :Type: Feature
 :Created: 2016-10-19
-:Last-Modified: 2017-09-30
 
 .. contents:: Table of Contents
    :depth: 3

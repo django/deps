@@ -6,7 +6,6 @@ DEP 182: Multiple Template Engines
 :Type: Feature
 :Status: Final
 :Created: 2014-09-14
-:Last-Modified: 2015-10-02
 :Author: Aymeric Augustin
 :Implementation-Team: Aymeric Augustin
 :Shepherd: Carl Meyer

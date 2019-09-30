@@ -9,7 +9,6 @@ DEP 0005: Improved middleware
 :Status: Final
 :Type: Feature
 :Created: 2016-01-07
-:Last-Modified: 2016-06-17
 
 .. contents:: Table of Contents
    :depth: 3

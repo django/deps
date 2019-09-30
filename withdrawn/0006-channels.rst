@@ -9,7 +9,6 @@ DEP 0006: Channels
 :Status: Withdrawn
 :Type: Feature
 :Created: 2016-05-08
-:Last-Modified: 2016-05-08
 
 .. contents:: Table of Contents
    :depth: 3

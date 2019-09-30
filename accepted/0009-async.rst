@@ -9,7 +9,6 @@ DEP 0009: Async-capable Django
 :Status: Accepted
 :Type: Feature
 :Created: 2019-05-06
-:Last-Modified: 2019-05-06
 
 .. contents:: Table of Contents
    :depth: 3

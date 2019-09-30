@@ -9,7 +9,6 @@ DEP 0010: Dissolving Django Core
 :Status: Draft
 :Type: Process
 :Created: 2018-09-22
-:Last-Modified: 2019-06-10
 
 .. contents:: Table of Contents
    :depth: 3

@@ -9,7 +9,6 @@ DEP 0008: Formatting Code with Black
 :Status: Accepted
 :Type: Process
 :Created: 2019-04-27
-:Last-Modified: 2019-05-10
 
 .. contents:: Table of Contents
    :depth: 3
@@ -378,7 +377,7 @@ Implementing this change requires:
      Since the change will be fully automated, there won't be anything to
      review, so it's easier to make just one commit. That commit will be easy
      to identify as non-significant in the future.
-   
+
    * Add the whole-repo-refactor commit SHA to a file in the root of the repo,
      ``.gitblameskip`` or similar, for use with ``git blame`` 's
      ``--ignore-revs-file`` flag

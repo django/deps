@@ -9,7 +9,6 @@ DEP 2: Experimental APIs
 :Status: Draft
 :Type: Process
 :Created: 2014-12-05
-:Last-Modified: 2014-12-05
 
 .. contents:: Table of Contents
    :depth: 3

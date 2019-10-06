@@ -59,6 +59,81 @@ https://www.python.org/dev/peps/pep-0484/#stub-files
 `django-stubs` uses a mix of static analysis provided by mypy, and runtime type inference from Django own introspection facilities.
  For example, newly introduced typechecking of `QuerySet.filter` uses Django _meta API to extract possible lookups for every field, to resolve kwargs like `name__iexact`.
 
+ ## What is currently implemented (and therefore possible)
+
+1. Fields inference.
+
+    ```python
+    class User(models.Model):
+        name = models.CharField()
+        surname = models.CharField(null=True)
+
+    user = User()
+    user.name  # inferred type: str
+    user.surname  # inferred type: Optional[str]
+
+    # objects is added to every model
+    User.objects.get()  # inferred type: User
+    User.objects.filter(unknown=True)  # will fail with "no such field"
+    User.objects.filter(name=True)  # will fail with "incompatible types 'bool' and 'str'"
+    User.objects.filter(name__iexact=True)  # will fail with "incompatible types 'bool' and 'str'"
+    User.objects.filter(name='hello')  # passes
+    User.objects.filter(name__iexact='hello')  # passes
+    ```
+
+2. Typechecking for `__init__` and `create()`
+    ```python
+    class User(models.Model):
+        name = models.CharField()
+    User(name=1)  # fail
+    User(unknown=1)  # fail
+    User(name='hello')  # pass
+    ```
+    same for `create()` with different `Optional`ity conditions.
+
+
+3. RelatedField's support, support for different apps in the RelatedField's to= argument
+
+    ```python
+    class User:
+        pass
+    class Profile:
+        user = models.OneToOneField(to=User, related_name='profile')
+
+    Profile().user  # inferred type 'User'
+    User().profile  # inferred type 'Profile'
+    ```
+
+    ```python
+    class CustomProfile:
+        user = models.ForeignKey(to='some_custom_app.User')
+    CustomProfile().user  # will be correctly inferred as 'some_custom_app.User'
+    ```
+
+4. Support for unannotated third-party base models,
+    ```python
+    class User(ThirdPartyModel):
+        pass
+    ```
+    will be recognized as correct model.
+
+5. `values`, `values_list` support
+
+    ```python
+    class User:
+        name = models.CharField()
+        surname = models.CharField()
+    User.objects.values_list('name', 'surname')[0]  # will return Tuple[str, str]
+    ```
+
+6. settings support
+    ```python
+    from django.conf import settings
+    settings.INSTALLED_APPS  # will be inferred as Sequence[str]
+    ```
+
+7. `get_user_model()` infers current model class
+
 
 ## Current issues and limitations of django-stubs
 

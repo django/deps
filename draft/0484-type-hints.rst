@@ -1,3 +1,16 @@
+# DEP 0484: Static type checking for Django
+
+|  |  |
+| --- | --- |
+| **DEP:** | 0484 |
+| **Author:** | Maksim Kurnikov |
+| **Implementation team:** | Maksim Kurnikov |
+| **Shepherd:** | Carlton Gibson |
+| **Type:** | Feature |
+| **Status:** | Draft |
+| **Created:** | 2019-10-08 |
+| **Last modified:** | 2019-10-08 |
+
 ## Abstract
 
 Add mypy (and other type checker) support for Django.
@@ -5,16 +18,60 @@ Add mypy (and other type checker) support for Django.
 
 ## Specification
 
-Currently, there are two ways to accomplish that:
-1. Provide type annotations right in the Django codebase.
+I propose to add type hinting support for Django via mypy and PEP484. All at once it's too big of a change, so I want to propose an incremental migration, using both stub files and inline type annotations.
 
-Pros:
-* much more accurate types
-* easier to keep them in sync with the code changes
-* additional value for typechecking of the codebase itself
+https://www.python.org/dev/peps/pep-0484/#stub-files
 
-Cons:
-* clutter of the codebase
+Back in a day, there was some friction about gradually improving the type checking coverage of different parts of Python ecosystem. So PEP561 was accepted based on the discussion.
+
+It defines how PEP484-based typecheckers would look for a type annotations information across the different places.
+
+https://www.python.org/dev/peps/pep-0561
+
+Specifically, it defines a "Type Checker Method Resolution Order"
+https://www.python.org/dev/peps/pep-0561/#type-checker-module-resolution-order
+
+> 1. Stubs or Python source manually put in the beginning of the path. Type checkers SHOULD provide this to allow the user complete control of which stubs to use, and to patch broken stubs/inline types from packages. In mypy the $MYPYPATH environment variable can be used for this.
+> 2. User code - the files the type checker is running on.
+> 3. Stub packages - these packages SHOULD supersede any installed inline package. They can be found at foopkg-stubs for package foopkg.
+> 4. Inline packages - if there is nothing overriding the installed package, and it opts into type checking, inline types SHOULD be used.
+> 5. Typeshed (if used) - Provides the stdlib types and several third party libraries.
+
+What is means for Django, it that we can split type annotations into stub files, and inline annotations. Where there will be a corresponding `.pyi` file, mypy would use that, otherwise fallback to inline type annotations.
+
+There's an existing `django-stubs` package where most of the Django codebase files have a `.pyi` counterpart with type annotations.
+
+https://github.com/typeddjango/django-stubs
+
+It also has some plugin code, which takes care of the dynamic nature of Django models.
+
+It's desirable that this package would be usable alongside the Django type annotations migration.
+
+
+### Incremental migration path:
+1. Add `py.typed` file inside the Django top-level module, to mark that it has inline annotations.
+See https://www.python.org/dev/peps/pep-0561/#packaging-type-information
+
+2. Add `__class_getitem__` implementation for the `QuerySet` class to support generic instantiation.
+
+3. Decide on file-by-file based, whether it's appropriate to have inline type annotation, or have it separate for the sake of readability. For those files, merge annotations from `django-stubs`, removing those files in the library.
+
+4. Adopt `django-stubs` as an official Django library to catch more bugs, push users a bit more towards type annotations and prepare them for a change.
+
+5. Do some work on a `merge-pyi` side to make it complete enough for `django-stubs` and Django. For that, we can react out for mypy folks and work with them.
+
+6. Add stubs checking CI step:
+    1. Use `merge-pyi` to merge `django-stubs` into the Django codebase.
+    2. Run `mypy` and report errors.
+
+    This would allow us to keep `django-stubs` in sync with Django codebase, and prevent false-positives to happen.
+
+7. Based on gained experience, merge more stubs into the codebase.
+
+
+## Notes
+
+### Overload clutter
 
 Django is very dynamic, so some functions have a lot of different signatures, which could not be expressed in the codebase and require `@overload` clauses
 https://www.python.org/dev/peps/pep-0484/#function-method-overloading
@@ -36,30 +93,13 @@ class Field(Generic[_ST, _GT])
     def __get__(self: _T, instance, owner) -> _T: ...
 ```
 
-2. Store type stubs separately.
-https://www.python.org/dev/peps/pep-0484/#stub-files
 
-    Pros:
-    * non-invasive change, could be stored / installed as a separate package
-
-    Cons:
-    * Out-of-sync with Django itself
-
-    * Hard to test. Mypy (as of now) can't use stub definitions to typecheck codebase itself. There are some solutions to this problem, like
-    https://github.com/ambv/retype
-    https://github.com/google/pytype/tree/master/pytype/tools/merge_pyi
-
-        but I've miserably failed in making them work for django-stubs and Django, there's a lot of things to consider. There's also a possibility of writing our own solution, shouldn't be too hard.
-
-        django-stubs uses Django test suite to test stubs right now.
-
-
-## How django-stubs currently implemented
+### How django-stubs currently implemented
 
 `django-stubs` uses a mix of static analysis provided by mypy, and runtime type inference from Django own introspection facilities.
  For example, newly introduced typechecking of `QuerySet.filter` uses Django _meta API to extract possible lookups for every field, to resolve kwargs like `name__iexact`.
 
- ## What is currently implemented (and therefore possible)
+ ### What is currently implemented (and therefore possible)
 
 1. Fields inference.
 
@@ -135,7 +175,7 @@ https://www.python.org/dev/peps/pep-0484/#stub-files
 7. `get_user_model()` infers current model class
 
 
-## Current issues and limitations of django-stubs
+### Current issues and limitations of django-stubs
 
 1. Generic parameters of `QuerySet`.
 
@@ -210,6 +250,4 @@ https://www.python.org/dev/peps/pep-0484/#stub-files
     Not implementable as of now, see
     https://github.com/python/mypy/issues/2813
     https://github.com/python/mypy/issues/7266
-
-
 

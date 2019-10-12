@@ -5,7 +5,7 @@
 | **DEP:** | 0484 |
 | **Author:** | Maksim Kurnikov |
 | **Implementation team:** | Maksim Kurnikov |
-| **Shepherd:** | Carlton Gibson |
+| **Shepherd:** | Carlton Gibson | 
 | **Type:** | Feature |
 | **Status:** | Draft |
 | **Created:** | 2019-10-08 |
@@ -13,95 +13,182 @@
 
 ## Abstract
 
-Add mypy (and other type checker) support for Django.
+Add mypy (and other type checkers) support for Django. 
 
+## Motivation
 
-## Specification
+### Internal use
 
-I propose to add type hinting support for Django via mypy and PEP484. All at once it's too big of a change, so I want to propose an incremental migration, using both stub files and inline type annotations.
+1. Inline documentation
+    * Lower barrier to entry.
+    * Easier to think about what's going on and edgecases
 
-https://www.python.org/dev/peps/pep-0484/#stub-files
+2. Catching hard-to-find bugs
+    * not all codebase is covered with tests, so `None` related functionality is never tested, because nobody actually thought about it being used that way. 
 
-Back in a day, there was some friction about gradually improving the type checking coverage of different parts of Python ecosystem. So PEP561 was accepted based on the discussion.
+3. Another testsuite to prevent regressions
+    * accidental changes break other parts of the codebase
+    * easier review, easier to understand what contributor meant to do 
 
-It defines how PEP484-based typecheckers would look for a type annotations information across the different places.
+### External use
 
-https://www.python.org/dev/peps/pep-0561
+1. Typechecking of user codebases. 
 
-Specifically, it defines a "Type Checker Method Resolution Order"
-https://www.python.org/dev/peps/pep-0561/#type-checker-module-resolution-order
+    * mypy is increasingly popular in proprietary projects.
 
-> 1. Stubs or Python source manually put in the beginning of the path. Type checkers SHOULD provide this to allow the user complete control of which stubs to use, and to patch broken stubs/inline types from packages. In mypy the $MYPYPATH environment variable can be used for this.
-> 2. User code - the files the type checker is running on.
-> 3. Stub packages - these packages SHOULD supersede any installed inline package. They can be found at foopkg-stubs for package foopkg.
-> 4. Inline packages - if there is nothing overriding the installed package, and it opts into type checking, inline types SHOULD be used.
-> 5. Typeshed (if used) - Provides the stdlib types and several third party libraries.
+        * shorten time for new developer to get up to speed with the codebase. 
+        * prevent bugs / regressions, basically another test suite. 
 
-What is means for Django, it that we can split type annotations into stub files, and inline annotations. Where there will be a corresponding `.pyi` file, mypy would use that, otherwise fallback to inline type annotations.
+        * add scalability to the codebase
 
-There's an existing `django-stubs` package where most of the Django codebase files have a `.pyi` counterpart with type annotations.
+    * third-party apps that use / modify Django internal tools would benefit from typechecking
 
-https://github.com/typeddjango/django-stubs
+### IDE support
 
-It also has some plugin code, which takes care of the dynamic nature of Django models.
+* go to definition, find usages, refactorings.
 
-It's desirable that this package would be usable alongside the Django type annotations migration.
+Example: 
 
-
-### Incremental migration path:
-1. Add `py.typed` file inside the Django top-level module, to mark that it has inline annotations.
-See https://www.python.org/dev/peps/pep-0561/#packaging-type-information
-
-2. Add `__class_getitem__` implementation for the `QuerySet` class to support generic instantiation.
-
-3. Decide on file-by-file based, whether it's appropriate to have inline type annotation, or have it separate for the sake of readability. For those files, merge annotations from `django-stubs`, removing those files in the library.
-
-4. Adopt `django-stubs` as an official Django library to catch more bugs, push users a bit more towards type annotations and prepare them for a change.
-
-5. Do some work on a `merge-pyi` side to make it complete enough for `django-stubs` and Django. For that, we can react out for mypy folks and work with them.
-
-6. Add stubs checking CI step:
-    1. Use `merge-pyi` to merge `django-stubs` into the Django codebase.
-    2. Run `mypy` and report errors.
-
-    This would allow us to keep `django-stubs` in sync with Django codebase, and prevent false-positives to happen.
-
-7. Based on gained experience, merge more stubs into the codebase.
-
-
-## Notes
-
-### Overload clutter
-
-Django is very dynamic, so some functions have a lot of different signatures, which could not be expressed in the codebase and require `@overload` clauses
-https://www.python.org/dev/peps/pep-0484/#function-method-overloading
-
-An example would be a `Field` - it should behave different whether it's invoked on model class, or model instance. Class returns `Field` object itself, and instance resolve field into an underlying python object
 ```python
-# _ST - set type
-# _GT - get type
-# self: _T -> _T allows mypy to extract type of `self` and return it
+class User(models.Model):
+    name = models.CharField()
 
-class Field(Generic[_ST, _GT])
-    @overload
-    def __get__(self: _T, instance: None, owner) -> _T: ...
-    # Model instance access
-    @overload
-    def __get__(self, instance: Model, owner) -> _GT: ...
-    # non-Model instances
-    @overload
-    def __get__(self: _T, instance, owner) -> _T: ...
+# other file
+def get_username(user):
+    return user.name
 ```
 
+Rename `name` -> `username`. Any IDE will have a hard time understanding that `user` param is a `User` instance. Trivial with type annotation. 
 
-### How django-stubs currently implemented
+```python
+def get_username(user: User):
+    return user.name  # will be renamed into user.username
+```
+    
+* interactive typechecking of passed params and return values
 
-`django-stubs` uses a mix of static analysis provided by mypy, and runtime type inference from Django own introspection facilities.
- For example, newly introduced typechecking of `QuerySet.filter` uses Django _meta API to extract possible lookups for every field, to resolve kwargs like `name__iexact`.
+* support in vscode/emacs/vim (microsoft's python-language-server), PyCharm (internal implementation of the typechecker), pyre, mypy
 
- ### What is currently implemented (and therefore possible)
+* inline annotations -> IDE is always up to date with code changes (no `typeshed` syncing)
 
-1. Fields inference.
+## Implementation
+
+### Migration path
+
+1. Add `py.typed` file inside the Django top-level module, to mark that it has inline annotations. 
+See https://www.python.org/dev/peps/pep-0561/#packaging-type-information
+
+2. Add `__class_getitem__` implementation to classes which need to support generic parameters. For example, for `QuerySet` class (`QuerySet[MyModel]` annotation)
+https://docs.python.org/3/reference/datamodel.html#emulating-generic-types
+
+    It's just
+
+    ```python
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+    ```
+    
+    (some additional parameters checking could be added later)
+
+3. Add `mypy` to CI, like it's done in this PR for DRF
+https://github.com/encode/django-rest-framework/pull/6988 
+
+    Make it pass. It would require some type annotations around the codebase, some cases should be silenced via `# type: ignore`
+    https://mypy.readthedocs.io/en/latest/common_issues.html#spurious-errors-and-locally-silencing-the-checker
+
+4. Merge `django-stubs` annotations into the codebase. This one could be done incrementally, on file-per-file basis. 
+
+5. For complex cases use `.pyi` counterpart (described below). To be able to remain in sync with the codebase, `merge-pyi` tool invocation must be added to the CI.
+https://github.com/google/pytype/tree/master/pytype/tools/merge_pyi
+
+
+### Complementing with `.pyi` stub files for complex cases
+
+There are some cases, for which stores type information inline creates more problems than benefits. 
+
+Django is very dynamic, some functions have more than on relationship between argument types and return value type. For those cases, there's an `@overload` clause available
+https://www.python.org/dev/peps/pep-0484/#function-method-overloading
+
+For these cases, type information should be stored in the separate stub file. 
+https://www.python.org/dev/peps/pep-0484/#stub-files
+
+Examples: 
+
+* `@overload` clauses
+
+    Django is very dynamic, some functions have more than one relationship between argument types and return value type. For those cases, there's an `@overload` clause available
+    https://www.python.org/dev/peps/pep-0484/#function-method-overloading
+
+    Example is `__get__` method of the `Field`. 
+    1. Returns underlying python type when called on instance. 
+    2. Returns `Field` instance when called on class. 
+
+    ```python
+    # _ST - set type
+    # _GT - get type
+    # self: _T -> _T allows mypy to extract type of `self` and return it
+
+    class Field(Generic[_ST, _GT])
+        @overload
+        def __get__(self: _T, instance: None, owner) -> _T: ...
+        # Model instance access
+        @overload
+        def __get__(self, instance: Model, owner) -> _GT: ...
+        # non-Model instances
+        @overload
+        def __get__(self: _T, instance, owner) -> _T: ...
+    ```
+
+* `**kwargs` for `Field` classes
+
+    Mypy (and other typecheckers) doesn't understand `**kwargs`. There are ways to make it work via `TypedDict` and type aliases, but it's hard to read. 
+
+    ```python
+    class CharField(Field):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.validators.append(validators.MaxLengthValidator(self.max_length))
+    ```
+
+    How it would look like, if it would be inline: 
+
+    ```python
+    class CharField(Field):
+        def __init__(
+            self,
+            verbose_name: Optional[Union[str, bytes]] = ...,
+            name: Optional[str] = ...,
+            primary_key: bool = ...,
+            max_length: Optional[int] = ...,
+            unique: bool = ...,
+            blank: bool = ...,
+            null: bool = ...,
+            db_index: bool = ...,
+            default: Any = ...,
+            editable: bool = ...,
+            auto_created: bool = ...,
+            serialize: bool = ...,
+            unique_for_date: Optional[str] = ...,
+            unique_for_month: Optional[str] = ...,
+            unique_for_year: Optional[str] = ...,
+            choices: Optional[_FieldChoices] = ...,
+            help_text: str = ...,
+            db_column: Optional[str] = ...,
+            db_tablespace: Optional[str] = ...,
+            validators: Iterable[_ValidatorCallable] = ...,
+            error_messages: Optional[_ErrorMessagesToOverride] = ...,
+        ): 
+            super().__init__(*args, **kwargs)
+            self.validators.append(validators.MaxLengthValidator(self.max_length))
+    ```
+
+### Mypy plugin support
+
+Not all Django behavious expressable via type system - Django will have to provide those features via mypy plugin. Most of those are implemented in `django-stubs`, inside `mypy_django_plugin` sub-package. 
+
+Those are features implemented so far in the `mypy_django_plugin`:
+
+1. Fields and managers inference.
 
     ```python
     class User(models.Model):
@@ -129,10 +216,9 @@ class Field(Generic[_ST, _GT])
     User(unknown=1)  # fail
     User(name='hello')  # pass
     ```
-    same for `create()` with different `Optional`ity conditions.
+    same for `create()` with different `Optional`ity conditions. 
 
-
-3. RelatedField's support, support for different apps in the RelatedField's to= argument
+3. RelatedField's support, support for different apps in the RelatedField's `to=` argument
 
     ```python
     class User:
@@ -147,53 +233,36 @@ class Field(Generic[_ST, _GT])
     ```python
     class CustomProfile:
         user = models.ForeignKey(to='some_custom_app.User')
-    CustomProfile().user  # will be correctly inferred as 'some_custom_app.User'
+    CustomProfile().user  # will be correctly inferred as 'some_custom_app.models.User'
     ```
 
-4. Support for unannotated third-party base models,
+4. Support for unannotated third-party base models, 
     ```python
     class User(ThirdPartyModel):
         pass
     ```
-    will be recognized as correct model.
-
-5. `values`, `values_list` support
-
-    ```python
-    class User:
-        name = models.CharField()
-        surname = models.CharField()
-    User.objects.values_list('name', 'surname')[0]  # will return Tuple[str, str]
-    ```
+    will be recognized as correct model. 
 
 6. settings support
     ```python
     from django.conf import settings
-    settings.INSTALLED_APPS  # will be inferred as Sequence[str]
+    settings.ALLOWED_HOSTS  # inferred as Sequence[str]
     ```
 
-7. `get_user_model()` infers current model class
+7. `get_user_model()` correctly infers current user model class.
 
 
-### Current issues and limitations of django-stubs
+### Limitations of the plugin
 
-1. Generic parameters of `QuerySet`.
+0. `mypy_django_plugin` uses a mix of static and dynamic analysis to support Django features. It basically does `django.setup()` inside to gain access to all the _meta API and `Apps` information. 
 
-    For example, we have a model
-    ```python
-    class User:
-        name = models.CharField()
-    ```
+    * users needs to be aware of that, and work on preventing side-effects of `django.setup()`, if there's any
 
-    1. A simple `QuerySet` which is a result of `User.objects.filter()` returns `QuerySet[User]`.
+    * typechecking of Django app with invalid syntax or semantics will crash the plugin
 
-    2. When we add `values_list('name')` method to the picture, we need to remember (and encode in the generic params) both the fact that it's a `QuerySet` of the `User` model, and that the return item will be a tuple object of `name`.
-    So, it becomes `QuerySet[User, Tuple[str]]`.
+    Possible solution: reimplement all Django logic of traversing models in apps for the plugin. 
 
-    3. To implement `.annotate(upper=Upper('name'))` we need to remember all the fields that created from `annotate`, so it becomes
-    `QuerySet[User, Tuple[str], TypedDict('upper': str)]`
-
-2. Manager inheritance.
+1. Manager inheritance. 
 
     ```python
     class BaseUser(models.Model):
@@ -205,9 +274,11 @@ class Field(Generic[_ST, _GT])
     class User(BaseUser):
         objects = UserManager()
     ```
-    Mypy will flag those `objects` managers as incompatible as they violate Liskov Substitution principle.
+    Mypy will flag those `objects` managers as incompatible as they violate Liskov Substitution principle. 
 
-3. Generic parameters for `Field`
+    Possible solution: https://github.com/python/mypy/issues/7468
+
+2. Generic parameters for `Field`
 
     ```python
     class User:
@@ -235,19 +306,21 @@ class Field(Generic[_ST, _GT])
         _pyi_private_get_type: str
     ```
 
-    In the plugin `django-stubs` dynamically marks `name` and `surname` as `CharField[Optional[Union[str, int, Combinable]], Optional[str]]`. We cannot use (as far as I know),
+    In the plugin `django-stubs` dynamically marks `name` and `surname` as `CharField[Optional[Union[str, int, Combinable]], Optional[str]]`. We cannot use (as far as I know),  
 
     ```python
     class CharField(Field[Union[str, int, Combinable], str]):
         pass
     ```
-    because then we won't be able to change generic params for `CharField` dynamically.
+    because then we won't be able to change generic params for `CharField` dynamically. 
 
-    And it also creates a UX issue, as `Field` has two generic params which makes zero sense semantically.
+    And it also creates a UX issue, as `Field` has two generic params which makes zero sense semantically. 
 
-4. `BaseManager.from_queryset()`, `QuerySet.as_manager()`
+    Possible solution: whole bunch of `@overload` statements over `__new__` method. 
 
-    Not implementable as of now, see
+3. `BaseManager.from_queryset()`, `QuerySet.as_manager()`
+
+    Not implementable as of now, see 
     https://github.com/python/mypy/issues/2813
     https://github.com/python/mypy/issues/7266
 

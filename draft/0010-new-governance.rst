@@ -133,8 +133,8 @@ roles a single person may hold simultaneously.
 If this doesn't work, how can it be changed?
 --------------------------------------------
 
-This proposal includees a process for making changes. It will use a
-modified version of the DEP process, and requires approval by at least
+This proposal includes a process for making changes. It will use a
+modified version of the DEP process, and require approval by at least
 the Technical Board and the DSF Board to adopt a change to
 governance. Additionally, for any change that either board feels is
 large enough to require it, there is a procedure for changes to be put
@@ -359,7 +359,7 @@ The powers of the Technical Board are:
   change to Django.
 
 * To veto the merging of any particular piece of code into Django or
-  order the reversion of any particular merge or ccommit, except in
+  order the reversion of any particular merge or commit, except in
   extraordinary circumstances when the Django Security Team must act
   quickly to resolve a security issue under Django's security process.
 
@@ -660,8 +660,8 @@ The following restrictions apply to the roles of Merger and Releaser:
   becomes ineligible while already holding such a role SHALL
   cease to hold that role immediately upon becoming ineligible.
 
-Mergers MAY resign their role at any time, but SHOULD provide some
-advance notice in order to allow the selection of a
+Mergers and Releasers MAY resign their role at any time, but SHOULD
+provide some advance notice in order to allow the selection of a
 replacement. Termination of the contract of a Django Fellow by the
 Django Software Foundation SHALL temporarily suspend that person's
 Merger and/or Releaser role(s) until such time as the Technical Board

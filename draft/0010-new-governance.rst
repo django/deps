@@ -171,7 +171,7 @@ groups:
   <https://www.djangoproject.com/security/>`_.
 
 The following terms are used in this document to refer to types of
-changes made to Django's codebae:
+changes made to Django's codebase:
 
 * "Minor Change" means fixing a bug in, or adding a new feature to,
   Django of a scope small enough not to require the use of `the DEP
@@ -204,60 +204,12 @@ releases of Django:
   security issue in Django being handled under Django's security
   process.
 
-Some sections of this document refer to discussion venues "generally
-open to interested members of the public". This term should be
-interpreted according to its plain English meaning, with the following
-qualifications:
-
-* A venue "generally open to interested members of the public" MAY
-  require prior registration of an account to participate, but MUST
-  NOT require monetary payment from general participants to join or
-  participate. A venue which has both paid and non-paid membership
-  options available is acceptable.
-
-* Such a venue MAY have rules for participation established by the
-  Technical Board, and MAY be moderated by a person or persons
-  designated by the Technical Board, for the purpose of maintaining
-  good order and on-topic discussion.
-
-* All such venues MUST be subject to the Django Code of
-  Conduct.
-
-* Moderators of such venues MAY remove, close, filter, restrict access
-  to, and/or lock particular messages, threads, and/or sections of the
-  venue as necessary, in the moderators' judgment, to enforce the
-  venue's rules and the Django Code of Conduct. The Technical Board
-  SHALL be the final arbiter of the rules of such venues, and the Code
-  of Conduct committee of the DSF, with appeal to the DSF Board, SHALL
-  be the final arbiter of the application of the Django Code of
-  Conduct in such venues.
-
-* Such a venue also MUST exclude any person deemed ineligible to
-  participate in the community spaces of the Django project by the
-  Code of Conduct committee of the DSF, for at least the period of
-  time during which the Code of Conduct committee deems that person
-  ineligible.
-
-* Such a venue also MAY temporarily exclude a person who has been
-  deemed by the designated moderators to be disruptive, acting in bad
-  faith, spamming, or otherwise not behaving in accordance with the
-  rules of the venue or the Django Code of Conduct, and MAY
-  permanently exclude such a person, if the Technical Board and/or the
-  DSF Code of Conduct committee approve a permanent exclusion of that
-  person.
-
-* Finally, such a venue also MAY exclude, temporarily or permanently,
-  any person whose membership, account, and/or access is suspended or
-  terminated by a third-party provider of the platform and/or of
-  account services (such as an identity provider service, if such
-  venue uses a third-party identity provider for authentication).
-
-* The django-developers mailing list, the code.djangoproject.com bug
-  tracker and wiki, the pull-request discussion areas of the primary
-  Django repository on GitHub, and the forum.djangoproject.com
-  discussion forum SHALL all be deemed venues generally open to
-  interested members of the public, for purposes of this document.
-
+* A member "in good standing" of a venue for discussing the technical
+  direction of Django is any member of that venue whose participation
+  privileges have not been revoked, either by moderators of that
+  venue, by the operator of the venue if operated by a third-party
+  service or administrator, or by the Code of Coduct committee of the
+  DSF.
 
 Specification
 =============
@@ -363,8 +315,8 @@ The powers of the Technical Board are:
   extraordinary circumstances when the Django Security Team must act
   quickly to resolve a security issue under Django's security process.
 
-* To canvas for proposals and ideas for the future technical direction
-  of Django.
+* To put out calls for proposals and ideas for the future technical
+  direction of Django.
 
 * To set and to adjust the schedule of releases of Django.
 
@@ -406,10 +358,14 @@ Framework team MUST demonstrate:
 * A history of participation in Django's development outside of
   contributions merged to the <https://github.com/django/django/>
   repository. This may include, but is not restricted to:
-  participation in discussions on the django-developers mailing list;
-  reviewing and offering feedback on pull requests in the Django
-  source repository; and assisting in triage and management of the
-  Django bug tracker.
+  
+  * Participation in discussions on the django-developers mailing list
+
+  * Reviewing and offering feedback on pull requests in the Django
+    source-code repository
+
+  * Assisting in triage and management of the
+    Django bug tracker.
 
 * A history of recent engagement with the direction and development of
   Django. Such engagement MUST have occurred within a period of no
@@ -428,14 +384,71 @@ At the time of adoption of this proposal, all individuals who meet the
 definition of "Django Core", as given in the terminology section of
 this DEP, SHALL be granted the title of Django Core Developer,
 retroactive to the date on which they first met that definition of
-"Django Core", and the DSF SHALL cause to be published, on
-djangoproject.com, a list of all such persons.
+"Django Core", and the DSF SHALL publish, on djangoproject.com, a list
+of all such persons.
 
 Future grants of the title of Django Core Developer will be made by
 the DSF Board; the DSF Board SHALL use input from the Technical Board,
 the DSF membership, and interested members of the general public, to
 identify candidates for this title, and SHALL maintain and publish the
 list of individuals to whom this title has been granted.
+
+
+How Django's development is discussed
+-------------------------------------
+
+Discussion of Django's technical development can take place in any
+venue approved by this DEP or by the Technical Board, so long as that
+venue is generall open to interested members of the public. Such a
+venue is defined as follows:
+
+* Such a venue MAY require prior registration of an account to
+  participate, but MUST NOT require monetary payment from general
+  participants to join or participate. A venue which has both paid and
+  non-paid membership options available is acceptable.
+
+* Such a venue MAY have rules for participation established by the
+  Technical Board, and MAY be moderated by a person or persons
+  designated by the Technical Board, for the purpose of maintaining
+  good order and on-topic discussion.
+
+* All such venues MUST be subject to the Django Code of
+  Conduct.
+
+* Moderators of such venues MAY remove, close, filter, restrict access
+  to, and/or lock particular messages, threads, and/or sections of the
+  venue as necessary, in the moderators' judgment, to enforce the
+  venue's rules and the Django Code of Conduct. The Technical Board
+  SHALL be the final arbiter of the rules of such venues, and the Code
+  of Conduct committee of the DSF, with appeal to the DSF Board, SHALL
+  be the final arbiter of the application of the Django Code of
+  Conduct in such venues.
+
+* Such a venue also MUST exclude any person deemed ineligible to
+  participate in the community spaces of the Django project by the
+  Code of Conduct committee of the DSF, for at least the period of
+  time during which the Code of Conduct committee deems that person
+  ineligible.
+
+* Such a venue also MAY temporarily exclude a person who has been
+  deemed by the designated moderators to be disruptive, acting in bad
+  faith, spamming, or otherwise not behaving in accordance with the
+  rules of the venue or the Django Code of Conduct, and MAY
+  permanently exclude such a person, if the Technical Board and/or the
+  DSF Code of Conduct committee approve a permanent exclusion of that
+  person.
+
+* Finally, such a venue also MAY exclude, temporarily or permanently,
+  any person whose membership, account, and/or access is suspended or
+  terminated by a third-party provider of the platform and/or of
+  account services (such as an identity provider service, if such
+  venue uses a third-party identity provider for authentication).
+
+The django-developers mailing list, the code.djangoproject.com bug
+tracker and wiki, the pull-request discussion areas of the primary
+Django repository on GitHub, and the forum.djangoproject.com
+discussion forum SHALL all be deemed venues generally open to
+interested members of the public, for purposes of this document.
 
 
 How Django is developed
@@ -447,11 +460,11 @@ merge a Minor Change primarily authored by that Merger, unless the
 pull request has been approved by another Merger, by the Technical
 Board, or by the Django Security Team.
 
-Any Merger MAY initiate discussion in the appropriate venue of a Minor
-Change, and request that other Mergers refrain from merging it while
-discussion proceeds. Any Merger MAY request a vote of the Technical
-Board regarding any Minor Change if, in the Merger's opinion,
-discussion has failed to reach a consensus.
+Any Merger MAY initiate discussion of a Minor Change in the
+appropriate venue, and request that other Mergers refrain from merging
+it while discussion proceeds. Any Merger MAY request a vote of the
+Technical Board regarding any Minor Change if, in the Merger's
+opinion, discussion has failed to reach a consensus.
 
 When a Major Change reaches one of its implementation milestones, any
 Merger or member of the associated DEP's Implementation Team MAY
@@ -543,7 +556,8 @@ occur, or deem that a consensus was reached via discussion.
 Any member in good standing of an appropriate discussion venue for a
 proposal MAY request that the Technical Board reconsider a proposal
 previously vetoed, but not until at least six months have elapsed
-since the veto. The Technical Board MAY decline to reconsider the
+since the veto, or the next Feature Release of Django has occurred,
+whichever is later. The Technical Board MAY decline to reconsider the
 proposal, and allow the veto to stand without a new vote. In the event
 that the Technical Board once again vetoes the proposal, or allows the
 previous veto to stand, the proposal SHALL NOT be raised for
@@ -569,12 +583,16 @@ following process:
    or no question. For example: "Shall the Django project accept and
    begin implementation of DEP 10?"
 
-2. The possible outcomes of a vote are: Accept the proposal (the "yes"
-   option of the question is to be taken); or Decline the proposal
-   (the "no" option of the question is taken, but the proposal is not
-   subject to the waiting period for reconsideration); or Veto the
-   proposal (the "no" option of the question is taken, and the
-   proposal is subject to the waiting period for reconsideration).
+2. The possible outcomes of a vote are:
+
+   * Accept: the "yes" option of the question is to be taken.
+
+   * Decline: the "no" option of the question is taken, but the
+     proposal is not subject to the waiting period for
+     reconsideration.
+
+   * Veto: the "no" option of the question is taken, and the proposal
+     is subject to the waiting period for reconsideration.
 
 3. Members of the Technical Board SHALL have, from the time a question
    is put to them, a voting period of one week to review the question
@@ -584,15 +602,14 @@ following process:
    or such other venue, generally open to interested members of the
    public, as the Technical Board may direct.
 
-5. Each vote MUST be one of the following: "Accept", "Decline", or
-   "Veto". Each of these options shall indicate that the voter desires
-   the correspondingly-named outcome described above. Each vote SHOULD
-   be accompanied by an explanation of the voter's reasoning.
+5. Each vote MUST be one of the following: "+1", "0", or "-1". Each
+   vote SHOULD be accompanied by an explanation of the voter's
+   reasoning.
 
 6. Votes SHALL be counted as follows: the score of the proposal is an
-   integer, and initially is zero. Each "Accept" vote adds one to the
-   score; each "Decline" vote leaves the score unchanged; and each
-   "Veto" vote subtracts one from the score.
+   integer, and initially is zero. Each "+1" vote adds one to the
+   score; each "0" vote leaves the score unchanged; and each "-1" vote
+   subtracts one from the score.
 
 7. If a voting period ends and not all members of the Technical Board
    have voted, the vote SHALL be deemed incomplete if either: a
@@ -629,8 +646,8 @@ As noted above, the initial set of Mergers and Releasers SHALL be the
 current Django Fellows as of the time of adoption of this governance
 process. The Technical Board then SHALL work to select at least one
 additional Merger, and SHALL at all times attempt to maintain a roster
-of at least three Mergers, and as many Releasers as are deemed
-necessary to meet needs.
+of at least three Mergers, and at least three Releasers. There shall
+be no upper limit to the number of Mergers and Releasers.
 
 The selection process for either role, when a vacancy occurs or when
 the Technical Board deems it necessary to select additional persons
@@ -719,10 +736,10 @@ events:
   implementation of the required voter registration and balloting
   features.
 
-* Immediately and automatically, one month prior to the scheduled
-  release of the final Feature Release of a Major Release Series of
-  Django, if no election of the Technical Board has yet occurred
-  during that Major Release Series.
+* Immediately and automatically, one week after the actual release of
+  the final Feature Release of a Major Release Series of Django, if no
+  election of the Technical Board has yet occurred during that Major
+  Release Series.
 
 * Immediately and automatically upon the Technical Board being reduced
   -- via resignation, removal, or incapacity of members -- to fewer
@@ -736,9 +753,10 @@ events:
   outcome on the question "Shall an election of the Technical Board
   occur?"
 
-Voting in elections of the Technical Board shall be the privilege of:
+Any person who meets one of the following qualifications is generally
+eligible to vote in elections of the Technical Board:
 
-* Any person who holds an Individual membership in the DSF, and/or
+* Any person who holds an Individual membership in the DSF.
 
 * Any person who can demonstrate, on application to the DSF, a history
   of substantive contribution to Django or its ecosystem. Such persons

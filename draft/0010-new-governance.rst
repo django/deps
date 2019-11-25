@@ -311,9 +311,7 @@ The powers of the Technical Board are:
   change to Django.
 
 * To veto the merging of any particular piece of code into Django or
-  order the reversion of any particular merge or commit, except in
-  extraordinary circumstances when the Django Security Team must act
-  quickly to resolve a security issue under Django's security process.
+  order the reversion of any particular merge or commit.
 
 * To put out calls for proposals and ideas for the future technical
   direction of Django.
@@ -399,8 +397,8 @@ How Django's development is discussed
 
 Discussion of Django's technical development can take place in any
 venue approved by this DEP or by the Technical Board, so long as that
-venue is generall open to interested members of the public. Such a
-venue is defined as follows:
+venue is open to interested members of the public. Such a venue is
+defined as follows:
 
 * Such a venue MAY require prior registration of an account to
   participate, but MUST NOT require monetary payment from general
@@ -469,11 +467,12 @@ opinion, discussion has failed to reach a consensus.
 When a Major Change reaches one of its implementation milestones, any
 Merger or member of the associated DEP's Implementation Team MAY
 inform the Technical Board of an intent to merge the appropriate
-code. The Technical Board MUST then hold a vote (see Technical Board
-voting process below) on whether to permit the merge; if the result of
-the vote is any result other than a veto, the code MAY be merged at
-the earliest practical opportunity after the vote, by any Merger,
-without further consultation with the Technical Board.
+code. The Technical Board MUST then hold a vote (see `Technical Board
+voting process below <voting-process>`) on whether to permit the
+merge; if the result of the vote is any result other than a veto, the
+code MAY be merged at the earliest practical opportunity after the
+vote, by any Merger, without further consultation with the Technical
+Board.
 
 
 How Django is released
@@ -573,6 +572,8 @@ previous veto to stand. The Technical Board MAY decline to reconsider
 the proposal, and allow the veto to stand without a new vote.
 
 
+.. _voting-process:
+
 Voting process of the Technical Board
 -------------------------------------
 
@@ -587,7 +588,7 @@ following process:
 
    * Accept: the "yes" option of the question is to be taken.
 
-   * Decline: the "no" option of the question is taken, but the
+   * No Action: the "no" option of the question is taken, but the
      proposal is not subject to the waiting period for
      reconsideration.
 
@@ -630,7 +631,7 @@ following process:
    score SHALL be tallied from the votes cast, and the outcome SHALL
    be as follows: a score of 3 or greater produces an outcome of
    Accept; a score less than 3 but greater than or equal to zero
-   produces an outcome of Decline; a score of less than zero produces
+   produces an outcome of No Action; a score of less than zero produces
    an outcome of Veto.
 
 Votes of the Technical Board on matters within the scope of its powers
@@ -669,7 +670,8 @@ The following restrictions apply to the roles of Merger and Releaser:
 * A person MUST NOT simultaneously serve as a Merger and as a member
   of the Technical Board. If a Merger is elected to the Technical
   Board, they SHALL cease to be a Merger immediately upon taking up
-  membership in the Technical Board.
+  membership in the Technical Board. A person MAY simultaneously serve
+  as a Releaser and as a member of the Technical Board.
 
 * A person who is ineligible to participate in Django community spaces
   due to action of the Code of Conduct committee of the DSF MUST NOT
@@ -696,7 +698,9 @@ or those roles by:
 
 * A vote of the Technical Board, on the question "Shall this person be
   removed from their role(s)", in which all members of the Technical
-  Board vote "Accept".
+  Board vote "+1". If the person in question is a Releaser, and also a
+  member of the Technical Board, the outcome instead requires that all
+  members of the Technical Board, other than that person, vote "+1".
 
 A vote of the Technical Board, on the question "Shall this person be
 suspended from their role(s)", achieving an Accept outcome with any
@@ -741,10 +745,6 @@ events:
   election of the Technical Board has yet occurred during that Major
   Release Series.
 
-* Immediately and automatically upon the Technical Board being reduced
-  -- via resignation, removal, or incapacity of members -- to fewer
-  than three members.
-
 * Immediately and automatically when fewer than three of the members
   elected in the most recent election of the Technical Board remain
   among the current roster of members of the Technical Board.
@@ -787,11 +787,12 @@ Technical Board election.
 The process of electing a Technical Board is as follows:
 
 1. When an election is automatically triggered, or when the Technical
-   Board votes to trigger an election, the Secretary of the DSF SHALL
-   be notified in writing of the triggering of the election, and the
-   condition which triggered it. The Secretary of the DSF then SHALL
-   post to the django-developers mailing list to announce the
-   election and its timeline.
+   Board votes to trigger an election, the Technical Board SHALL
+   direct one of its members to notify the Secretary of the DSF, in
+   writing, of the triggering of the election, and the condition which
+   triggered it. The Secretary of the DSF then SHALL post to the
+   django-developers mailing list to announce the election and its
+   timeline.
 
 2. As soon as the election is announced, the DSF Board shall begin a
    period of voter registration. All Individual members of the DSF are
@@ -849,7 +850,7 @@ of two ways:
   member of the Technical Board. This determination must be made
   jointly by the other members of the Technical Board, and the DSF
   Board. A valid determination of ineligibility requires that all
-  other members of the Technical Board vote "Accept" on the question
+  other members of the Technical Board vote "+1" on the question
   "Shall this person be declared ineligible for the Technical Board?",
   and that all members of the DSF Board who can vote on the issue (the
   affected person, if a DSF Board member, MUST NOT vote) vote "yes" on
@@ -872,19 +873,19 @@ process:
 * Any member of the Technical Board, including an otherwise eligible
   but departing member, MAY nominate a candidate to fill a vacancy.
 
-* The Technical Board SHALL then notify the Secretary of the DSF, in
-  writing, of the nomination. The DSF Board SHALL check the
-  qualifications of the person nominated, and the Secretary of the DSF
-  SHALL notify the Technical Board of the result. If the DSF Board
-  determines the nominated person is not qualified, the nomination
-  MUST be discarded.
+* The Technical Board SHALL then direct one of its members to notify
+  the Secretary of the DSF, in writing, of the nomination. The DSF
+  Board SHALL check the qualifications of the person nominated, and
+  the Secretary of the DSF SHALL notify the Technical Board of the
+  result. If the DSF Board determines the nominated person is not
+  qualified, the nomination MUST be discarded.
 
 * Otherwise, the Technical Board then SHALL vote on the question:
   "Shall this candidate fill the vacancy on the Technical Board?" As
   an exception to the Technical Board voting process described above,
   this vote SHALL have only a single one-week voting period, SHALL
   have an outcome of "Accept" if all eligible voting members of the
-  Technical Board vote "Accept" in that period, and SHALL have an
+  Technical Board vote "+1" in that period, and SHALL have an
   outcome of "Reject" otherwise.
 
 
@@ -975,8 +976,9 @@ process as described in DEP 1, with modifications as described below.
    usual 3.
 
 2. Once such a DEP reaches "accepted" status, the Technical Board MUST
-   notify the Secretary of the DSF, in writing, of the existence of an
-   accepted DEP for changing the governance process.
+   direct one of its members to notify the Secretary of the DSF, in
+   writing, of the existence of an accepted DEP for changing the
+   governance process.
 
 3. The DSF Board SHALL hold a vote, at its earliest convenience, on a
    motion to adopt the proposed change. If the DSF Board rejects the

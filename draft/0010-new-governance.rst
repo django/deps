@@ -29,7 +29,7 @@ below.
 
 
 What roles will there be in the project after this change?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------------
 
 Three roles will be actively involved in producing Django as we know
 it: Mergers, Releasers, and the Technical Board. One additional role,
@@ -40,7 +40,7 @@ governance, oversight, or code-committing privileges.
 
 
 How will code get added to Django?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 For smaller changes such as bugfixes and minor features, Mergers will
 use their judgment to determine if there's consensus that the change
@@ -55,7 +55,7 @@ unless the Technical Board decides to block the merge.
 
 
 Who decides when Django gets released?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 Django's bugfix releases already follow a consistent schedule, and
 feature releases (and their alpha/beta/candidate packages) have target
@@ -68,7 +68,7 @@ releases as needed to fix critical security issues.
 
 
 Who decides the technical direction of Django?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 Anyone can propose new features or directions for Django. For larger
 features, the DEP process will be used, and for smaller features
@@ -82,7 +82,7 @@ of them.
 
 
 How will the people in these roles be chosen?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 Mergers and Releasers will be selected by the Technical Board in
 consultation with the DSF's Fellowship Committee.
@@ -97,7 +97,7 @@ people who have historically been part of "Django Core".
 
 
 Who can speak on behalf of Django?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Originally, Adrian and Jacob, as co-BDFLs, could speak on behalf of
 Django if they wished. Since they stepped back from that role, no
@@ -117,7 +117,7 @@ that.
 
 
 Why can't people serve on the Technical Board if they hold certain other roles?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------------------
 
 To avoid concentration of power/authority in any single person, or any
 small group of people. It has been the case at least once in the past
@@ -142,7 +142,7 @@ to a vote of the community.
 
 
 Terminology
------------
+===========
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -468,7 +468,7 @@ When a Major Change reaches one of its implementation milestones, any
 Merger or member of the associated DEP's Implementation Team MAY
 inform the Technical Board of an intent to merge the appropriate
 code. The Technical Board MUST then hold a vote (see `Technical Board
-voting process below <voting-process>`) on whether to permit the
+voting process <voting-process>`_ below) on whether to permit the
 merge; if the result of the vote is any result other than a veto, the
 code MAY be merged at the earliest practical opportunity after the
 vote, by any Merger, without further consultation with the Technical

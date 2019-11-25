@@ -467,12 +467,11 @@ opinion, discussion has failed to reach a consensus.
 When a Major Change reaches one of its implementation milestones, any
 Merger or member of the associated DEP's Implementation Team MAY
 inform the Technical Board of an intent to merge the appropriate
-code. The Technical Board MUST then hold a vote (see `Technical Board
-voting process <voting-process>`_ below) on whether to permit the
-merge; if the result of the vote is any result other than a veto, the
-code MAY be merged at the earliest practical opportunity after the
-vote, by any Merger, without further consultation with the Technical
-Board.
+code. The Technical Board MUST then hold a vote (see `Voting process
+of the Technical Board`_ below) on whether to permit the merge; if the
+result of the vote is any result other than a veto, the code MAY be
+merged at the earliest practical opportunity after the vote, by any
+Merger, without further consultation with the Technical Board.
 
 
 How Django is released
@@ -571,8 +570,6 @@ Technical Board has vetoed the proposal multiple times or allowed a
 previous veto to stand. The Technical Board MAY decline to reconsider
 the proposal, and allow the veto to stand without a new vote.
 
-
-.. _voting-process:
 
 Voting process of the Technical Board
 -------------------------------------

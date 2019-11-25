@@ -9,7 +9,7 @@ DEP 0010: New governance for the Django project
 :Status: Draft
 :Type: Process
 :Created: 2018-09-22
-:Last-Modified: 2019-10-20
+:Last-Modified: 2019-11-25
 
 .. contents:: Table of Contents
    :depth: 3

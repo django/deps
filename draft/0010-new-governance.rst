@@ -346,8 +346,8 @@ The powers of the Technical Board are:
   and to govern those teams accordingly.
 
 The Technical Board SHALL consist initially of five members. To be
-qualified for election to the Technical Board, a member of the
-Framework team MUST demonstrate:
+qualified for election to the Technical Board, a candidate MUST
+demonstrate:
 
 * A history of technical contributions to Django or the Django
   ecosystem. This history MUST begin at least 18 months prior to the
@@ -624,7 +624,7 @@ following process:
    member of the Technical Board SHALL be the one counted toward the
    proposal's score.
 
-7. Once a voting period ends and is not deemed incopmlete, the final
+7. Once a voting period ends and is not deemed incomplete, the final
    score SHALL be tallied from the votes cast, and the outcome SHALL
    be as follows: a score of 3 or greater produces an outcome of
    Accept; a score less than 3 but greater than or equal to zero

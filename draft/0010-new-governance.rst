@@ -624,7 +624,7 @@ following process:
    member of the Technical Board SHALL be the one counted toward the
    proposal's score.
 
-7. Once a voting period ends and is not deemed incomplete, the final
+8. Once a voting period ends and is not deemed incomplete, the final
    score SHALL be tallied from the votes cast, and the outcome SHALL
    be as follows: a score of 3 or greater produces an outcome of
    Accept; a score less than 3 but greater than or equal to zero

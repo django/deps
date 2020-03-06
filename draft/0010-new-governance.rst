@@ -171,7 +171,7 @@ groups:
   <https://www.djangoproject.com/security/>`_.
 
 * "Django Forum": the discussion forum at `forum.djangoproject.com
-  <https://forum.djangoproject.com/>`_
+  <https://forum.djangoproject.com/>`_.
 
 The following terms are used in this document to refer to types of
 changes made to Django's codebase:

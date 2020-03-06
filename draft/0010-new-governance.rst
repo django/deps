@@ -205,7 +205,7 @@ releases of Django:
 
 * "Security Release" means a Bugfix Release which included a fix for a
   security issue in Django being handled under `Django's security
-  process <https://www.djangoproject.com/security/`_.
+  process <https://www.djangoproject.com/security/>`_.
 
 * A member "in good standing" of a venue for discussing the technical
   direction of Django is any member of that venue whose participation

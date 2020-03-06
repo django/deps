@@ -170,6 +170,9 @@ groups:
   issues handled under `Django's security process
   <https://www.djangoproject.com/security/>`_.
 
+* "Django Forum": the discussion forum at `forum.djangoproject.com
+  <https://forum.djangoproject.com/>`_
+
 The following terms are used in this document to refer to types of
 changes made to Django's codebase:
 
@@ -358,6 +361,7 @@ demonstrate:
   repository. This may include, but is not restricted to:
   
   * Participation in discussions on the django-developers mailing list
+    or Django Forum.
 
   * Reviewing and offering feedback on pull requests in the Django
     source-code repository
@@ -444,9 +448,9 @@ defined as follows:
 
 The django-developers mailing list, the code.djangoproject.com bug
 tracker and wiki, the pull-request discussion areas of the primary
-Django repository on GitHub, and the forum.djangoproject.com
-discussion forum SHALL all be deemed venues generally open to
-interested members of the public, for purposes of this document.
+Django repository on GitHub, and the Django Forum SHALL all be deemed
+venues generally open to interested members of the public, for
+purposes of this document.
 
 
 How Django is developed
@@ -493,8 +497,9 @@ Releases of Django will occur as follows:
    time as they receive an update from the Technical Board granting
    permission for the release. If the Technical Board requests that a
    release not be issued, they SHALL provide public notice, on the
-   django-developers mailing list, of their reasoning, and SHALL
-   provide timely updates regarding the status of the release.
+   django-developers mailing list or the Django Forum, of their
+   reasoning, and SHALL provide timely updates regarding the status of
+   the release.
 
 2. At any time, the Django Security Team MAY ask a Releaser to issue
    one or more Security Releases of Django, regardless of prior
@@ -518,25 +523,26 @@ for Django at any time.
 
 For features which qualify as a Minor Change, proposers SHALL use the
 code.djangoproject.com bug tracker and/or the django-developers list
-to make their proposal, and discussion SHALL occur in those venues, or
-in such other venue as the Technical Board may direct, provided that
-the venue of discussion is generally open to interested memebrs of the
-public.
+or the Django Forum to make their proposal, and discussion SHALL occur
+in those venues, or in such other venue as the Technical Board may
+direct, provided that the venue of discussion is generally open to
+interested memebrs of the public.
 
 For features which qualify as a Major Change, proposers SHALL use the
 DEP process, with discussion taking place on the django-developers
-mailing list, or in such other venue as the Technical Board may
-direct, provided that the venue of discussion is generally open to
-interested members of the public.
+mailing list, the Django Forum, or in such other venue as the
+Technical Board may direct, provided that the venue of discussion is
+generally open to interested members of the public.
 
 No later than one week after the feature freeze of an upcoming Feature
 Release of Django, the Technical Board SHALL issue a public call, on
-the django-developers mailing list, for proposals of features to be
-implemented in the next Feature Release following the one which has
-just undergone feature freeze. The Technical Board SHALL ensure that
-such proposals are archived in a venue generally open to interested
-members of the public. The Technical Board also MAY issue such a call
-for proposals more frequently if the Technical Board so chooses.
+the django-developers mailing list and the Django Forum, for proposals
+of features to be implemented in the next Feature Release following
+the one which has just undergone feature freeze. The Technical Board
+SHALL ensure that such proposals are archived in a venue generally
+open to interested members of the public. The Technical Board also MAY
+issue such a call for proposals more frequently if the Technical Board
+so chooses.
 
 The Technical Board SHALL have the right to veto, via its voting
 process, any proposed change to Django.
@@ -596,9 +602,10 @@ following process:
    is put to them, a voting period of one week to review the question
    and submit their votes.
 
-4. Votes MUST be made in public, on the django-developers mailing list
-   or such other venue, generally open to interested members of the
-   public, as the Technical Board may direct.
+4. Votes MUST be made in public, on the django-developers mailing
+   list, Django Forum, or such other venue, generally open to
+   interested members of the public, as the Technical Board may
+   direct.
 
 5. Each vote MUST be one of the following: "+1", "0", or "-1". Each
    vote SHOULD be accompanied by an explanation of the voter's
@@ -788,8 +795,8 @@ The process of electing a Technical Board is as follows:
    direct one of its members to notify the Secretary of the DSF, in
    writing, of the triggering of the election, and the condition which
    triggered it. The Secretary of the DSF then SHALL post to the
-   django-developers mailing list to announce the election and its
-   timeline.
+   appropriate venue -- the django-developers mailing list and the
+   Django Forum to announce the election and its timeline.
 
 2. As soon as the election is announced, the DSF Board shall begin a
    period of voter registration. All Individual members of the DSF are
@@ -815,9 +822,10 @@ The process of electing a Technical Board is as follows:
 4. Registration of candidates will close one week after it has
    opened. One week after registration of candidates closes, the
    Secretary of the DSF SHALL publish the roster of candidates to the
-   django-developers mailing list, and the election will begin. The
-   DSF Board SHALL provide a voting form accessible to registered
-   voters, and SHALL be the custodian of the votes.
+   django-developers mailing list and the Django Forum, and the
+   election will begin. The DSF Board SHALL provide a voting form
+   accessible to registered voters, and SHALL be the custodian of the
+   votes.
 
 5. Voting SHALL be by secret ballot. Each voter will be presented with
    a ballot containing the roster of candidates, and any relevant
@@ -829,9 +837,9 @@ The process of electing a Technical Board is as follows:
    total number of votes cast and the number received by each
    candidate. This summary SHALL be ratified by a majority vote of the
    DSF Board, then posted by the Secretary of the DSF to the
-   django-developers mailing list. The five candidates with the
-   highest vote totals SHALL immediately become the new Technical
-   Board.
+   django-developers mailing list and the Django Forum. The five
+   candidates with the highest vote totals SHALL immediately become
+   the new Technical Board.
 
 Once elected, a member of the Technical Board MAY be removed in either
 of two ways:

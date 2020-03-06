@@ -161,10 +161,10 @@ groups:
 * "DSF" and "DSF Board": the Django Software Foundation and its Board
   of Directors, respectively.
 
-* "Django Fellows": a list of multiple people who have been, and in
-  two cases still are, paid by the Django Software Foundation to
-  perform various tasks, including triaging issues, reviewing and
-  merging pull requests, and managing Django's releases.
+* "Django Fellows": a list of multiple people who have been or still
+  are paid by the Django Software Foundation to perform various tasks,
+  including triaging issues, reviewing and merging pull requests, and
+  managing Django's releases.
 
 * "Django Security Team": a group of people who respond to security
   issues handled under `Django's security process
@@ -201,8 +201,8 @@ releases of Django:
   for the Django 3.1.0 Feature Release.
 
 * "Security Release" means a Bugfix Release which included a fix for a
-  security issue in Django being handled under Django's security
-  process.
+  security issue in Django being handled under `Django's security
+  process <https://www.djangoproject.com/security/`_.
 
 * A member "in good standing" of a venue for discussing the technical
   direction of Django is any member of that venue whose participation
@@ -948,7 +948,7 @@ governance of the Technical Board, the following shall apply:
 
 * Those teams MAY make requests of the Technical Board, and the
   Technical Board SHOULD accommodate those requests when reasonable
-  and practicable, provided that acccmmodating the request falls
+  and practicable, provided that accommodating the request falls
   within the powers of the Technical Board.
 
 In the event of a dispute between the Technical Board and a team not

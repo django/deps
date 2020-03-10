@@ -456,6 +456,10 @@ purposes of this document.
 How Django is developed
 -----------------------
 
+Any Releaser MAY, on their own initiative, merge administrative commits, such
+as bumping version numbers or adding stub release notes, without seeking
+approval from other Releasers or Mergers.
+
 Any Merger MAY, on their own initiative, merge any pull request which
 constitutes a Minor Change, with one exception: a Merger MUST NOT
 merge a Minor Change primarily authored by that Merger, unless the

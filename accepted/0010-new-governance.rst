@@ -6,10 +6,10 @@ DEP 0010: New governance for the Django project
 :Author: James Bennett
 :Implementation Team: James Bennett, others to be determined
 :Shepherd: Aymeric Augustin
-:Status: Draft
+:Status: Accepted
 :Type: Process
 :Created: 2018-09-22
-:Last-Modified: 2020-03-06
+:Last-Modified: 2020-03-12
 
 .. contents:: Table of Contents
    :depth: 3

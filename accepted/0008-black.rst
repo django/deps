@@ -73,6 +73,10 @@ do, for example channels_ and asgiref_.
 .. _channels: https://github.com/django/channels
 .. _asgiref: https://github.com/django/asgiref
 
+ALl code Django generates will also be Black-formatted
+(``startproject``, migrations, ``inspectdb``, etc.), at least if the user has
+Black installed.
+
 Motivation
 ==========
 
@@ -378,7 +382,7 @@ Implementing this change requires:
      Since the change will be fully automated, there won't be anything to
      review, so it's easier to make just one commit. That commit will be easy
      to identify as non-significant in the future.
-   
+
    * Add the whole-repo-refactor commit SHA to a file in the root of the repo,
      ``.gitblameskip`` or similar, for use with ``git blame`` 's
      ``--ignore-revs-file`` flag

@@ -73,7 +73,7 @@ do, for example channels_ and asgiref_.
 .. _channels: https://github.com/django/channels
 .. _asgiref: https://github.com/django/asgiref
 
-ALl code Django generates will also be Black-formatted
+All code Django generates will also be Black-formatted
 (``startproject``, migrations, ``inspectdb``, etc.), at least if the user has
 Black installed.
 

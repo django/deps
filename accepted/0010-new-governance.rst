@@ -38,6 +38,10 @@ individuals who have previously made significant contributions to
 Django. A Django Core Developer will not have any type of automatic
 governance, oversight, or code-committing privileges.
 
+In addition, a Triage & Review Team will be created to recognize active
+contributors, and allow additional privileges when assisting on pull request
+reviews.
+
 
 How will code get added to Django?
 ----------------------------------
@@ -243,6 +247,8 @@ The following new roles are added:
 
 * Releaser
 
+* Triage & Review Team
+
 The following roles are repurposed:
 
 * Django Core Developer
@@ -298,6 +304,36 @@ Releasers, SHALL have that permission revoked.
 It SHALL NOT be a requirement that a Releaser also be a Django Fellow,
 but the Django Software Foundation SHALL have the power to use funding
 of Fellow positions as a way to make the role of Releaser sustainable.
+
+New role: Triage & Review Team
+------------------------------
+
+The Triage & Review Team allows current, regular contributors additional
+permissions on GitHub, in order to assist with the processing of pull requests.
+
+The objective of the team is to help spread work beyond the Mergers and into
+the wider contributor community.
+
+* There will be a GitHub Team with GitHub's Triage Permission to allow
+  members to help manage pull requests directly.
+
+* A pull request approval from a member of the Triage and Review team will be
+  sufficient to allow a Merger to merge a minor change they themselves have
+  proposed.
+
+* Subject to both the Django Code of Conduct, and to Technical Board
+  oversight, the Triage and Review Team will be self-managing.
+
+* Anyone actively engaging in discussions on GitHub and django-developers will
+  be eligible to join the Triage and Review Team. Membership is not meant to be
+  bureaucratic: folks who are active should be invited by a team member or
+  Merger, or quietly mention that they've been overlooked and would like to
+  join if this fails to happen. A simple seconding from an existing member
+  should be enough for approval.
+
+* Team membership will be reviewed with each major release. Members will be
+  asked if they wish to continue. For self-care, those needing a break are
+  advised to take it. Former members will be welcome back in the future.
 
 
 Repurposed role: Technical Board
@@ -359,7 +395,7 @@ demonstrate:
 * A history of participation in Django's development outside of
   contributions merged to the <https://github.com/django/django/>
   repository. This may include, but is not restricted to:
-  
+
   * Participation in discussions on the django-developers mailing list
     or Django Forum.
 
@@ -461,10 +497,11 @@ as bumping version numbers or adding stub release notes, without seeking
 approval from other Releasers or Mergers.
 
 Any Merger MAY, on their own initiative, merge any pull request which
-constitutes a Minor Change, with one exception: a Merger MUST NOT
-merge a Minor Change primarily authored by that Merger, unless the
-pull request has been approved by another Merger, by a Technical
-Board member, or by the Django Security Team.
+constitutes a Minor Change, with one exception: a Merger MUST NOT merge
+a Minor Change primarily authored by that Merger, unless the pull
+request has been approved by another Merger, by a Technical Board
+member, by a member of the Triage & Review Team, or by the Django Security
+Team.
 
 Any Merger MAY initiate discussion of a Minor Change in the
 appropriate venue, and request that other Mergers refrain from merging

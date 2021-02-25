@@ -179,7 +179,7 @@ changes made to Django's codebase:
 * "Minor Change" means fixing a bug in, or adding a new feature to,
   Django of a scope small enough not to require the use of `the DEP
   process
-  <https://github.com/django/deps/blob/master/final/0001-dep-process.rst>`_.
+  <https://github.com/django/deps/blob/main/final/0001-dep-process.rst>`_.
 
 * "Major Change" means any change to Django's codebase of scope
   significant enough to require the use of the DEP process.

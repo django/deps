@@ -34,7 +34,7 @@ Membership
 The team shall not have a fixed size, but instead will grow and shrink
 organically as members choose to leave, and when new members are deemed to be
 required by the rest of the team. Membership of the team works similarly to the
-`Code of Conduct Committee <https://github.com/django/code-of-conduct/blob/master/membership.md>`_.
+`Code of Conduct Committee <https://github.com/django/code-of-conduct/blob/main/membership.md>`_.
 New members shall be chosen from a list of volunteers, or if there is a lack
 of volunteers, an advertisement will be published on the Django website.
 Priority will be given to volunteers who, in no particular order:

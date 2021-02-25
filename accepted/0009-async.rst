@@ -103,7 +103,7 @@ There will be full backwards compatibility. A standard Django 2.2 project
 should load and run in async Django (be that 3.0 or 3.1) with no changes.
 
 This proposal is designed to be done in small, iterative parts and landed to
-Django's ``master`` branch progressively to avoid the problems of a long-running
+Django's ``main`` branch progressively to avoid the problems of a long-running
 fork, and to allow us to change course as we discover issues.
 
 This is a good opportunity to bring on new contributors. We should fund the
@@ -671,7 +671,7 @@ core pieces of work that need to be done first - having async views be possible,
 and enabling async tests.
 
 Once both these are complete, we can then work on all the other features in
-parallel, and release them into Django's ``master`` branch and thus into a
+parallel, and release them into Django's ``main`` branch and thus into a
 date-based release when they are ready. Even within some features, like the ORM,
 we can allow for basic operations to be async-native at first, release that,
 and then build the rest with feedback from our users.
@@ -862,7 +862,7 @@ implementation that this DEP will hopefully answer.
 There are several ways to approach the async question, but ultimately this one
 has been influenced by several key goals:
 
-* Iterative: This approach allows for regular commits back to the master branch,
+* Iterative: This approach allows for regular commits back to the main branch,
   and the ability to release async abilities into Django's fixed releases
   as and when they are ready.
 
@@ -898,7 +898,7 @@ is abandoned (because of contributors being unavailable, a changing Python
 ecosystem, or other reasons). The iterative design means that in this case,
 Django is unlikely to end up in a bad state; there might be a few merged changes
 that should be reverted, but the intention is to keep Django's policy of the
-``master`` branch always being shippable to reduce the impact of such an event.
+``main`` branch always being shippable to reduce the impact of such an event.
 
 Besides, even if we just get asynchronous views working and none of the rest of
 Django (no ORM, no templates, etc.), this will still be a successful project;

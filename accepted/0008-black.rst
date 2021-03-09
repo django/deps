@@ -277,12 +277,12 @@ integrate with IDEs.
 
 Reformatting will also be disruptive for open pull requests. One way to update
 them is to run Black on modified files, keep a copy aside, start a new branch
-from master, move the modified files back into place, and commit the result.
+from "main", move the modified files back into place, and commit the result.
 
 In order to minimize the effort for backporting patches, Black will be applied
-to the master and stable/2.2.x branches, which are in their mainstream support
-period. 2.2 is an LTS release that will be supported for three more years;
-this is a good reason for formatting it. Black will not be applied to
+to the main branch and stable/2.2.x branches, which are in their mainstream
+support period. 2.2 is an LTS release that will be supported for three more
+years; this is a good reason for formatting it. Black will not be applied to
 stable/2.1.x and stable/1.11.x which are in the extended support period and
 only get fixes for security and data loss bugs.
 

@@ -4,12 +4,12 @@ DEP 0008: Formatting Code with Black
 
 :DEP: 0008
 :Author: Aymeric Augustin
-:Implementation Team: Aymeric Augustin, Carlton Gibson, Florian Apolloner, Herman Schistad, Markus Holtermann
+:Implementation Team: Aymeric Augustin, Carlton Gibson, Florian Apolloner, Herman Schistad, Markus Holtermann, Mariusz Felisiak
 :Shepherd: Andrew Godwin
-:Status: Accepted
+:Status: Final
 :Type: Process
 :Created: 2019-04-27
-:Last-Modified: 2019-05-10
+:Last-Modified: 2021-02-11
 
 .. contents:: Table of Contents
    :depth: 3

@@ -215,7 +215,7 @@ releases of Django:
   direction of Django is any member of that venue whose participation
   privileges have not been revoked, either by moderators of that
   venue, by the operator of the venue if operated by a third-party
-  service or administrator, or by the Code of Coduct committee of the
+  service or administrator, or by the Code of Conduct committee of the
   DSF.
 
 Specification
@@ -362,7 +362,7 @@ The powers of the Technical Board are:
   process.
 
 * To remove Mergers and/or Releasers, when deemed appropriate, using
-  the proceesses desribed in this document.
+  the processes described in this document.
 
 * To participate in the removal of members of the Technical Board,
   when deemed appropriate, using the processes described in this
@@ -567,7 +567,7 @@ code.djangoproject.com bug tracker and/or the django-developers list
 or the Django Forum to make their proposal, and discussion SHALL occur
 in those venues, or in such other venue as the Technical Board may
 direct, provided that the venue of discussion is generally open to
-interested memebrs of the public.
+interested members of the public.
 
 For features which qualify as a Major Change, proposers SHALL use the
 DEP process, with discussion taking place on the django-developers
@@ -659,7 +659,7 @@ following process:
 
 7. If a voting period ends and not all members of the Technical Board
    have voted, the vote SHALL be deemed incomplete if either: a
-   majority of the memebers of the Technical Board have not voted; or
+   majority of the members of the Technical Board have not voted; or
    a majority have voted, but the current score of the proposal is -1,
    0, 2, or 3 (that is, the score is such that a single additional
    vote could change its outcome). When a voting period ends and the
@@ -1176,7 +1176,7 @@ This section is informative.
 Dissolving or reorganizing Django core is a recurring issue within
 Django core, the broader community of Django developers, and the
 DSF. In particular, there seems to be a consensus to remove the
-perceived bump in governance status asociated with membership in
+perceived bump in governance status associated with membership in
 Django core, especially as many people who could claim this membership
 are no longer active in contributing to or shepherding the development
 of Django. This DEP attempts to act on that consensus by providing a

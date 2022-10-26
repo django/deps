@@ -89,14 +89,14 @@ active, but it is apparent that to do this we must staff it more sustainably.
 
 As such, this DEP does two things:
 
- * Makes the Board's role more clear by renaming it (Steering Council implies
-   the job of "working out what features and direction to go" more than
-   Technical Board does) and by specifically adding language highlighting the
-   more active role expected of its members.
+* Makes the Board's role more clear by renaming it (Steering Council implies
+  the job of "working out what features and direction to go" more than
+  Technical Board does) and by specifically adding language highlighting the
+  more active role expected of its members.
 
- * Increases the number of people eligible for candidacy on the Council in
-   order for us to sustainably staff it for the foreseeable future, while not
-   making the rules so loose that they risk hostile or populist takeovers.
+* Increases the number of people eligible for candidacy on the Council in
+  order for us to sustainably staff it for the foreseeable future, while not
+  making the rules so loose that they risk hostile or populist takeovers.
 
 It refrains from making any further changes under the belief that good progress
 is incremental - take a model, refine it slightly, and then if we continue to

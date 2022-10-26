@@ -53,7 +53,7 @@ will be replaced with requiring both of the following:
 * A history of recent engagement with the direction and future of
   Django. Such engagement must have occurred within a period of no
   more than two years prior to the individual's candidacy for the
-  Technical Board.
+  Steering Council.
 
 Additionally, the following section is added to the definition of
 the Steering Council to make its role clearer:

@@ -62,7 +62,7 @@ the Steering Council to make its role clearer:
   Django projects at a fundamental level, and to help shepherd the project's
   future direction.
 
-  While the Council should not to define this direction entirely by itself,
+  While the Council should not define this direction entirely by itself,
   it should be the catalyst within the community for doing so - as such, it is
   expected for Council members to actively participate in engaging with the
   community, canvassing for ideas about big new features or directions to take
@@ -85,7 +85,7 @@ projects in a variety of languages, and indeed to non-profits at large, this
 appears to be a wider trend.
 
 In order to get closer to the initial intention, we want to make the Board more
-active, but it is apparent that to do this we must staff it more sustainably.
+active, but it is apparent that, to do this, we must staff it more sustainably.
 
 As such, this DEP does two things:
 
@@ -96,7 +96,7 @@ As such, this DEP does two things:
 
 * Increases the number of people eligible for candidacy on the Council in
   order for us to sustainably staff it for the foreseeable future, while not
-  making the rules so loose that they risk hostile or populist takeovers.
+  making the rules so loose that it risks hostile or populist takeovers.
 
 It refrains from making any further changes under the belief that good progress
 is incremental - take a model, refine it slightly, and then if we continue to
@@ -108,14 +108,14 @@ belief that further changes may be necessary.
 Rationale
 =========
 
-While we could try and redo our governance process far more drastically, I
-believe that the model outlined in DEP 10 is fundamentally sound and merely
+While we could try and redo our governance process far more drastically, the
+author believes that the model outlined in DEP 10 is fundamentally sound and merely
 needs a few tweaks as the demographics of who is willing to step up and help
 steer Django has changed over the years.
 
-We also could do nothing, but I think that would be foolish in the face of the
+We also could do nothing, but the author thinks that would be foolish in the face of the
 current approach (which is not what was outlined in DEP 10 anyway) not working.
-Change is needed, and I believe this is the right line between iterative
+Change is needed, and the author believes this is the right line between iterative
 changes and overhaul.
 
 

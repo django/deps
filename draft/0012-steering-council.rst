@@ -5,7 +5,7 @@ DEP 0012: The Steering Council
 :DEP: 0012
 :Author: Andrew Godwin
 :Implementation Team: Andrew Godwin
-:Shepherd: TBD
+:Shepherd: Carlton Gibson
 :Status: Draft
 :Type: Process
 :Created: 2022-10-26

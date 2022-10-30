@@ -50,10 +50,10 @@ will be replaced with requiring both of the following:
 
   * Running Django-related events or user groups
 
-* A history of recent engagement with the direction and future of
-  Django. Such engagement must have occurred within a period of no
-  more than two years prior to the individual's candidacy for the
-  Steering Council.
+* A history of engagement with the direction and future of Django.
+  This does not need to be recent, but candidates who have not engaged in the
+  past three years must still demonstrate an understanding of Django's changes
+  and direction within those three years.
 
 Additionally, the following section is added to the definition of
 the Steering Council to make its role clearer:

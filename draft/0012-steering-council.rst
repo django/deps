@@ -19,7 +19,7 @@ DEP 0012: The Steering Council
 Abstract
 ========
 
-The Technical Board, as defined in DEP 10, will be renamed to the Steering
+The Technical Board, as defined in `DEP 10 <https://github.com/django/deps/blob/main/accepted/0010-new-governance.rst>`_, will be renamed to the Steering
 Council, the eligibility requirements for becoming a candidate will be
 revised, and a renewed focus will be placed on inviting feature changes.
 
@@ -96,7 +96,7 @@ As such, this DEP does two things:
 
 * Increases the number of people eligible for candidacy on the Council in
   order for us to sustainably staff it for the foreseeable future, while not
-  making the rules so loose that it risks hostile or populist takeovers.
+  making the rules so loose that it risks hostile takeovers.
 
 It refrains from making any further changes under the belief that good progress
 is incremental - take a model, refine it slightly, and then if we continue to

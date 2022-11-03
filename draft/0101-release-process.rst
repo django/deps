@@ -166,7 +166,8 @@ DEP 10 into line with the established release process.
 Reference Implementation
 ========================
 
-A pull request to DEP 10 will be added here shortly.
+A pull request with suggested changes is available for review at
+`django/deps#77 <https://github.com/django/deps/pull/77>`_.
 
 Copyright
 =========

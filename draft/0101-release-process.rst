@@ -48,8 +48,8 @@ have a pre-release phase, which has one alpha release, one beta, and one
 release candidate.
 
 * The release candidate comes two weeks before the final release.
-* The beta comes one month before the release candidate.
-* The alpha comes one month before the beta.
+* The beta comes four weeks before the release candidate.
+* The alpha comes five weeks before the beta.
 
 The exact day is left to the Releaser's discretion.
 
@@ -60,7 +60,7 @@ The exact day is left to the Releaser's discretion.
     Factors that are considered when setting the exact release day include:
     being as close to the 1st of the month as possible, releaser availability,
     avoiding Fridays and weekends, avoiding days such as April 1st, and the
-    largest international public holidays, such as New Years day.
+    largest international public holidays, such as New Year's Day.
 
     In general, other public holidays cannot be considered as there are too
     many internationally. Historically, though, releasers have tried to avoid
@@ -86,7 +86,8 @@ of the release schedule. Historical examples include a security release made
 quickly due to a high severity vulnerability being made public, and an ad hoc
 release made to correct a packaging error.
 
-As per DEP 4, release may be held back if there are unresolved release blockers.
+As per DEP 4, non-security releases may be held back if there are unresolved
+release blockers.
 
 In their role as oversight, with the exception of security releases, the
 Technical Board may vote to delay a release if they believe there is reason to
@@ -138,19 +139,19 @@ On specific points of the original DEP 10 phrasing on the release process:
   above. There is no determination needed, and so the requirement for the
   technical board to do so introduces artificial busy-work.
 * Whilst the technical board can raise a flag if necessary, in the normal case,
-  releases procede automatically, on-schedule, unless there is a specific
+  releases proceed automatically, on-schedule, unless there is a specific
   reason, such as an open release blocker, for them not to. The introduction of
   the requirement for an approval vote before release introduces a risk of a
   release not occurring for a procedural failing if a vote, under DEP10's quite
   strict voting procedures, is not successfully held.
 * Releasing a major version of Django is an extremely stressful activity. It
-  already has many moving parts. It takes the full effort of the Releaser
+  already has many moving parts. It takes the full effort of the release manager
   on-hand, likely with assistance from other Releasers, to do everything
   correctly. Adding the requirement to ensure that a technical board vote is
   held, when this is in-truth merely rubber-stamping the release, is an
   unnecessary extra burden.
 
-In a utopian world where technical board members had the time and capacity to
+In a perfect world where technical board members had the time and capacity to
 be more directly involved in the day-to-day development of Django, these last
 two points concerning the vote-to-release flow would perhaps be minimised.
 That's not our world, however. Even if it were though, the correct procedure is

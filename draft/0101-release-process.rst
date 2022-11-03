@@ -23,8 +23,8 @@ pertain to Django's release process, to bring it into line with the established
 time-based release process that Django has been following since DEP 4 in 2015.
 
 The wording in DEP 10 is in conflict with the actual release process, for which
-it was not part of DEP 10's to adjust. Correcting the wording of DEP 10 to
-bring it into line with the actual release policy resolves the conflict.
+it was not part of DEP 10's intent to adjust. Correcting the wording of DEP 10
+to bring it into line with the actual release policy resolves the conflict.
 
 Specification
 =============

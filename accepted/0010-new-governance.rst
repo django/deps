@@ -540,7 +540,7 @@ release candidate.
 The exact day is left to the Releaser's discretion.
 
 No later than one week after the release of each Feature Release of Django, the
-Release acting as release manager for the following Feature Release SHALL
+Releaser acting as release manager for the following Feature Release SHALL
 determine and publish a schedule for the following Feature Release.
 
 As per `DEP 4`_, Bugfix and Security Releases for each supported Feature Release

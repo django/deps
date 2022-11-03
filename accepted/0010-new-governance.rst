@@ -533,9 +533,9 @@ release candidate.
 
 * The release candidate comes two weeks before the final release.
 
-* The beta comes one month before the release candidate.
+* The beta comes four weeks before the release candidate.
 
-* The alpha comes one month before the beta.
+* The alpha comes five weeks before the beta.
 
 The exact day is left to the Releaser's discretion.
 
@@ -573,8 +573,8 @@ The following additional points apply:
    feels such release(s) are or were inappropriate, the Technical
    Board may take action after the release(s).
 
-3. In exceptional circumstances,  and in accordance with the Technical Board, a
-   Releaser may issue a unscheduled release. (Historical examples include a
+3. In exceptional circumstances, and in accordance with the Technical Board, a
+   Releaser may issue an unscheduled release. (Historical examples include a
    release to fix a packaging error.)
 
 

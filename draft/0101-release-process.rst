@@ -77,7 +77,7 @@ As a matter of course regular contributors, including technical board members,
 but not as a matter of obligation, review the proposed schedule in order to
 spot any errors.
 
-Within this, bugfix and security releases occur at the beginning on each month
+Within this, bugfix and security releases occur at the beginning of each month
 for each stable version with applied changes to be released during its
 supported lifetime.
 

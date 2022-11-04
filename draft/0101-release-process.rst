@@ -122,7 +122,7 @@ of updates.
 Any change to Django's release process would require a full DEP of its own and
 it was not part of DEP 10's scope to address this.
 
-DEP 10 concerned the dissolving of the old Django Core, the establishment or
+DEP 10 concerned the dissolving of the old Django Core, the establishment of
 the Technical Board, and voting around that, together with Merger, Releaser and
 other related roles. Adjusting the release process was not mentioned in the
 motivation or rationale for DEP 10, and it claims no relevant backwards

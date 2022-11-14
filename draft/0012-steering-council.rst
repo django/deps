@@ -101,7 +101,7 @@ appears to be a wider trend.
 In order to get closer to the initial intention, we want to make the Board more
 active, but it is apparent that, to do this, we must staff it more sustainably.
 
-As such, this DEP does two things:
+As such, this DEP does three things:
 
 * Makes the Board's role more clear by renaming it (Steering Council implies
   the job of "working out what features and direction to go" more than
@@ -111,6 +111,10 @@ As such, this DEP does two things:
 * Increases the number of people eligible for candidacy on the Council in
   order for us to sustainably staff it for the foreseeable future, while not
   making the rules so loose that it risks hostile takeovers.
+
+* Adds a mechanism to actively disband the Council if they do not perform their
+  duties, to prevent the failure mode being a whole major release cycle of
+  inaction.
 
 It refrains from making any further changes under the belief that good progress
 is incremental - take a model, refine it slightly, and then if we continue to

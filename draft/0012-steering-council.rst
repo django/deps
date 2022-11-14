@@ -56,18 +56,32 @@ will be replaced with requiring both of the following:
   and direction within those three years.
 
 Additionally, the following section is added to the definition of
-the Steering Council to make its role clearer:
+the Steering Council to make its role clearer and to establish a mechanism to
+re-elect it in case of inaction:
 
   The Council's goal is twofold - to safeguard big decisions that affect
   Django projects at a fundamental level, and to help shepherd the project's
   future direction.
 
-  While the Council should not define this direction entirely by itself,
+  While the Council SHOULD NOT define this direction entirely by itself,
   it should be the catalyst within the community for doing so - as such, it is
   expected for Council members to actively participate in engaging with the
   community, canvassing for ideas about big new features or directions to take
   the framework, and reporting back to the community and the DSF Board on these
   ideas and if the Council believes they should be followed.
+
+  Any Django Software Foundation individual member may make a public statement
+  of no-confidence in the Steering Council by identifying a material breach of
+  their duties as defined in DEP 10 and DEP 12. Upon seconding by another
+  individual member of the DSF the DSF Board SHALL no later than the next
+  scheduled board meeting evaluate the merits of the statement of
+  no-confidence.
+
+  If the statement is found to be accurate and correct the Board shall inform
+  the Steering Council of the breach and provide 2 weeks to rectify said
+  breach. If the Steering Council fails to rectify the breach in the time
+  allotted, a new Steering Council election SHALL be triggered. Current members
+  of the Steering Council are permitted to run in the new election.
 
 
 Motivation

@@ -2,7 +2,7 @@
 DEP 0044: Clarify Release Process
 =================================
 
-:DEP: 0041
+:DEP: 0044
 :Author: Carlton Gibson
 :Implementation Team: Carlton Gibson
 :Shepherd: Mariusz Felisiak

@@ -63,12 +63,13 @@ Who decides when Django gets released?
 
 Django's bugfix releases already follow a consistent schedule, and
 feature releases (and their alpha/beta/candidate packages) have target
-dates scheduled in advance. This will continue, with Releasers
-following a schedule approved by the Technical Board; there will be
-consultation on release blockers and the Technical Board will have the
-power to change the schedule or delay a release as needed. The Django
-Security Team will also have the ability to authorize off-schedule
-releases as needed to fix critical security issues.
+dates scheduled in advance, as per the time-based release schedule defined in
+`DEP 44`_.
+
+This will continue. There will continue to be consultation on release blockers
+and the Technical Board will have the power to change the schedule or delay a
+release as needed. The Django Security Team will also have the ability to
+authorize off-schedule releases as needed to fix critical security issues.
 
 
 Who decides the technical direction of Django?
@@ -81,7 +82,7 @@ achieving consensus on the change. The Technical Board will have the
 power to veto individual changes or proposals.
 
 The Technical Board will also periodically request proposals for new
-features/ideas for upcoming release of Django, and maintain an archive
+features/ideas for upcoming releases of Django, and maintain an archive
 of them.
 
 
@@ -522,12 +523,10 @@ Merger, without further consultation with the Technical Board.
 How Django is released
 ----------------------
 
-No later than one week after the release of each Feature Release of
-Django, the Technical Board SHALL determine and publish a schedule for
-the following Feature Release. Bugfix Releases for each supported
-Feature Release SHALL be scheduled to occur on a monthly basis.
+Django follows the time-based release schedule, as outlined in `DEP 44`_.
 
-Releases of Django will occur as follows:
+The following points apply specifically to the oversight role of the Technical
+Board:
 
 1. When the scheduled date of a Feature Release, of an
    alpha/beta/candidate package for a Feature Release, or of a Bugfix
@@ -575,15 +574,11 @@ mailing list, the Django Forum, or in such other venue as the
 Technical Board may direct, provided that the venue of discussion is
 generally open to interested members of the public.
 
-No later than one week after the feature freeze of an upcoming Feature
-Release of Django, the Technical Board SHALL issue a public call, on
-the django-developers mailing list and the Django Forum, for proposals
-of features to be implemented in the next Feature Release following
-the one which has just undergone feature freeze. The Technical Board
-SHALL ensure that such proposals are archived in a venue generally
-open to interested members of the public. The Technical Board also MAY
-issue such a call for proposals more frequently if the Technical Board
-so chooses.
+In order to provide focus for development efforts, the Technical Board SHALL
+periodically issue a public call, on the django-developers mailing list and the
+Django Forum, for proposals of features to be implemented in the future Feature
+Releases. The Technical Board SHALL ensure that such proposals are archived in
+a venue generally open to interested members of the public.
 
 The Technical Board SHALL have the right to veto, via its voting
 process, any proposed change to Django.
@@ -1202,3 +1197,5 @@ This document has been placed in the public domain per the Creative Commons
 CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
 
 (All DEPs must include this exact copyright statement.)
+
+.. _DEP 44: https://github.com/django/deps/blob/main/accepted/0044-clarify-release-process.rst

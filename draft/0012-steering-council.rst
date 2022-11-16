@@ -81,7 +81,7 @@ re-elect it in case of inaction:
   the Steering Council of the breach and provide 2 weeks to rectify said
   breach. If the Steering Council fails to rectify the breach in the time
   allotted, a new Steering Council election SHALL be triggered. Current members
-  of the Steering Council are permitted to run in the new election.
+  of the Steering Council MAY run in the new election.
 
 
 Motivation

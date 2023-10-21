@@ -6,15 +6,24 @@ DEP 0012: The Steering Council
 :Author: Andrew Godwin
 :Implementation Team: Andrew Godwin
 :Shepherd: Carlton Gibson
-:Status: Accepted
+:Status: Final
 :Type: Process
 :Created: 2022-10-26
-:Last-Modified: 2022-12-03
+:Last-Modified: 2023-10-21
 
 .. contents:: Table of Contents
    :depth: 3
    :local:
 
+.. note::
+
+    This is a historical document, describing the changes from the Technical
+    Board stucture described in `DEP 10`_ to a Steering Council. See Django's
+    documentation for `operational documentation of the Steering Council and how
+    it works`_.
+
+.. _DEP 10: https://github.com/django/deps/blob/main/final/0010-new-governance.rst
+.. _operational documentation of the Steering Council and how it works: https://docs.djangoproject.com/en/dev/internals/organization/#steering-council
 
 Abstract
 ========

@@ -65,7 +65,7 @@ So, you'd like to submit a DEP? Here's how it works, and what to expect.
 There are several reference in this DEP to the **Steering Council** This
 refers to Django's `Steering Council
 <https://docs.djangoproject.com/en/dev/internals/organization/#steering-council>`_,
-the group of experienced and active committers who steer technical choices.
+the group of experienced and active contributors who steer technical choices.
 Django's documentation lists `the current Steering Council membership
 <https://www.djangoproject.com/foundation/teams/#steering-council-team>`_.
 
@@ -165,20 +165,20 @@ Submitting the draft
 --------------------
 
 Once the idea's been vetted and the roles are filled, a draft DEP should be
-presented to django-developers. This gives the author a chance to flesh out the
-draft DEP to make sure it's properly formatted, of high quality, and to address
-initial concerns about the proposal.
+presented to django-developers and/or the Django Forum. This gives the author a
+chance to flesh out the draft DEP to make sure it's properly formatted, of high
+quality, and to address initial concerns about the proposal.
 
-Following the discussion on django-developers, the proposal should be sent as a
-GitHub pull request to the `django/deps <https://github.com/django/deps>`_ repo.
-This PR should add a DEP to the ``drafts/`` directory, written in the style
-described below. The draft must be written in DEP style; if it isn't the pull
-request may be rejected until proper formatting rules are followed.
+Following the discussion, the proposal should be sent as a GitHub pull request
+to the `django/deps <https://github.com/django/deps>`_ repo. This PR should add
+a DEP to the ``drafts/`` directory, written in the style described below. The
+draft must be written in DEP style; if it isn't the pull request may be rejected
+until proper formatting rules are followed.
 
 At this point, developers review the pull request. In most cases the reviewer
 will be the Shepherd of the DEP, but if that's not possible for some reason the
-author may want to ask on django-developers to ensure that this review happens
-quickly. A reviewer will do the following:
+author may want to ask on django-developers and/or the Django Forum to ensure
+that this review happens quickly. A reviewer will do the following:
 
 * Read the DEP to check if it is ready: sound and complete.  The ideas
   must make technical sense, even if they don't seem likely to be

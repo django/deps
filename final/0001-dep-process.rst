@@ -140,14 +140,14 @@ Implementation Team
 
 Shepherd
     If a DEP is being written by someone relatively new to the Django community,
-    they may want **Shepherd** -- a mentor, essentially -- to help. The Shepherd
+    they may want a **Shepherd** -- a mentor, essentially -- to help. The Shepherd
     can be someone with a long history of contributing to Django, who can help
     the Author assess the fitness of their proposal and help make sure it gets
     accepted. The primary job of the Shepherd will be to review the DEP in an
     editorial role, and help guide the Author through the DEP process. 
     
     The Shepherd may be a `Merger`_, and if so the Shepherd will be the one who
-    actually merges the code into the project. Or, the Sheperd may be a
+    actually merges the code into the project. Or, the Shepherd may be a
     member of the Steering Council, which can help streamline discussion.
 
     DEPs don't necessarily require a Shepherd, but it's a good idea, especially
@@ -175,7 +175,7 @@ a DEP to the ``drafts/`` directory, written in the style described below. The
 draft must be written in DEP style; if it isn't the pull request may be rejected
 until proper formatting rules are followed.
 
-At this point, developers review the pull request. In most cases the reviewer
+At this point, contributors review the pull request. In most cases the reviewer
 will be the Shepherd of the DEP, but if that's not possible for some reason the
 author may want to ask on django-developers and/or the Django Forum to ensure
 that this review happens quickly. A reviewer will do the following:

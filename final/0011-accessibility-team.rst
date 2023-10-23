@@ -4,12 +4,12 @@ DEP 11: Accessibility Team
 
 :DEP: 11
 :Author: Tom Carrick
-:Implementation Team: Tom Carrick, Thibaud Colas, others to be determined.
+:Implementation Team: Tom Carrick, Thibaud Colas, Sarah Abderemane, others to be determined.
 :Shepherd: Carlton Gibson
-:Status: Accepted
+:Status: Final
 :Type: Process
 :Created: 2020-06-29
-:Last-Modified: 2021-02-10
+:Last-Modified: 2023-10-23
 
 .. contents:: Table of Contents
   :depth: 3

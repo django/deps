@@ -165,7 +165,7 @@ Submitting the draft
 --------------------
 
 Once the idea's been vetted and the roles are filled, a draft DEP should be
-presented to django-developers and/or the Django Forum. This gives the author a
+presented to the Django Forum and/or django-developers. This gives the author a
 chance to flesh out the draft DEP to make sure it's properly formatted, of high
 quality, and to address initial concerns about the proposal.
 

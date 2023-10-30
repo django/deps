@@ -62,7 +62,7 @@ DEP submission workflow
 
 So, you'd like to submit a DEP? Here's how it works, and what to expect.
 
-There are several reference in this DEP to the **Steering Council** This
+There are several references in this DEP to the **Steering Council**. This
 refers to Django's `Steering Council
 <https://docs.djangoproject.com/en/dev/internals/organization/#steering-council>`_,
 the group of experienced and active contributors who steer technical choices.
@@ -140,7 +140,7 @@ Implementation Team
 
 Shepherd
     If a DEP is being written by someone relatively new to the Django community,
-    they may want a **Shepherd** -- a mentor, essentially -- to help. The Shepherd
+    they will likely need a **Shepherd** -- a mentor, essentially -- to help. The Shepherd
     can be someone with a long history of contributing to Django, who can help
     the Author assess the fitness of their proposal and help make sure it gets
     accepted. The primary job of the Shepherd will be to review the DEP in an
@@ -172,10 +172,10 @@ quality, and to address initial concerns about the proposal.
 Following the discussion, the proposal should be sent as a GitHub pull request
 to the `django/deps <https://github.com/django/deps>`_ repo. This PR should add
 a DEP to the ``drafts/`` directory, written in the style described below. The
-draft must be written in DEP style; if it isn't the pull request may be rejected
+draft must be written in DEP style; if it isn't, the pull request may be rejected
 until proper formatting rules are followed.
 
-At this point, contributors review the pull request. In most cases the reviewer
+At this point, contributors will review the pull request. In most cases the reviewer
 will be the Shepherd of the DEP, but if that's not possible for some reason the
 author may want to ask on django-developers and/or the Django Forum to ensure
 that this review happens quickly. A reviewer will do the following:
@@ -247,10 +247,10 @@ Steering Council for review and pronouncement. The final authority for deciding
 on a DEP rests with the Steering Council. They may choose to rule on a DEP as a
 team, or they may designate one or more members to review and decide.
 
-Having the shepherd (i.e. an experienced contributor) rather than the author ask
+Having the Shepherd (i.e. an experienced contributor) rather than the Author ask
 helps ensure that the DEP meets the basic technical bar before it's called for
 review. It also provides a fairly strong fitness test before the Steering
-Council is asked to rule on it, making rulings fairly easy. If the shepherd is
+Council is asked to rule on it, making rulings fairly easy. If the Shepherd is
 happy, the Steering Council will likely be as well.
 
 For a DEP to be accepted it must meet certain minimum criteria.  It must be a
@@ -264,8 +264,8 @@ rejects a DEP for lack of "fit" they should provide a clear explanation for why.
 At this point, the DEP will be considered "Accepted" and moved to the
 ``accepted`` directory in the DEPs repo.
 
-A DEP can also be "Withdrawn".  The DEP author or maintainer of the DEPs repo
-can assign the DEP this status when the author is no longer interested in the
+A DEP can also be "Withdrawn".  The DEP Author or maintainer of the DEPs repo
+can assign the DEP this status when the Author is no longer interested in the
 DEP, or if no progress is being made on the DEP.  Once a DEP is withdrawn, it's
 moved to the ``withdrawn`` directory for reference. Later, another author may
 resurrect the DEP by opening a pull request, updating (at least) the author, and

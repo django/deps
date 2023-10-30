@@ -223,7 +223,7 @@ of feedback and updates.
 Updates to a DEP can be submitted as pull requests; once again, someone with
 merge access to the DEP repo will merge those pull requests (typically they
 don't require much if any review). In cases where the Author has commit access
-(fairly common), the Author should just update the draft DEP directly.
+the Author should just update the draft DEP directly.
 
 Feature DEPs generally consist of two parts, a design document and a
 reference implementation.  It is generally recommended that at least a

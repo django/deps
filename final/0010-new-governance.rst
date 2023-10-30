@@ -6,15 +6,24 @@ DEP 0010: New governance for the Django project
 :Author: James Bennett
 :Implementation Team: James Bennett, others to be determined
 :Shepherd: Aymeric Augustin
-:Status: Accepted
+:Status: Final
 :Type: Process
 :Created: 2018-09-22
-:Last-Modified: 2021-06-01
+:Last-Modified: 2023-10-21
 
 .. contents:: Table of Contents
    :depth: 3
    :local:
 
+.. note::
+
+    This is a historical document, describing the changes from Django's BDFL
+    structure to its Technical Board leadership, later updated by `DEP 12`_ to
+    the Steering Council. See Django's documentation for `operational documentation
+    of the Steering Council and how it works`_.
+
+.. _DEP 12: https://github.com/django/deps/blob/main/final/0012-steering-council.rst
+.. _operational documentation of the Steering Council and how it works: https://docs.djangoproject.com/en/dev/internals/organization/#steering-council
 
 Abstract
 ========

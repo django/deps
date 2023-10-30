@@ -7,7 +7,7 @@ DEP 1: DEP Purpose and Guidelines
 :Status: Final
 :Type: Process
 :Created: 2014-04-14
-:Last-Modified: 2014-11-15 
+:Last-Modified: 2023-10-21 
 
 .. contents:: Table of Contents
    :depth: 3
@@ -62,23 +62,12 @@ DEP submission workflow
 
 So, you'd like to submit a DEP? Here's how it works, and what to expect.
 
-There are a couple of terms you should be familiar with before reading the
-rest of this document:
-
-The Technical Board
-    There are several reference in this DEP to the **Technical Board**
-    (sometimes just "the Board"). This refers to Django's `Technical Board
-    <https://docs.djangoproject.com/en/dev/internals/organization/#technical-
-    board>`_, the group of experienced and active committers who steer technical
-    choices. Django's documentation lists `the current Technical Board
-    membership <https://www.djangoproject.com/foundation/teams
-    /#technical-board-team>`_.
-
-Core Developers
-    Similarly, there are several references to **Core Developers** (sometimes
-    "core devs"). This refers to the members of Django's `core team
-    <https://docs.djangoproject.com/en/dev/internals/organization/#core-team>`_,
-    and specifically those with commit access.
+There are several references in this DEP to the **Steering Council**. This
+refers to Django's `Steering Council
+<https://docs.djangoproject.com/en/dev/internals/organization/#steering-council>`_,
+the group of experienced and active contributors who steer technical choices.
+Django's documentation lists `the current Steering Council membership
+<https://www.djangoproject.com/foundation/teams/#steering-council-team>`_.
 
 At a very high level, the DEP submission process looks like this:
 
@@ -94,7 +83,7 @@ At a very high level, the DEP submission process looks like this:
 4. `Discussion, development, and updates`_ — the DEP and reference
    implementation are discussed, improved, and updated as feedback comes in.
 
-5. `Review & Resolution`_ — the DEP is reviewed by the Technical Board and
+5. `Review & Resolution`_ — the DEP is reviewed by the Steering Council and
    either accepted or rejected.
 
 6. `Implementation`_ — the implementation of the proposed feature is completed
@@ -110,10 +99,9 @@ that a single DEP contain a single key proposal or new idea. Small enhancements
 or patches usually don't need a DEP and follow Django's normal `contribution
 process <https://docs.djangoproject.com/en/dev/internals/contributing/>`_.
 
-The more focused the DEP, the more successful it tends to be.  The Core
-Developers reserve the right to reject DEP proposals if they appear too
-unfocused or too broad.  If in doubt, split your DEP into several well-focused
-ones.
+The more focused the DEP, the more successful it tends to be.  The Steering
+Council reserve the right to reject DEP proposals if they appear too unfocused
+or too broad.  If in doubt, split your DEP into several well-focused ones.
 
 The DEP Author (see below for the formal definition of an Author)
 should first attempt to ascertain whether the idea is DEP-able.  Posting to
@@ -151,38 +139,46 @@ Implementation Team
     DEPs generally don't have implementers, and Process DEPs sometimes will.
 
 Shepherd
-    The **Shepherd** is the Core Developer who will be the primary reviewer
-    of the DEP on behalf of the Django team, will be the main point person
-    who will help the Author assess the fitness of their proposal, and
-    is the person who will finally submit the DEP for pronouncement by the
-    Technical Board. When the implementation team doesn't contain someone
-    who can commit to Django, the Shepherd will be the one who actually merges
-    the code into the project. 
+    If a DEP is being written by someone relatively new to the Django community,
+    they will likely need a **Shepherd** -- a mentor, essentially -- to help. The Shepherd
+    can be someone with a long history of contributing to Django, who can help
+    the Author assess the fitness of their proposal and help make sure it gets
+    accepted. The primary job of the Shepherd will be to review the DEP in an
+    editorial role, and help guide the Author through the DEP process. 
+    
+    The Shepherd may be a `Merger`_, and if so the Shepherd will be the one who
+    actually merges the code into the project. Or, the Shepherd may be a
+    member of the Steering Council, which can help streamline discussion.
+
+    DEPs don't necessarily require a Shepherd, but it's a good idea, especially
+    for newer contributors.
+
+.. _merger: https://docs.djangoproject.com/en/dev/internals/organization/#mergers
 
 It's normal for a single person to fulfill multiple roles -- in most cases the
 Author will be an/the Implementer, and it's not uncommon for the implementation
 team to include the Shepherd as well. It's unusual but acceptable for a single
 person to fulfill all roles, though this generally only happens when that person
-is a long-time committer.
+is a long-time contributor.
 
 Submitting the draft
 --------------------
 
 Once the idea's been vetted and the roles are filled, a draft DEP should be
-presented to django-developers. This gives the author a chance to flesh out the
-draft DEP to make sure it's properly formatted, of high quality, and to address
-initial concerns about the proposal.
+presented to the Django Forum and/or django-developers. This gives the author a
+chance to flesh out the draft DEP to make sure it's properly formatted, of high
+quality, and to address initial concerns about the proposal.
 
-Following the discussion on django-developers, the proposal should be sent as a
-GitHub pull request to the `django/deps <https://github.com/django/deps>`_ repo.
-This PR should add a DEP to the ``drafts/`` directory, written in the style
-described below. The draft must be written in DEP style; if it isn't the pull
-request may be rejected until proper formatting rules are followed.
+Following the discussion, the proposal should be sent as a GitHub pull request
+to the `django/deps <https://github.com/django/deps>`_ repo. This PR should add
+a DEP to the ``drafts/`` directory, written in the style described below. The
+draft must be written in DEP style; if it isn't, the pull request may be rejected
+until proper formatting rules are followed.
 
-At this point, a core dev will review the pull request. In most cases the
-reviewer will be the Shepherd of the DEP, but if that's not possible for some
-reason the author may want to ask on django-developers to ensure that this
-review happens quickly. The reviewer will do the following:
+At this point, contributors will review the pull request. In most cases the reviewer
+will be the Shepherd of the DEP, but if that's not possible for some reason the
+author may want to ask on django-developers and/or the Django Forum to ensure
+that this review happens quickly. A reviewer will do the following:
 
 * Read the DEP to check if it is ready: sound and complete.  The ideas
   must make technical sense, even if they don't seem likely to be
@@ -224,10 +220,10 @@ reference implementation, and of course updates to the DEP. It's rare for
 a DEP to be judged on the first draft; far more common is several rounds
 of feedback and updates.
 
-Updates to a DEP can be submitted as pull requests; once again,
-a core developer will merge those pull requests (typically they don't
-require much if any review). In cases where the Author has commit access
-(fairly common), the Author should just update the draft DEP directly.
+Updates to a DEP can be submitted as pull requests; once again, someone with
+merge access to the DEP repo will merge those pull requests (typically they
+don't require much if any review). In cases where the Author has commit access
+the Author should just update the draft DEP directly.
 
 Feature DEPs generally consist of two parts, a design document and a
 reference implementation.  It is generally recommended that at least a
@@ -246,34 +242,34 @@ DEP authors should use their discretion here.
 Review & Resolution
 -------------------
 
-Once the author has completed a DEP, the shepherd will ask the Technical Board
-for review and pronouncement. The final authority for deciding on a DEP rests
-with the Technical Board. They may choose to rule on a DEP as a team, or they
-may designate one or more board members to review and decide.
+Once the author has completed a DEP, the Author or Shepherd will ask the
+Steering Council for review and pronouncement. The final authority for deciding
+on a DEP rests with the Steering Council. They may choose to rule on a DEP as a
+team, or they may designate one or more members to review and decide.
 
-Having the shepherd (i.e. a core dev) rather than the author ask helps ensure
-that the DEP meets the basic technical bar before it's called for review. It
-also provides a fairly strong fitness test before the board is asked to rule on
-it, making board rulings fairly easy. If the core developer shepherd is happy,
-the board will likely be as well.
+Having the Shepherd (i.e. an experienced contributor) rather than the Author ask
+helps ensure that the DEP meets the basic technical bar before it's called for
+review. It also provides a fairly strong fitness test before the Steering
+Council is asked to rule on it, making rulings fairly easy. If the Shepherd is
+happy, the Steering Council will likely be as well.
 
 For a DEP to be accepted it must meet certain minimum criteria.  It must be a
 clear and complete description of the proposed enhancement. The enhancement must
 represent a net improvement. The proposed implementation, if applicable, must be
 solid and must not complicate Django unduly. Finally, a proposed enhancement
 must "fit" with Django's general philosophy and architecture. This last category
-is the most imprecise and takes the most judgment, so if the Board rejects a
-DEP for lack of "fit" they should provide a clear explanation for why.
+is the most imprecise and takes the most judgment, so if the Steering Council
+rejects a DEP for lack of "fit" they should provide a clear explanation for why.
 
 At this point, the DEP will be considered "Accepted" and moved to the
 ``accepted`` directory in the DEPs repo.
 
-A DEP can also be "Withdrawn".  The DEP author or a core developer can assign
-the DEP this status when the author is no longer interested in the DEP, or if no
-progress is being made on the DEP.  Once a DEP is withdrawn, it's moved
-to the ``withdrawn`` directory for reference. Later, another author may
-resurrect the DEP by opening a pull request, updating (at least) the author,
-and moving it back to ``draft``.
+A DEP can also be "Withdrawn".  The DEP Author or maintainer of the DEPs repo
+can assign the DEP this status when the Author is no longer interested in the
+DEP, or if no progress is being made on the DEP.  Once a DEP is withdrawn, it's
+moved to the ``withdrawn`` directory for reference. Later, another author may
+resurrect the DEP by opening a pull request, updating (at least) the author, and
+moving it back to ``draft``.
 
 Finally, a DEP can also be "Rejected".  Perhaps after all is said and done it
 was not a good idea.  It is still important to have a record of this
@@ -290,7 +286,7 @@ Implementation
 Finally, once a DEP has been accepted, the implementation must be completed. In
 many cases some (or all) implementation will actually happen during the DEP
 process: Feature DEPs will often have fairly complete implementations before
-being reviewed by the board. When the implementation is complete and
+being reviewed by the Steering Council. When the implementation is complete and
 incorporated into the main source code repository, the status will be changed to
 "Final" and the DEP moved to the ``final`` directory.
 
@@ -380,7 +376,7 @@ The headers must contain the following fields:
 ``Implementation-Team``
     The person/people who have committed to implementing this DEP
 ``Shepherd``
-    The core developer "on point" for the DEP
+    A more experienced developer to help mentor and guide the DEP forward
 ``Requires``
     If this DEP depends on another DEP being implemented first,
     this should be a link to the required DEP.
@@ -417,7 +413,7 @@ finished DEPs you can submit corrections as GitHub issues or pull requests
 against the DEP repository.
 
 When in doubt about where to send your changes, please check first with the DEP
-author and/or a core developer.
+author and/or the Steering Council.
 
 DEP authors with git push privileges for the DEP repository can update the DEPs
 themselves.
@@ -445,6 +441,15 @@ email within a few weeks, contact django-developers.
 Differences between DEPs and PEPs
 =================================
 
+.. note::
+
+    This section is historical, describing the differences between the DEP and
+    PEP processes when this was originally written in 2014. Since then, the PEP
+    process has changed -- in particular, there's now a Python Steering Council,
+    and a mechanism for delegating authority for each specific PEP. This section
+    hasn't been updated to reflect those changes, nor the changes to the DEP
+    process either.
+
 As stated in the preamble, the DEP process is more or less a direct copy of
 the PEP process (and this document is a modified version of 
 `PEP 1 <https://www.python.org/dev/peps/pep-0001/>`_). 
@@ -469,7 +474,7 @@ Relative to the PEP process, we made the following changes in DEPs:
   - DEPs are "edited" (e.g. pull request approved) by any core developer,
     rather than an explicit "editor" role like the PEP editors.
 
-- DEPs are pronounced upon by the Technical Board, rather than a BDFL (because
+- DEPs are pronounced upon by the Steering Council, rather than a BDFL (because
   Django no longer has BDFLs).
 
 - DEPs explicitly require identifying a few roles (Author, Implementation Team,
@@ -489,6 +494,18 @@ Relative to the PEP process, we made the following changes in DEPs:
 - DEPs have "Feature DEPs" rather than "Standards Track" DEPs.
 
 - DEPs may only be reStructuredText (there is no plain text option).
+
+Revision History
+================
+
+2023-10-23
+    Updates to reflect changes in governance since this document was originally
+    written, including changes from "Technical Board" to "Steering Council",
+    the removal of the no-longer-existant "Core Developer" concept, and updates
+    to reflect the Merger role.
+
+2014-04-14
+    Initial version
 
 Copyright
 =========

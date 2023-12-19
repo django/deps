@@ -56,11 +56,11 @@ through the DEP process.
 Specification
 =============
 
-This section should contain a complete, detailed technical specification should
-describe the syntax and semantics of any new feature.  The specification should
-be detailed enough to allow implementation -- that is, developers other than the
-author should (given the right experience) be able to independently implement
-the feature, given only the DEP.
+This section should contain a complete, detailed technical specification which
+should describe the syntax and semantics of any new feature. The specification
+should be detailed enough to allow implementation -- that is, developers other
+than the author should (given the right experience) be able to independently
+implement the feature, given only the DEP.
 
 Motivation
 ==========

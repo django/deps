@@ -72,6 +72,18 @@ A backend will be a class which extends a Django-defined base class, and provide
          """
          ...
 
+      def get_task(self, task_id: str) -> BaseTask:
+         """
+         Retrieve a task by its id (if one exists)
+         """
+         ...
+
+      async def aget_task(self, task_id: str) -> BaseTask:
+         """
+         Retrieve a task by its id (if one exists)
+         """
+         ...
+
       def close(self) -> None:
          """
          Close any connections opened as part of the constructor
@@ -137,6 +149,7 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
          """
          ...
 
+A ``Task`` is obtained either when scheduling a task function, or by calling ``get_task`` on the backend.
 
 A ``Task`` will cache its values, relying on the user calling ``refresh`` / ``arefresh`` to reload the values from the task store.
 

@@ -247,7 +247,7 @@ But what about *X*?
 
 The most obvious alternative to this DEP would be to standardise on a task implementation and vendor it in to Django. The Django ecosystem is already full of background worker libraries, eg Celery and RQ. Writing a production-ready task runner is a complex and nuanced undertaking, and discarding the work already done is a waste.
 
-This proposal doesn't seek to replace existing tools, nor add yet another option for developers to consider. The primary motivation is creating a shared API contract between worker libaries and developers. It does however provide a simple way to get started, with a solution suitable for most sizes of projects (``DatabaseBackend``).
+This proposal doesn't seek to replace existing tools, nor add yet another option for developers to consider. The primary motivation is creating a shared API contract between worker libaries and developers. It does however provide a simple way to get started, with a solution suitable for most sizes of projects (``DatabaseBackend``). Slowly increasing features, adding more built-in storage backends and a first-party task runner aren't out of the question for the future, but must be done with careful planning and consideration.
 
 Rationale
 =========

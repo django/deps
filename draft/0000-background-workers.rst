@@ -78,7 +78,7 @@ A backend will be a class which extends a Django-defined base class, and provide
          """
          ...
 
-If a backend doesn't support a particular scheduling mode, it simply does not define the method. Convenience methods ``supports_async`` and ``supports_defer`` will be implemented by ``BaseTaskBackend``.
+If a backend doesn't support a particular scheduling mode, it simply does not define the method. Convenience methods ``supports_enqueue`` and ``supports_defer`` will be implemented by ``BaseTaskBackend``. Similarly, ``BaseTaskBackend`` will provide stubs which expose ``enqueue`` and ``defer`` wrapped with ``asgiref.sync_to_async``.
 
 Django will ship with 2 implementations:
 

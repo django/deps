@@ -276,9 +276,9 @@ So that library maintainers can use this integration without concern as to wheth
 Reference Implementation
 ========================
 
-The reference implementation is currently being developed alongside this DEP process. This implementation will serve both as an "early-access" demo to get initial feedback and start using the interface, as the basis for the integration with Django core, but also as a backport for users of supported Django versions prior to this work being released.
+The reference implementation will be developed alongside this DEP process. This implementation will serve both as an "early-access" demo to get initial feedback and start using the interface, as the basis for the integration with Django core, but also as a backport for users of supported Django versions prior to this work being released.
 
-Once code is available, it will be referenced here.
+A more complete implementation picture can be found at https://github.com/RealOrangeOne/django-core-tasks, however it should not be considered final.
 
 Future iterations
 =================

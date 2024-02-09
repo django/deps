@@ -37,8 +37,8 @@ A backend will be a class which extends a Django-defined base class, and provide
    from datetime import datetime
    from typing import Callable, Dict, List
 
-   from django.contrib.tasks import BaseTask
-   from django.contrib.tasks.backends.base import BaseTaskBackend
+   from django.tasks import BaseTask
+   from django.tasks.backends.base import BaseTaskBackend
 
 
    class MyBackend(BaseTaskbackend):
@@ -98,7 +98,7 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
    from datetime import datetime
    from typing import Any
 
-   from django.contrib.tasks import BaseTask, TaskStatus
+   from django.tasks import BaseTask, TaskStatus
 
    class MyBackendTask(BaseTask):
       id: str
@@ -154,7 +154,7 @@ Tasks can be queued using ``enqueue``, a proxy method which calls ``enqueue`` on
 
 .. code:: python
 
-   from django.contrib.tasks import enqueue
+   from django.tasks import enqueue
 
    def do_a_task(*args, **kwargs):
       pass
@@ -169,7 +169,7 @@ Similar methods are also available for ``defer``, ``aenqueue`` and ``adefer``. W
 
 .. code:: python
 
-   from django.contrib.tasks import tasks
+   from django.tasks import tasks
 
    def do_a_task(*args, **kwargs):
       pass
@@ -193,7 +193,7 @@ Tasks may also be "deferred" to run at a specific time in the future:
 
    from django.utils import timezone
    from datetime import timedelta
-   from django.contrib.tasks import defer
+   from django.tasks import defer
 
    task = defer(do_a_task, when=timezone.now() + timedelta(minutes=5))
 
@@ -213,7 +213,7 @@ Where the underlying task runner supports it, backends may also provide an ``asy
 
 .. code:: python
 
-   from django.contrib.tasks import aenqueue
+   from django.tasks import aenqueue
 
    await aenqueue(do_a_task)
 
@@ -224,7 +224,7 @@ Settings
 
    TASKS = {
       "default": {
-         "BACKEND": "django.contrib.tasks.backends.ImmediateBackend",
+         "BACKEND": "django.tasks.backends.ImmediateBackend",
          "OPTIONS": {}
       }
    }
@@ -260,7 +260,7 @@ The global task connection ``tasks`` is used to access the configured backends, 
 
 .. code:: python
 
-   from django.contrib.tasks import task
+   from django.tasks import task
 
    # Later...
    task = task.enqueue(do_a_thing)

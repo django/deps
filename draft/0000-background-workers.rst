@@ -255,6 +255,8 @@ Secondly, it allows third-party libraries to offload some of their execution. Cu
 
 One of the key benefits behind background workers is removing the requirement for the user to wait for tasks they don't need to, moving computation and complexity out of the request-response cycle, towards dedicated background worker processes. Moving certain actions to be run in the background not improves performance of web requests, but also allows those actions to run on specialised hardware, potentially scaled differently to the web servers. This presents an opportunity to greatly decrease the percieved execution time of certain common actions performed by Django projects.
 
+The target audience for ``DatabaseBackend`` and a SQL-based queue are likely fairly well aligned with those who may choose something like PostgreSQL FTS over something like ElasticSearch. ElasticSearch is probably better for those 10% of users who really need it, but doesn't mean the other 90% won't be perfectly happy with PostgreSQL, and probably wouldn't benefit from ElasticSearch anyway.
+
 But what about *X*?
 -------------------
 

@@ -25,7 +25,7 @@ Library maintainers must implement support for any possible task backend separat
 Specification
 =============
 
-The proposed implementation will be in the form of an application wide "task backend" interface. This backend will be what connects Django to the task runners with a single pattern. The task backend will provide an interface for either third-party libraries, or application developers to specify how tasks should be created and pushed into the background
+The proposed implementation will be in the form of an application wide "task backend" interface. This backend will be what connects Django to the task runners with a single pattern. The task backend will provide an interface for either third-party libraries, or application developers to specify how tasks should be created and pushed into the background.
 
 Backends
 --------
@@ -176,7 +176,7 @@ Tasks can be queued using ``enqueue``, a proxy method which calls ``enqueue`` on
    task = enqueue(do_a_task)
 
    # Optionally, provide arguments
-   task = enqueue(do_a_task, args=[], kwargs={})]
+   task = enqueue(do_a_task, args=[], kwargs={})
 
 Similar methods are also available for ``defer``, ``aenqueue`` and ``adefer``. When multiple task backends are configured, each can be obtained from a global ``tasks`` connection handler:
 

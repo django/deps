@@ -303,7 +303,7 @@ The field of background tasks is vast, and attempting to implement everything su
 - Automated task retrying
 - A generic way of executing task runners. This will remain the repsonsibility of the underlying implementation, and the user to execute correctly.
 - Observability into task queues, including monitoring and reporting
-- Cron-based scheduling. For now, this can be achieved by triggering the same task once it finishes.
+- Cron-based scheduling
 
 Copyright
 =========

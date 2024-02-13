@@ -100,6 +100,9 @@ ImmediateBackend
 DatabaseBackend
    This backend uses the Django ORM as a task store. This backend will support all features, and should be considered production-grade.
 
+DummyBackend
+   This backend doesn't execute tasks at all, and instead stores the ``Task`` objects in memory. This backend is mostly useful in tests.
+
 Tasks
 -----
 

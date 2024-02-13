@@ -161,7 +161,7 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
          """
          ...
 
-A ``Task`` is obtained either when scheduling a task function, or by calling ``get_task`` on the backend.
+A ``Task`` is obtained either when scheduling a task function, or by calling ``get_task`` on the backend. If called with a ``task_id`` which doesn't exist, a ``TaskDoesNotExist`` exception is raised.
 
 A ``Task`` will cache its values, relying on the user calling ``refresh`` / ``arefresh`` to reload the values from the task store.
 

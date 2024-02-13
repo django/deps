@@ -234,7 +234,7 @@ Django will ship with an additional task-based SMTP email backend, configured id
 Async tasks
 -----------
 
-Where the underlying task runner supports it, backends may also provide an ``async``-compatible interface for task running, using ``a``-prefixed methods:
+Where the underlying task runner supports it, backends may also provide an ``async``-compatible interface for task queueing, using ``a``-prefixed methods:
 
 .. code:: python
 

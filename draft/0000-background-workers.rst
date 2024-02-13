@@ -172,7 +172,7 @@ To enable a ``Task`` to be backend-agnostic, statuses must include a set of know
 :Failed: The task failed
 :Complete: The task is complete, and the result is accessible
 
-Running tasks
+Queueing tasks
 -------------
 
 Tasks can be queued using ``enqueue``, a proxy method which calls ``enqueue`` on the default task backend:
@@ -207,7 +207,7 @@ Similar methods are also available for ``defer``, ``aenqueue`` and ``adefer``. W
 
 When enqueueing tasks, ``args`` and ``kwargs`` are intentionally their own dedicated arguments to make the API simpler and backwards-compatible should other attributes be added in future.
 
-Here, ``do_a_task`` can either be a regular function or coroutine. It will be up to the backend implementor to determine whether coroutines are supported.
+Here, ``do_a_task`` can either be a regular function or coroutine. It will be up to the backend implementor to determine whether coroutines are supported. In either case, the function must be globally importable.
 
 Deferring tasks
 ---------------

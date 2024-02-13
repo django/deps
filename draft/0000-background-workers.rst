@@ -108,7 +108,7 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
 .. code:: python
 
    from datetime import datetime
-   from typing import Any
+   from typing import Any, Callable
 
    from django.tasks import BaseTask, TaskStatus
 
@@ -130,6 +130,18 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
 
       raw: Any | None
       """Return the underlying runner's task handle"""
+
+      priority: int | None
+      """The priority of the task"""
+
+      func: Callable
+      """The task function"""
+
+      args: list
+      """The arguments to pass to the task function"""
+
+      kwargs: dict
+      """The keyword arguments to pass to the task function"""
 
       def __init__(self, **kwargs):
          """

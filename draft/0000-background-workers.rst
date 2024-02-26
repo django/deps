@@ -257,6 +257,21 @@ Where the underlying task runner supports it, backends may also provide an ``asy
 
    await aenqueue(do_a_task)
 
+Similarly, a backend may support queueing an async task function:
+
+.. code:: python
+
+   from django.tasks import aenqueue, enqueue, task
+
+   @task
+   async def do_an_async_task():
+      pass
+
+   await aenqueue(do_an_async_task)
+
+   # Also works
+   enqueue(do_an_async_task)
+
 Settings
 ---------
 

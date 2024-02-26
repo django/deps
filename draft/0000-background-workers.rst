@@ -48,6 +48,12 @@ A backend will be a class which extends a Django-defined base class, and provide
          """
          super().__init__(options)
 
+      def is_valid_task_function(self, func: Callable) -> bool:
+         """
+         Determine whether the provided callable is valid as a task function.
+         """
+         ...
+
       def enqueue(self, func: Callable, priority: int | None, args: List, kwargs: Dict) -> BaseTask:
          """
          Queue up a task function (or coroutine) to be executed
@@ -93,6 +99,8 @@ A backend will be a class which extends a Django-defined base class, and provide
          ...
 
 If a backend doesn't support a particular scheduling mode, it simply does not define the method. Convenience methods ``supports_enqueue`` and ``supports_defer`` will be implemented by ``BaseTaskBackend``. Similarly, ``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue``, ``defer`` and ``get_task`` wrapped with ``asgiref.sync_to_async``.
+
+``is_valid_task_function`` determines whether the provided function (or possibly coroutine) is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable. The default implementation will ensure the callable is globally importable.
 
 Django will ship with 3 implementations:
 

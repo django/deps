@@ -100,7 +100,7 @@ A backend will be a class which extends a Django-defined base class, and provide
 
 If a backend doesn't support a particular scheduling mode, it simply does not define the method. Convenience methods ``supports_enqueue`` and ``supports_defer`` will be implemented by ``BaseTaskBackend``. Similarly, ``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue``, ``defer`` and ``get_task`` wrapped with ``asgiref.sync_to_async``.
 
-``is_valid_task_function`` determines whether the provided function (or possibly coroutine) is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable. The default implementation will ensure the callable is globally importable.
+``is_valid_task_function`` determines whether the provided function (or possibly coroutine) is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable.
 
 Django will ship with 3 implementations:
 
@@ -187,6 +187,28 @@ A ``Task``'s ``status`` must be one of the follwing values (as defined by an ``e
 
 If a backend supports more than these statuses, it should compress them into one of these.
 
+Task functions
+--------------
+
+A task function is any globally-importable callable which can be used as the function for a task (ie passed into ``enqueue``).
+
+Before a task can be run, it must be marked:
+
+.. code:: python
+
+   from django.tasks import task
+
+   @task
+   def do_a_task(*args, **kwargs):
+      pass
+
+The decorator "marks" the task as being a valid function to be executed. This prevent arbitrary methods from being queued, potentially resulting in a security vulnerability (eg ``subprocess.run``).
+
+Tasks will be validated against the backend's ``is_valid_task_function`` before queueing. The default implementation will validate all generic assumptions:
+
+- Is the task function globally importable
+- Has the task function been marked
+
 Queueing tasks
 -------------
 
@@ -194,8 +216,9 @@ Tasks can be queued using ``enqueue``, a proxy method which calls ``enqueue`` on
 
 .. code:: python
 
-   from django.tasks import enqueue
+   from django.tasks import enqueue, task
 
+   @task
    def do_a_task(*args, **kwargs):
       pass
 
@@ -209,8 +232,9 @@ Similar methods are also available for ``defer``, ``aenqueue`` and ``adefer``. W
 
 .. code:: python
 
-   from django.tasks import tasks
+   from django.tasks import tasks, task
 
+   @task
    def do_a_task(*args, **kwargs):
       pass
 

@@ -124,7 +124,7 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
       status: TaskStatus
       """The status of the task"""
 
-      result: Any
+      result: Any | None
       """The return value from the task function"""
 
       queued_at: datetime

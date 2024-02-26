@@ -92,7 +92,7 @@ A backend will be a class which extends a Django-defined base class, and provide
 
 If a backend doesn't support a particular scheduling mode, it simply does not define the method. Convenience methods ``supports_enqueue`` and ``supports_defer`` will be implemented by ``BaseTaskBackend``. Similarly, ``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue``, ``defer`` and ``get_task`` wrapped with ``asgiref.sync_to_async``.
 
-Django will ship with 2 implementations:
+Django will ship with 3 implementations:
 
 ImmediateBackend
    This backend runs the tasks immediately, rather than offloading to a background process. This is useful both for a graceful transition towards background workers, but without impacting existing functionality.

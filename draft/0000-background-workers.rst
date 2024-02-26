@@ -178,12 +178,14 @@ A ``Task`` is obtained either when scheduling a task function, or by calling ``g
 
 A ``Task`` will cache its values, relying on the user calling ``refresh`` / ``arefresh`` to reload the values from the task store.
 
-To enable a ``Task`` to be backend-agnostic, statuses must include a set of known values. Additional fields may be added if the backend supports them, but these attributes must be supported:
+A ``Task``'s ``status`` must be one of the follwing values (as defined by an ``enum``):
 
 :NEW: The task has been created, but hasn't started running yet
 :RUNNING: The task is currently running
 :FAILED: The task failed
 :COMPLETE: The task is complete, and the result is accessible
+
+If a backend supports more than these statuses, it should compress them into one of these.
 
 Queueing tasks
 -------------

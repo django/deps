@@ -320,7 +320,7 @@ The field of background tasks is vast, and attempting to implement everything su
 - Completion hooks, to run subsequent tasks automatically
 - Bulk queueing
 - Automated task retrying
-- A generic way of executing task runners. This will remain the repsonsibility of the underlying implementation, and the user to execute correctly.
+- A generic way of executing task runners. This will remain the responsibility of the underlying implementation, and the user to execute correctly.
 - Observability into task queues, including monitoring and reporting
 - Cron-based scheduling
 

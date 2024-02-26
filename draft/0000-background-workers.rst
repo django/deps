@@ -74,13 +74,15 @@ A backend will be a class which extends a Django-defined base class, and provide
 
       def get_task(self, task_id: str) -> BaseTask:
          """
-         Retrieve a task by its id (if one exists)
+         Retrieve a task by its id (if one exists).
+         If one doesn't, raises self.TaskDoesNotExist.
          """
          ...
 
       async def aget_task(self, task_id: str) -> BaseTask:
          """
-         Retrieve a task by its id (if one exists)
+         Retrieve a task by its id (if one exists).
+         If one doesn't, raises self.TaskDoesNotExist.
          """
          ...
 

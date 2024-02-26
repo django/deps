@@ -172,10 +172,10 @@ A ``Task`` will cache its values, relying on the user calling ``refresh`` / ``ar
 
 To enable a ``Task`` to be backend-agnostic, statuses must include a set of known values. Additional fields may be added if the backend supports them, but these attributes must be supported:
 
-:New: The task has been created, but hasn't started running yet
-:Running: The task is currently running
-:Failed: The task failed
-:Complete: The task is complete, and the result is accessible
+:NEW: The task has been created, but hasn't started running yet
+:RUNNING: The task is currently running
+:FAILED: The task failed
+:COMPLETE: The task is complete, and the result is accessible
 
 Queueing tasks
 -------------

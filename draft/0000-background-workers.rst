@@ -132,9 +132,6 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
       status: TaskStatus
       """The status of the task"""
 
-      result: Any | None
-      """The return value from the task function"""
-
       queued_at: datetime
       """When the task was added to the queue"""
 
@@ -171,6 +168,15 @@ A ``Task`` is used as a handle to the running task, and contains useful informat
       async def arefresh(self) -> None:
          """
          Reload the cached task data from the task store
+         """
+         ...
+
+      @property
+      def result(self) -> Any:
+         """
+         The return value from the task function.
+         If the task raised an exception, the result will contain that exception.
+         If the task has not completed, a `ValueError` is raised when accessing.
          """
          ...
 

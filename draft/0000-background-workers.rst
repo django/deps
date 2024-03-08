@@ -62,7 +62,7 @@ A backend will be a class which extends a Django-defined base class, and provide
 
       def defer(self, func: Callable, priority: int | None, when: datetime, args: List, kwargs: Dict) -> BaseTask:
          """
-         Add a task function (or coroutine) to be completed at a specific time
+         Add a task function (or coroutine) to be completed at a specific (timezone-aware) time
          """
          ...
 
@@ -74,7 +74,7 @@ A backend will be a class which extends a Django-defined base class, and provide
 
       async def adefer(self, func: Callable, priority: int | None, when: datetime, args: List, kwargs: Dict) -> BaseTask:
          """
-         Add a task function (or coroutine) to be completed at a specific time
+         Add a task function (or coroutine) to be completed at a specific (timezone-aware) time
          """
          ...
 

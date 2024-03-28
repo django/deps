@@ -357,7 +357,7 @@ The global task connection ``tasks`` is used to access the configured backends, 
 Backwards Compatibility
 =======================
 
-So that library maintainers can use this integration without concern as to whether a Django project has configured background workers, the default configuration will use the ``ImmediateBackend``. Developers on older versions of Django but who need libraries which assume tasks are available can use the reference implementation.
+So that library maintainers can use this integration without concern as to whether a Django project has configured background workers, the default configuration will use the ``ImmediateBackend``. Developers on older versions of Django but who need libraries which assume tasks are available can use the reference implementation, which will serve as a backport and be API-compatible with Django.
 
 Reference Implementation
 ========================

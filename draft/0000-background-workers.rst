@@ -142,6 +142,8 @@ A ``Task`` can only be created for globally-importable callables. The task will 
 
 ``@task`` may be used on functions or coroutines. It will be up to the backend implementor to determine whether coroutines are supported. In either case, the function must be globally importable.
 
+Task arguments must be JSON serializable, to avoid compatibility and versioning issues. Complex arguments should be converted to a format which is JSON-serializable.
+
 Task Results
 ------------
 

@@ -57,7 +57,7 @@ A backend will be a class which extends a Django-defined base class, and provide
          """
          ...
 
-      def enqueue(self, task: Task, *, args: List, kwargs: Dict, priority: int | None = None, run_after: datetime | None = None) -> TaskResult:
+      def enqueue(self, task: Task, *, args: List, kwargs: Dict, priority: int | None = None, run_after: datetime | None = None, queue_name: str | None = None) -> TaskResult:
          """
          Queue up a task to be executed
          """
@@ -123,6 +123,9 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
       kwargs: dict
       """The keyword arguments to pass to the task function"""
 
+      queue_name: str | None
+      """The name of the queue the task will run on """
+
 
 A ``Task`` is created by decorating a function with ``@task``:
 
@@ -168,6 +171,9 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
       status: TaskStatus
       """The status of the running task"""
 
+      queue_name: str | None
+      """The name of the queue the task will run on """
+
       def refresh(self) -> None:
       """
       Reload the cached task data from the task store
@@ -175,7 +181,7 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
       ...
 
 
-Attributes such as ``priority`` will reflect the values used to enqueue the task, as opposed to the defaults from the ``Task``. If no overridden values are provided, the value will mirror the ``Task``.
+Attributes such as ``priority`` and ``queue_name`` will reflect the values used to enqueue the task, as opposed to the defaults from the ``Task``. If no overridden values are provided, the value will mirror the ``Task``.
 
 A ``TaskResult`` will cache its values, relying on the user calling ``refresh`` to reload the values from the task store. An ``async`` version of ``refresh`` is automatically provided by ``TaskResult`` using ``asgiref.sync_to_async``.
 
@@ -299,11 +305,15 @@ Settings
    TASKS = {
       "default": {
          "BACKEND": "django.tasks.backends.ImmediateBackend",
+         "QUEUES": []
          "OPTIONS": {}
       }
    }
 
-``OPTIONS`` is passed as-is to the backend's constructor.
+
+``QUEUES`` contains a list of valid queue names for the backend. If a task is queued to a queue which doesn't exist, an exception is raised. If omitted or empty, any name is valid.
+
+``OPTIONS`` is passed as-is to the backend's constructor. ``QUEUES`` is additionally passed to the constructor as the ``queues`` keyword argument.
 
 Motivation
 ==========

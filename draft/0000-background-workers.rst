@@ -371,12 +371,13 @@ Future iterations
 
 The field of background tasks is vast, and attempting to implement everything supported by existing tools in the first iteration is futile. The following functionality has been considered, and deemed explicitly out of scope of the first pass, but still worthy of future development:
 
-- Completion hooks, to run subsequent tasks automatically
+- Completion / failed hooks, to run subsequent tasks automatically
 - Bulk queueing
 - Automated task retrying
 - A generic way of executing task runners. This will remain the responsibility of the underlying implementation, and the user to execute correctly.
 - Observability into task queues, including monitoring and reporting
 - Cron-based scheduling
+- Task timeouts
 
 Copyright
 =========

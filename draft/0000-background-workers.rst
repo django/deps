@@ -126,6 +126,9 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
       queue_name: str | None
       """The name of the queue the task will run on """
 
+      backend: str | None
+      """The name of the backend the task will run on"
+
 
 A ``Task`` is created by decorating a function with ``@task``:
 
@@ -248,6 +251,8 @@ When multiple task backends are configured, each can be obtained from a global `
    task = tasks["special"].enqueue(do_a_task, args=[], kwargs={})
 
 When enqueueing tasks, ``args`` and ``kwargs`` are intentionally their own dedicated arguments to make the API simpler and backwards-compatible should other attributes be added in future.
+
+If a ``Task`` is defined to run on a different backend, ``InvalidTaskError`` is raised.
 
 Deferring tasks
 ---------------

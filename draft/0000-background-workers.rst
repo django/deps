@@ -44,11 +44,11 @@ A backend will be a class which extends a Django-defined base class, and provide
    class MyBackend(BaseTaskbackend):
       task_class = Task
 
-      def __init__(self, options: Dict):
+      def __init__(self, settings_dict: Dict):
          """
          Any connections which need to be setup can be done here
          """
-         super().__init__(options)
+         super().__init__(settings_dict)
 
       @classmethod
       def is_valid_task(cls, task: Task) -> bool:
@@ -320,8 +320,6 @@ Settings
 
 
 ``QUEUES`` contains a list of valid queue names for the backend. If a task is queued to a queue which doesn't exist, an exception is raised. If omitted or empty, any name is valid.
-
-``OPTIONS`` is passed as-is to the backend's constructor. ``QUEUES`` is additionally passed to the constructor as the ``queues`` keyword argument.
 
 Motivation
 ==========

@@ -121,8 +121,8 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
       queue_name: str | None
       """The name of the queue the task will run on """
 
-      backend: str | None
-      """The name of the backend the task will run on"
+      backend: str
+      """The name of the backend the task will run on"""
 
 
 A ``Task`` is created by decorating a function with ``@task``:
@@ -137,6 +137,8 @@ A ``Task`` is created by decorating a function with ``@task``:
 
 
 A ``Task`` can only be created for globally-importable callables. The task will be validated against the backend's ``is_valid_task`` callable during construction.
+
+If a task doesn't define a backend, it is assumed it will only use the default backend.
 
 ``@task`` may be used on functions or coroutines. It will be up to the backend implementor to determine whether coroutines are supported. Support for coroutine tasks can be determined with the ``supports_coroutine_tasks`` method on the backend. In either case, the function must be globally importable.
 
@@ -179,6 +181,9 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
 
       kwargs: dict
       """The keyword arguments to pass to the task function"""
+
+      backend: str
+      """The name of the backend the task will run on"""
 
       def refresh(self) -> None:
          """

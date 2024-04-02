@@ -79,11 +79,12 @@ A backend will be a class which extends a Django-defined base class, and provide
 
 ``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue`` and ``get_task`` using ``asgiref.sync_to_async``.
 
-If a backend receives a task which is not valid (ie ``is_valid_task`` returns ``False``), it should raise ``InvalidTaskError``.
+``is_valid_task`` determines whether the provided ``Task`` is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable. If a backend receives a task which is not valid (ie ``is_valid_task`` returns ``False``), it should raise ``InvalidTaskError``. The base implementation of ``is_valid_task`` will validate:
+
+- Is the task's function a valid, globally-importable callable?
+- Is the task allowed to be run on the current backend?
 
 If a backend cannot support deferred tasks (ie passing the ``run_after`` argument), it should raise ``InvalidTaskError``. The ``supports_defer`` method can be used to determine whether the backend supports deferring tasks.
-
-``is_valid_task_function`` determines whether the provided function (or possibly coroutine) is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable.
 
 Django will ship with 3 implementations:
 
@@ -117,12 +118,6 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
       func: Callable
       """The task function"""
 
-      args: list
-      """The arguments to pass to the task function"""
-
-      kwargs: dict
-      """The keyword arguments to pass to the task function"""
-
       queue_name: str | None
       """The name of the queue the task will run on """
 
@@ -143,7 +138,7 @@ A ``Task`` is created by decorating a function with ``@task``:
 
 A ``Task`` can only be created for globally-importable callables. The task will be validated against the backend's ``is_valid_task`` callable during construction.
 
-``@task`` may be used on functions or coroutines. It will be up to the backend implementor to determine whether coroutines are supported. In either case, the function must be globally importable.
+``@task`` may be used on functions or coroutines. It will be up to the backend implementor to determine whether coroutines are supported. Support for coroutine tasks can be determined with the ``supports_coroutine_tasks`` method on the backend. In either case, the function must be globally importable.
 
 Task arguments must be JSON serializable, to avoid compatibility and versioning issues. Complex arguments should be converted to a format which is JSON-serializable.
 
@@ -179,11 +174,17 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
       queue_name: str | None
       """The name of the queue the task will run on """
 
+      args: list
+      """The arguments to pass to the task function"""
+
+      kwargs: dict
+      """The keyword arguments to pass to the task function"""
+
       def refresh(self) -> None:
-      """
-      Reload the cached task data from the task store
-      """
-      ...
+         """
+         Reload the cached task data from the task store
+         """
+         ...
 
 
 Attributes such as ``priority`` and ``queue_name`` will reflect the values used to enqueue the task, as opposed to the defaults from the ``Task``. If no overridden values are provided, the value will mirror the ``Task``.

@@ -219,7 +219,7 @@ For convenience, calling a ``TaskResult`` will execute the task's function direc
    do_a_task()
 
 Queueing tasks
--------------
+--------------
 
 Tasks can be queued using ``enqueue``, a proxy method which calls ``enqueue`` on the default task backend:
 
@@ -389,6 +389,7 @@ The field of background tasks is vast, and attempting to implement everything su
 - Observability into task queues, including monitoring and reporting
 - Cron-based scheduling
 - Task timeouts
+- Swappable argument serialization (eg `pickle`)
 
 Copyright
 =========

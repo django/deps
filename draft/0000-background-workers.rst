@@ -9,7 +9,7 @@ DEP XXXX: Background workers
 :Status: Draft
 :Type: Feature
 :Created: 2024-02-07
-:Last-Modified: 2024-04-02
+:Last-Modified: 2024-04-05
 
 .. contents:: Table of Contents
    :depth: 3
@@ -57,7 +57,7 @@ A backend will be a class which extends a Django-defined base class, and provide
          """
          ...
 
-      def enqueue(self, task: Task, *, args: List, kwargs: Dict, priority: int | None = None, run_after: datetime | None = None, queue_name: str | None = None) -> TaskResult:
+      def enqueue(self, task: Task, *args, **kwargs) -> TaskResult:
          """
          Queue up a task to be executed
          """
@@ -107,9 +107,9 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
 .. code:: python
 
    from datetime import datetime
-   from typing import Callable
+   from typing import Callable, Self
 
-   from django.tasks import Task
+   from django.tasks import Task, TaskResult
 
    class MyBackendTask(Task):
       priority: int | None
@@ -124,6 +124,27 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
       backend: str
       """The name of the backend the task will run on"""
 
+      run_after: datetime | None
+      """The earliest this task will run"""
+
+      def using(self, priority: int | None = None, queue_name: str | None = None, run_after: datetime | None = None) -> Self:
+         """
+         Create a new task with modified defaults
+         """
+         ...
+
+      def enqueue(self, *args, **kwargs) -> TaskResult:
+         """
+         Queue up the task to be executed
+         """
+         ...
+
+      def get(self, task_id: str) -> Self:
+         """
+         Retrieve a task of this type by its id (if one exists).
+         If one doesn't, or is the wrong type, raises TaskDoesNotExist.
+         """
+         ...
 
 A ``Task`` is created by decorating a function with ``@task``:
 
@@ -144,6 +165,8 @@ If a task doesn't define a backend, it is assumed it will only use the default b
 
 Task arguments must be JSON serializable, to avoid compatibility and versioning issues. Complex arguments should be converted to a format which is JSON-serializable.
 
+The ``using`` method returns a clone of the task with the given attributes modified. This allows modification of the task before calling ``enqueue``. ``run_after`` cannot be passed to ``@task``, and can only be configued with ``using``.
+
 Task Results
 ------------
 
@@ -161,20 +184,11 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
    from django.tasks import TaskResult, TaskStatus, Task
 
    class MyBackendTaskResult(TaskResult):
-      task: TaskResult
-      """The task of which this is a result"""
-
-      priority: int | None
-      """The priority of the task"""
-
-      run_after: datetime | None
-      """The earliest time the task will be executed"""
+      task: Task
+      """The task for which this is a result"""
 
       status: TaskStatus
       """The status of the running task"""
-
-      queue_name: str | None
-      """The name of the queue the task will run on """
 
       args: list
       """The arguments to pass to the task function"""
@@ -191,8 +205,6 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
          """
          ...
 
-
-Attributes such as ``priority`` and ``queue_name`` will reflect the values used to enqueue the task, as opposed to the defaults from the ``Task``. If no overridden values are provided, the value will mirror the ``Task``.
 
 A ``TaskResult`` will cache its values, relying on the user calling ``refresh`` to reload the values from the task store. An ``async`` version of ``refresh`` is automatically provided by ``TaskResult`` using ``asgiref.sync_to_async``.
 
@@ -221,24 +233,30 @@ For convenience, calling a ``TaskResult`` will execute the task's function direc
 Queueing tasks
 --------------
 
-Tasks can be queued using ``enqueue``, a proxy method which calls ``enqueue`` on the default task backend:
+Tasks can be queued using the ``enqueue`` method, which in turn calls ``enqueue`` on the task backend:
 
 .. code:: python
 
-   from django.tasks import enqueue, task
+   from django.tasks import task
 
    @task(priority=1)
    def do_a_task(*args, **kwargs):
       pass
 
    # Submit the task function to be run
-   task = enqueue(do_a_task)
+   result = do_a_task.enqueue()
 
    # Optionally, provide arguments
-   task = enqueue(do_a_task, args=[], kwargs={})
+   result = do_a_task.enqueue(1, two="three")
 
    # Override the priority defined by the `Task`
-   task = enqueue(do_a_task, priority=10)
+   result = do_a_task.using(priority=10).enqueue()
+
+   # The modified task can be saved and reused
+   do_a_high_priority_task = do_a_task.using(priority=20)
+   for i in range(5):
+      do_a_high_priority_task.enqueue(i)
+
 
 When multiple task backends are configured, each can be obtained from a global ``tasks`` connection handler. Whilst it's unlikely multiple backends will be configured for a single project, support is available.
 
@@ -246,17 +264,20 @@ When multiple task backends are configured, each can be obtained from a global `
 
    from django.tasks import tasks, task
 
-   @task
+   @task()
    def do_a_task(*args, **kwargs):
       pass
 
    # Submit the task function to be run
-   task = tasks["special"].enqueue(do_a_task)
+   result = tasks["special"].enqueue(do_a_task)
 
    # Optionally, provide arguments
-   task = tasks["special"].enqueue(do_a_task, args=[], kwargs={})
+   result = tasks["special"].enqueue(do_a_task, 1, two="three")
 
-When enqueueing tasks, ``args`` and ``kwargs`` are intentionally their own dedicated arguments to make the API simpler and backwards-compatible should other attributes be added in future.
+   # Alternatively
+   result = do_a_task.using(backend="special").enqueue(1, two="three")
+
+Whilst this API is available, it's best to call ``enqueue`` on the ``Task`` directly instead and configure the backend using the ``backend`` argument.
 
 If a ``Task`` is defined to run on a different backend, ``InvalidTaskError`` is raised.
 
@@ -269,9 +290,8 @@ Tasks may also be "deferred" to run at a specific time in the future, by passing
 
    from django.utils import timezone
    from datetime import timedelta
-   from django.tasks import enqueue
 
-   task = enqueue(do_a_task, run_after=timezone.now() + timedelta(minutes=5))
+   result = do_a_task.using(run_after=timezone.now() + timedelta(minutes=5)).enqueue()
 
 ``run_after`` must be a timezone-aware ``datetime``.
 
@@ -291,24 +311,23 @@ Where the underlying task runner supports it, backends may also provide an ``asy
 
 .. code:: python
 
-   from django.tasks import aenqueue
-
-   await aenqueue(do_a_task)
+   await do_a_task.aenqueue()
+   await do_a_task.using(priority=10).aenqueue()
 
 Similarly, a backend may support queueing an async task function:
 
 .. code:: python
 
-   from django.tasks import aenqueue, enqueue, task
+   from django.tasks import task
 
    @task()
    async def do_an_async_task():
       pass
 
-   await aenqueue(do_an_async_task)
+   await do_an_async_task.aenqueue()
 
    # Also works
-   enqueue(do_an_async_task)
+   do_an_async_task.enqueue()
 
 Settings
 ---------
@@ -353,17 +372,7 @@ This proposed implementation specifically doesn't assume anything about the user
 
 This proposal started out as `Wagtail RFC 72 <https://github.com/wagtail/rfcs/pull/72>`_, as it was becoming clear a unified interface for background tasks was required, without imposing on a developer's decisions for how the tasks are executed. Wagtail is run in many different forms at many different scales, so it needed to be possible to allow developers to choose the backend they're comfortable with, in a way which Wagtail and its associated packages can execute tasks without assuming anything of the environment it's running in.
 
-The global task connection ``tasks`` is used to access the configured backends, with global versions of those methods available for the default backend. This contradicts the pattern already used for storage and caches. A "task" is already used in a number of places, so using it to refer to the default backend is confusing and may lead to it being overridden in the current scope:
-
-.. code:: python
-
-   from django.tasks import tasks
-
-   # Later...
-   result = tasks.enqueue(do_a_thing)
-
-   # Clearer
-   thing_result = tasks.enqueue(do_a_thing)
+The API design has been intentionally designed with type-safety in mind, including support for statically validating task arguments. Using ``Task.enqueue`` allows its arguments to be statically typed, and ``using`` allows the ``Task`` to be immutable (much like ``QuerySet``). Types should be able to flow from the task function, through the ``Task`` and eventually to the ``TaskResult``.
 
 Backwards Compatibility
 =======================

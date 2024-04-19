@@ -18,14 +18,20 @@ DEP XXXX: Background workers
 Abstract
 ========
 
+Whilst Django is a web framework, there's more to web applications than just the request-response lifecycle. Sending emails, communicating with external services or running complex actions should all be done outside the request-response cycle.
+
 Django doesn't have a first-party solution for long-running tasks, however the ecosystem is filled with incredibly popular frameworks, all of which interact with Django in slightly different ways. Other frameworks such as Laravel have background workers built-in, allowing them to push tasks into the background to be processed at a later date, without requiring the end user to wait for them to occur.
 
 Library maintainers must implement support for any possible task backend separately, should they wish to offload functionality to the background. This includes smaller libraries, but also larger meta-frameworks with their own package ecosystem such as `Wagtail <https://wagtail.org>`_.
 
+This proposal sets out to provide an interface and base implementation for long-running background tasks in Django.
+
 Specification
 =============
 
-The proposed implementation will be in the form of an application wide "task backend" interface. This backend will be what connects Django to the task runners with a single pattern. The task backend will provide an interface for either third-party libraries, or application developers to specify how tasks should be created and pushed into the background.
+The proposed implementation will be in the form of an application wide "task backend" interface(s). This backend will be what connects Django to the task runners with a single pattern. The task backend will provide an interface for either third-party libraries, or application developers to specify how tasks should be created and pushed into the background.
+
+Alongside this interface, Django will provide a few built-in backends, useful for testing, local development and production use cases.
 
 Backends
 --------

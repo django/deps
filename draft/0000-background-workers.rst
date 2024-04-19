@@ -86,7 +86,7 @@ A backend will be a class which extends a Django-defined base class, and provide
 
 If a backend cannot support deferred tasks (ie passing the ``run_after`` argument), it should raise ``InvalidTaskError``. The ``supports_defer`` method can be used to determine whether the backend supports deferring tasks.
 
-Django will ship with 3 implementations:
+Django will ship with the following implementations:
 
 ImmediateBackend
    This backend runs the tasks immediately, rather than offloading to a background process. This is useful both for a graceful transition towards background workers, but without impacting existing functionality.

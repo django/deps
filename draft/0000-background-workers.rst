@@ -9,7 +9,7 @@ DEP XXXX: Background workers
 :Status: Draft
 :Type: Feature
 :Created: 2024-02-07
-:Last-Modified: 2024-04-05
+:Last-Modified: 2024-04-19
 
 .. contents:: Table of Contents
    :depth: 3
@@ -127,7 +127,7 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
       run_after: datetime | None
       """The earliest this task will run"""
 
-      def using(self, priority: int | None = None, queue_name: str | None = None, run_after: datetime | None = None) -> Self:
+      def using(self, priority: int | None = None, queue_name: str | None = None, run_after: datetime | timedelta | None = None) -> Self:
          """
          Create a new task with modified defaults
          """
@@ -291,9 +291,13 @@ Tasks may also be "deferred" to run at a specific time in the future, by passing
    from django.utils import timezone
    from datetime import timedelta
 
+   # Run the task at a specific time.
    result = do_a_task.using(run_after=timezone.now() + timedelta(minutes=5)).enqueue()
 
-``run_after`` must be a timezone-aware ``datetime``.
+   # Or, pass the `timedelta` directly.
+   result = do_a_task.using(run_after=timedelta(minutes=5)).enqueue()
+
+``run_after`` must be a ``timedelta`` or timezone-aware ``datetime``.
 
 When deferring a task, it may not be **exactly** that time a task is executed, however it should be accurate to within a few seconds. This will depend on the current state of the queue and task runners, and is out of the control of Django.
 

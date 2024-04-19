@@ -69,10 +69,10 @@ A backend will be a class which extends a Django-defined base class, and provide
          """
          ...
 
-      def get_task(self, task_id: str) -> TaskResult:
+      def get_result(self, result_id: str) -> TaskResult:
          """
-         Retrieve a task by its id (if one exists).
-         If one doesn't, raises TaskDoesNotExist.
+         Retrieve a result by its id (if one exists).
+         If one doesn't, raises ResultDoesNotExist.
          """
          ...
 
@@ -83,7 +83,7 @@ A backend will be a class which extends a Django-defined base class, and provide
          ...
 
 
-``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue`` and ``get_task`` using ``asgiref.sync_to_async``.
+``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue`` and ``get_result`` using ``asgiref.sync_to_async``.
 
 ``is_valid_task`` determines whether the provided ``Task`` is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable. If a backend receives a task which is not valid (ie ``is_valid_task`` returns ``False``), it should raise ``InvalidTaskError``. The base implementation of ``is_valid_task`` will validate:
 
@@ -145,10 +145,10 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
          """
          ...
 
-      def get(self, task_id: str) -> Self:
+      def get(self, result_id: str) -> Self:
          """
-         Retrieve a task of this type by its id (if one exists).
-         If one doesn't, or is the wrong type, raises TaskDoesNotExist.
+         Retrieve a result for a task of this type by its id (if one exists).
+         If one doesn't, or is the wrong type, raises ResultDoesNotExist.
          """
          ...
 
@@ -178,7 +178,7 @@ Task Results
 
 A ``TaskResult`` is used as a handle to the running task, and contains useful information the application may need when referencing the execution of a ``Task``.
 
-A ``TaskResult`` is obtained either when scheduling a task function, or by calling ``get_task`` on the backend. If called with a ``task_id`` which doesn't exist, a ``TaskDoesNotExist`` exception is raised.
+A ``TaskResult`` is obtained either when scheduling a task function, or by calling ``get_result`` on the backend. If called with a ``task_id`` which doesn't exist, a ``TaskDoesNotExist`` exception is raised.
 
 Backend implementors aren't required to implement their own ``TaskResult``, but may for additional functionality.
 

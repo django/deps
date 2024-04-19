@@ -193,6 +193,9 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
       task: Task
       """The task for which this is a result"""
 
+      id: str
+      """A unique identifier for the task result"""
+
       status: TaskStatus
       """The status of the running task"""
 

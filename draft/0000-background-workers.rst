@@ -41,7 +41,7 @@ A backend will be a class which extends a Django-defined base class, and provide
    from django.tasks.backends.base import BaseTaskBackend
 
 
-   class MyBackend(BaseTaskbackend):
+   class MyBackend(BaseTaskBackend):
       task_class = Task
 
       def __init__(self, settings_dict: Dict):

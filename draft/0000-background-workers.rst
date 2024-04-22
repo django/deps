@@ -142,7 +142,7 @@ Backend implementors aren't required to implement their own ``Task``, but may fo
          """
          ...
 
-      def get(self, result_id: str) -> Self:
+      def get_result(self, result_id: str) -> Self:
          """
          Retrieve a result for a task of this type by its id (if one exists).
          If one doesn't, or is the wrong type, raises ResultDoesNotExist.

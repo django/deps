@@ -57,7 +57,7 @@ A backend will be a class which extends a Django-defined base class, and provide
          super().__init__(settings_dict)
 
       @classmethod
-      def is_valid_task(cls, task: Task) -> bool:
+      def validate_task(cls, task: Task) -> None:
          """
          Determine whether the provided task is one which can be executed by the backend.
          """
@@ -85,10 +85,7 @@ A backend will be a class which extends a Django-defined base class, and provide
 
 ``BaseTaskBackend`` will provide ``a``-prefixed stubs for ``enqueue`` and ``get_result`` using ``asgiref.sync_to_async``.
 
-``is_valid_task`` determines whether the provided ``Task`` is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable. If a backend receives a task which is not valid (ie ``is_valid_task`` returns ``False``), it should raise ``InvalidTaskError``. The base implementation of ``is_valid_task`` will validate:
-
-- Is the task's function a valid, globally-importable callable?
-- Is the task allowed to be run on the current backend?
+``validate_task`` determines whether the provided ``Task`` is valid for the backend. This can be used to prevent coroutines from being executed, or otherwise validate the callable. If the provided task is invalid, it will raise ``InvalidTaskError``.
 
 If a backend cannot support deferred tasks (ie passing the ``run_after`` argument), it should raise ``InvalidTaskError``. The ``supports_defer`` method can be used to determine whether the backend supports deferring tasks.
 
@@ -163,7 +160,7 @@ A ``Task`` is created by decorating a function with ``@task``:
       pass
 
 
-A ``Task`` can only be created for globally-importable callables. The task will be validated against the backend's ``is_valid_task`` callable during construction.
+A ``Task`` can only be created for globally-importable callables. The task will be validated against the backend's ``validate_task`` during construction.
 
 If a task doesn't define a backend, it is assumed it will only use the default backend.
 

@@ -182,7 +182,7 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
 .. code:: python
 
    from datetime import datetime
-   from typing import Callable
+   from typing import Any, Callable
 
    from django.tasks import TaskResult, TaskStatus, Task
 
@@ -205,6 +205,9 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
       backend: str
       """The name of the backend the task will run on"""
 
+      result: Any
+      """The return value from the task"""
+
       def refresh(self) -> None:
          """
          Reload the cached task data from the task store
@@ -219,7 +222,7 @@ A ``TaskResult``'s ``status`` must be one of the following values (as defined by
 :NEW: The task has been created, but hasn't started running yet
 :RUNNING: The task is currently running
 :FAILED: The task failed
-:COMPLETE: The task is complete, and the result is accessible
+:COMPLETE: The task is complete, and the ``result`` is accessible
 
 If a backend supports more than these statuses, it should compress them into one of these.
 

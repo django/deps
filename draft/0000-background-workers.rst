@@ -184,7 +184,7 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
    from datetime import datetime
    from typing import Any, Callable
 
-   from django.tasks import TaskResult, TaskStatus, Task
+   from django.tasks import TaskResult, ResultStatus, Task
 
    class MyBackendTaskResult(TaskResult):
       task: Task
@@ -193,7 +193,7 @@ Backend implementors aren't required to implement their own ``TaskResult``, but 
       id: str
       """A unique identifier for the task result"""
 
-      status: TaskStatus
+      status: ResultStatus
       """The status of the running task"""
 
       args: list

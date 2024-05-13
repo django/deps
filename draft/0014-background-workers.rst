@@ -392,10 +392,12 @@ Backwards Compatibility
 
 So that library maintainers can use this integration without concern as to whether a Django project has configured background workers, the default configuration will use the ``ImmediateBackend``. Developers on older versions of Django but who need libraries which assume tasks are available can use the reference implementation, which will serve as a backport and be API-compatible with Django.
 
+For users who need newer libraries which require this interface, but can't update Django itself, the reference implementation can be used. Users can use either ``django_tasks.task`` or ``django.tasks.task`` to register a task, which is usable with any configured backend, regardless of its source.
+
 Reference Implementation
 ========================
 
-A reference implementation is being developed alongside this DEP process. This implementation will serve as an "early-access" demo to get initial feedback and start using the interface, as the basis for the integration with Django itself, but also as a backport for users of supported Django versions prior to this work being released.
+A reference implementation (``django_tasks``) is being developed alongside this DEP process. This implementation will serve as an "early-access" demo to get initial feedback and start using the interface, as the basis for the integration with Django itself, but also as a backport for users of supported Django versions prior to this work being released.
 
 The reference implementation can be found at https://github.com/RealOrangeOne/django-core-tasks, along with its progression.
 

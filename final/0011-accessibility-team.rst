@@ -4,7 +4,7 @@ DEP 11: Accessibility Team
 
 :DEP: 11
 :Author: Tom Carrick
-:Implementation Team: Tom Carrick, Thibaud Colas, Sarah Abderemane, others to be determined.
+:Implementation Team: Tom Carrick, Thibaud Colas, Sarah Abderemane, Tushar Gupta, Saptak Sengupta, Eli Rosselli, others to be determined.
 :Shepherd: Carlton Gibson
 :Status: Final
 :Type: Process

@@ -6,10 +6,10 @@ DEP 0014: Background workers
 :Author: Jake Howard
 :Implementation Team: Jake Howard
 :Shepherd: Carlton Gibson
-:Status: Draft
+:Status: Accepted
 :Type: Feature
 :Created: 2024-02-07
-:Last-Modified: 2024-04-19
+:Last-Modified: 2024-05-13
 
 .. contents:: Table of Contents
    :depth: 3

@@ -1,38 +1,18 @@
-DEP 0015: Content type aware parsing and modernization of the HttpRequest API.
+DEP 0015: Content type aware parsing and modernization of the HttpRequest API
+=============================================================================
 
-DEP
+:DEP: 0015
+:Author: David Smith
+:Implementation Team: TBC
+:Shepherd: TBC
+:Status: Draft
+:Type: Feature
+:Created: 2024-03-25
+:Last-Modified: 2024-05-29
 
-    0015
-
-Author
-
-    David Smith
-
-Implementation Team
-
-    TBC
-
-Shepherd
-
-    TBC
-
-Status
-
-    Draft
-
-Type
-
-    Feature
-
-Created
-
-    2024-03-25
-
-Last-Modified
-
-    2024-05-29
-
-Table of Contents
+.. contents:: Table of Contents
+   :depth: 3
+   :local:
 
 
 Abstract

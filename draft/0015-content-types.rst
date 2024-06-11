@@ -26,7 +26,7 @@ Parsed data from an ``HttpRequest`` is accessed via its ``POST`` attribute. It w
 
 While introducing a new name for ``POST`` it is proposed that the names for the other attributes are modernized with an equivalent behaviour.
 
-The existing ``GET``, ``POST``, ``META``, and ``FILES`` attributes will be maintained for backwards compatibility, and the behaviour (specifically of POST) will remain unchanged.
+The existing ``GET``, ``POST``, ``COOKIES``, ``META``, and ``FILES`` attributes will be maintained for backwards compatibility, and the behaviour will remain unchanged.
 
 Specification
 =============

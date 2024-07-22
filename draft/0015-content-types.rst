@@ -24,7 +24,13 @@ This DEP proposes to add configurable content type parsers to allow parsing of a
 
 Parsed data from an ``HttpRequest`` is accessed via its ``POST`` attribute. It would be a breaking change if Django were to start parsing content types where currently a string is returned. To avoid introducing a breaking change it is proposed that a new ``data`` attribute is added for the new behaviour.
 
-While introducing a new name for ``POST`` it is proposed that the names for the other attributes are modernized with an equivalent behaviour.
+While introducing a new name for ``POST`` it is proposed that the names for the other attributes are modernized with an equivalent behaviour:
+
+* ``GET`` -> ``query_params``
+* ``POST`` -> ``form_data``
+* ``COOKIES`` -> ``cookies`
+* ``META`` -> ``meta``
+* ``FILES`` -> ``files``
 
 The existing ``GET``, ``POST``, ``COOKIES``, ``META``, and ``FILES`` attributes will be maintained for backwards compatibility, and the behaviour will remain unchanged.
 

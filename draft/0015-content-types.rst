@@ -22,13 +22,13 @@ Currently Django can parse requests for ``application/x-www-form-urlencoded`` an
 
 This DEP proposes to add configurable content type parsers to allow parsing of additional content types. It is proposed that Django will include a parsing of JSON, and appriate hooks to allow users to add custom parsers for other content types.
 
-Parsed data from an ``HttpRequest`` is accessed via its ``POST`` attribute. It would be a breaking change if Django were to start parsing content types where currently a string is returned. To avoid introducing a breaking change it is proposed that a new ``data`` attribute is added for the new behaviour.
+Parsed data from an ``HttpRequest`` is currently accessed via its ``POST`` attribute. It would be a breaking change if Django were to start parsing content types where currently a string is returned. To avoid introducing a breaking change it is proposed that a new ``data`` attribute is added for the new behaviour.
 
 While introducing a new name for ``POST`` it is proposed that the names for the other attributes are modernized with an equivalent behaviour:
 
 * ``GET`` -> ``query_params``
 * ``POST`` -> ``form_data``
-* ``COOKIES`` -> ``cookies`
+* ``COOKIES`` -> ``cookies``
 * ``META`` -> ``meta``
 * ``FILES`` -> ``files``
 
@@ -61,20 +61,19 @@ The list of parsers to be used can be set on the request, but must be done befor
         request.parsers = [MyCustomParser(), FormParser(), ...]
         ...
 
-To mitigate backward compatability concerns the new behaviour shall be accessed using the new ``data`` attribute. This introduces new, lower case names which better reflect the behaviour of the function.
+To mitigate backward compatability concerns the new behaviour shall be accessed using the new ``data`` attribute.
+
 At the same time it is proposed that the following attributes shall be added to modernise the other names:
 
-* query_params (for GET)
-* files (for FILES)
-* meta (for META)
-* cookies (for COOKIES)
+* ``GET`` -> ``query_params``
+* ``POST`` -> ``form_data``
+* ``COOKIES`` -> ``cookies``
+* ``META`` -> ``meta``
+* ``FILES`` -> ``files``
 
-The behaviour of renamed attributes shall be 100% compatible with the existing attributes.
+The behaviour of renamed attributes shall be 100% compatible with the existing attributes. To ease migration to the new names django-upgrade can be used to automate refactoring code. Some work to show this is possible is available [1].
 
-# TODO
-
-A separate [ticket 17235](https://code.djangoproject.com/ticket/17235) is accepted which proposes to leave FILES as immutable.
-Do we need to mention this here? The new behaviour could be on the lower cased name only?
+[1] https://github.com/smithdc1/django-upgrade/commit/c043761cb2fa00e97c3ea205be7e79fcec6f075d
 
 Motivation
 ==========
@@ -94,13 +93,9 @@ The CAPITALIZED naming style is similar to PHP's global variables $_GET, $_POST,
 However, with ``HttpRequest`` being such a core part of Django renaming these will cause a large amount of churn. The change to the documentation will be significant and many existing tutorials, blog posts and books by authors in the community would require updating to reflect the new, recommended appraoch.
 As such it is proposed that the new names are not immediately deprecated.
 
-# TODO
+See mailing list conversation [2]
 
-What would we like to say about a deprecation path? What would have to be true for it to even be considered?
-
-See mailing list conversation [1]
-
-[1] https://groups.google.com/g/django-developers/c/Kx8BfU-z4_E/m/gJBuGeZTBwAJ
+[2] https://groups.google.com/g/django-developers/c/Kx8BfU-z4_E/m/gJBuGeZTBwAJ
 
 Rationale
 =========
@@ -133,3 +128,4 @@ Copyright
 =========
 
 This document has been placed in the public domain per the Creative Commons CC0 1.0 Universal license (http://creativecommons.org/publicdomain/zero/1.0/deed).
+

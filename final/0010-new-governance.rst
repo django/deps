@@ -351,8 +351,8 @@ Repurposed role: Technical Board
 
 The Technical Board provides oversight of Django's development and
 release process, assists in setting the direction of feature
-development and releases, takes part in filling certain roles, and has
-a tie-breaking vote when other decision-making processes fail.
+development and releases, selects Mergers and Releasers, and has a
+tie-breaking vote when other decision-making processes fail.
 
 The powers of the Technical Board are:
 

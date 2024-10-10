@@ -27,7 +27,7 @@ outlined below.
 
 Note: if you are reading this DEP via the web, you should first grab
 [the source of this
-DEP](https://raw.githubusercontent.com/django/deps/template.md) in
+DEP](https://raw.githubusercontent.com/django/deps/refs/heads/main/template.rst) in
 order to complete the steps below. **DO NOT USE THE HTML FILE AS YOUR
 TEMPLATE!**
 

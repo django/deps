@@ -301,7 +301,7 @@ and filling it in as you go.
 
 DEPs may be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ 
 (the same format as Django's documentation) or
-`MarkDown <https://www.markdownguide.org>` (the same as GitHub issues). 
+`Markdown <https://www.markdownguide.org>` (the same as GitHub issues). 
 
 Each DEP should have the following parts:
 

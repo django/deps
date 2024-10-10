@@ -308,10 +308,12 @@ Each DEP should have the following parts:
 #. A short descriptive title (e.g. "ORM expressions"), which is also reflected
    in the DEP's filename (e.g. ``0181-orm-expressions.rst``).
 
-#. A preamble -- a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_ 
-   containing metadata about the DEP, including the DEP number, the names of the
-   various members of the `DEP team <#forming- the-team>`_, and so forth. See
-   `DEP Metadata`_ below for specific details.
+#. A preamble --  containing metadata about the DEP, including the DEP number,
+   the names of the various members of the `DEP team <#forming- the-team>`_, and so forth.
+   See `DEP Metadata`_ below for specific details.
+   This can be provided as a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_
+   or MarkDown frontmatter `https://github.com/Kernix13/markdown-cheatsheet/blob/master/frontmatter.md`_
+   depending on which temaplte you are using.
 
 #. Abstract -- a short (~200 word) description of the technical issue
    being addressed.

@@ -21,7 +21,7 @@ Table of Contents
 
 This DEP provides a sample template for creating your own DEPs. In
 conjunction with the content guidelines in [DEP
-1](https://github.com/django/deps/final/0001-dep-process.rst), this
+1](https://github.com/django/deps/blob/main/final/0001-dep-process.rst), this
 should make it easy for you to conform your own DEPs to the format
 outlined below.
 

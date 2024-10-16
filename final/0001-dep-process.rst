@@ -7,7 +7,7 @@ DEP 1: DEP Purpose and Guidelines
 :Status: Final
 :Type: Process
 :Created: 2014-04-14
-:Last-Modified: 2023-10-21 
+:Last-Modified: 2023-10-21
 
 .. contents:: Table of Contents
    :depth: 3
@@ -144,8 +144,8 @@ Shepherd
     can be someone with a long history of contributing to Django, who can help
     the Author assess the fitness of their proposal and help make sure it gets
     accepted. The primary job of the Shepherd will be to review the DEP in an
-    editorial role, and help guide the Author through the DEP process. 
-    
+    editorial role, and help guide the Author through the DEP process.
+
     The Shepherd may be a `Merger`_, and if so the Shepherd will be the one who
     actually merges the code into the project. Or, the Shepherd may be a
     member of the Steering Council, which can help streamline discussion.
@@ -202,7 +202,7 @@ Once the DEP is ready for the repository, the reviewer will:
 * Merge the pull request.
 
 * Assign a DEP number (almost always just the next available number), and rename
-  the DEP file with the new number (e.g. rename ``dep-process.rst`` to 
+  the DEP file with the new number (e.g. rename ``dep-process.rst`` to
   ``0001-dep-process.rst``)
 
 Developers with commit access to the DEPs repo may create drafts directly by
@@ -296,17 +296,17 @@ DEP format
 To save everyone time reading DEPs, they need to follow a common format
 and outline; this section describes that format. In most cases, it's probably
 easiest to start with copying the provided `DEP template <../template.rst>`_,
-and filling it in as you go. 
+and filling it in as you go.
 
-DEPs must be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ 
-(the same format as Django's documentation). 
+DEPs must be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
+(the same format as Django's documentation).
 
 Each DEP should have the following parts:
 
 #. A short descriptive title (e.g. "ORM expressions"), which is also reflected
    in the DEP's filename (e.g. ``0181-orm-expressions.rst``).
 
-#. A preamble -- a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_ 
+#. A preamble -- a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_
    containing metadata about the DEP, including the DEP number, the names of the
    various members of the `DEP team <#forming- the-team>`_, and so forth. See
    `DEP Metadata`_ below for specific details.
@@ -355,8 +355,8 @@ Each DEP should have the following parts:
 DEP Metadata
 ------------
 
-Each DEP must begin with some metadata given as an rST 
-`field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_. 
+Each DEP must begin with some metadata given as an rST
+`field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_.
 The headers must contain the following fields:
 
 ``DEP``
@@ -398,8 +398,8 @@ Auxiliary Files
 ---------------
 
 DEPs may include auxiliary files such as diagrams.  Such files must be named
-``XXXX-descriptive-title.ext``, where "XXXX" is the DEP number, 
-"descriptive-title" is a short slug indicating what the file contains, and 
+``XXXX-descriptive-title.ext``, where "XXXX" is the DEP number,
+"descriptive-title" is a short slug indicating what the file contains, and
 "ext" is replaced by the actual file extension (e.g. "png").
 
 Reporting DEP Bugs, or Submitting DEP Updates
@@ -451,8 +451,8 @@ Differences between DEPs and PEPs
     process either.
 
 As stated in the preamble, the DEP process is more or less a direct copy of
-the PEP process (and this document is a modified version of 
-`PEP 1 <https://www.python.org/dev/peps/pep-0001/>`_). 
+the PEP process (and this document is a modified version of
+`PEP 1 <https://www.python.org/dev/peps/pep-0001/>`_).
 
 Relative to the PEP process, we made the following changes in DEPs:
 
@@ -471,7 +471,7 @@ Relative to the PEP process, we made the following changes in DEPs:
     index by status isn't needed.
   - DEP file names are more descriptive (e.g. ``0181-orm-expressions.rst``),
     again to avoid the need for additional tooling.
-  - DEPs are "edited" (e.g. pull request approved) by any core developer,
+  - DEPs are "edited" (e.g. pull request approved) by any core contributor,
     rather than an explicit "editor" role like the PEP editors.
 
 - DEPs are pronounced upon by the Steering Council, rather than a BDFL (because
@@ -481,9 +481,9 @@ Relative to the PEP process, we made the following changes in DEPs:
   and Shepherd) before submission and throughout the process. With PEPs, most
   are authored and implemented by the same person, but the same doesn't seem to
   be true of DEPs (so far), hence the "implementer" role. As for the "shepherd":
-  the BDFL or BDFL-delegate tends to be much more hands-on than the Technical
-  Board, so the role of commenting and critiquing will be fulfilled by the
-  shepherd, rather than the board. Further, we've observed that features are
+  the BDFL or BDFL-delegate tends to be much more hands-on than the Steering
+  Council, so the role of commenting and critiquing will be fulfilled by the
+  shepherd, rather than the Council. Further, we've observed that features are
   tremendously unlikely to make it into Django without a committer on board to
   do the detail-work of merging a patch.
 
@@ -497,6 +497,9 @@ Relative to the PEP process, we made the following changes in DEPs:
 
 Revision History
 ================
+
+2024-10-04
+    Further updates to reflect current governance.
 
 2023-10-23
     Updates to reflect changes in governance since this document was originally

@@ -42,10 +42,9 @@ Council. All other aspects of DEP 10 will continue to apply unless noted below.
 The existing requirements to be qualified for election to the Steering Council
 will be replaced with requiring both of the following:
 
-* A history of substantive contributions to Django or the Django
-  ecosystem. This history must begin at least 18 months prior to the
-  individual's candidacy for the Steering Council, and include substantive
-  contributions in at least two of these bullet points:
+* A history of substantive contributions to Django or the Django ecosystem.
+  This history must include substantive contributions in at least two of these
+  bullet points:
 
   * Code contributions on Django projects or major third-party packages in
     the Django ecosystem

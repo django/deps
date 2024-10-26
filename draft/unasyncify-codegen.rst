@@ -48,6 +48,12 @@ A new module is added, ``django.utils.codegen``. Inside it are several decorator
 * ``generate_unasynced(*, async_unsafe=False)``, a decorator which marks functions to be transformed
 * ``from_codegen``, a decorator that marks functions that were generated through unasync codegen.
 
+This module also includes the following:
+
+* ``ASYNC_TRUTH_MARKER``
+  This is ``True``. But during codegen this gets replaced with ``False``. This allows us to easily mix async and sync "branches" within the same implementation for the times we need it.
+  This is a bit similar to ``typing.TYPE_CHECKING``.
+
 A new script is added, ``scripts/run_codegen.sh``, that scans Django's source tree for functions that need unasync codegen applied.
 
 A function annotated with ``@generate_unasynced()`` is marked to have the unasync codegen applied to it.

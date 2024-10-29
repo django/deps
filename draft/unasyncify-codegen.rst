@@ -172,7 +172,13 @@ An added step in CI will make sure that unasyncify codegen is applied. This also
 
 Developers working on annotated code will need to run ``scripts/run_codegen.sh`` and commit changes from this codegen. This has the added benefit of reviewing the result of the codegen, and supervising that the transformation matches what we want.
 
+Transformation Of Test Code
+===========================
 
+TODO: write out a spec for generating test code in a similar way. The main change required is to the function renaming
+technique, but otherwise the same principles apply to test code generation as to the rest.
+
+The core point here being that you could write an async variant of a test and then generate the sync variant,
 
 Rationale
 =========
@@ -202,6 +208,16 @@ Reference Implementation
 This code generation uses `libCST <https://libcst.readthedocs.io/en/latest/index.html>`_, which allows for code transformations that in particular preserve comments and whitespace layouts.
 This implementation was done in a couple of hours, almost entirely thanks to the existence of ``libCST``. The simplicity of the implementation should be an indicator of the feasibility.
 
+Usage of libCST
+===============
+
+Usage of ``ast`` directly does not preserve comments (although it does preserve docstrings). ``libCST`` does this, as well as offering "management command"-like functionality to syntax transformations, sidestepping design questions involved in how an AST transformation tool should be designed.
+
+While one could get away with not having line comments inside of functions who are targets for transformations, simply passing in an entire file to ``ast`` for transformation would remove comments from the rest of the file as well! There would need to be some targetted processing of functions to be able to apply only the changes we are interested in.
+
+If preserving comments within functions that are targetted for code generation is a goal, then this strategybecomes unfeasible without ``libCST``.
+
+if ``libCST`` is used, it would only be a requirement for people looking to make changes to annotated functions, in the same way that `gettext` is required only for people looking to make changes to text for translation.
 
 .. rubric:: Footnotes
 .. [#color-problem] shortly: I can call sync functions from async functions but not async functions from sync ones. Idea originating from `This blog post <https://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/>`_.

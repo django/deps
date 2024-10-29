@@ -4,8 +4,8 @@ DEP XXXX: Unasyncify Codegen
 
 :DEP: XXXX
 :Author: Raphael Gaschignard
-:Implementation Team: TODO (Raphael Gaschignard + others?)
-:Shepherd: TODO
+:Implementation Team: Raphael Gaschignard
+:Shepherd: TBD
 :Status: Draft
 :Type: Feature
 :Created: 2024-10-26
@@ -46,6 +46,7 @@ Specification
 A new module is added, ``django.utils.codegen``. Inside it are several decorators:
 
 * ``generate_unasynced(*, async_unsafe=False)``, a decorator which marks functions to be transformed
+* ``generate_unasynced_test()``, a decorator which marks test functions to be transformed
 * ``from_codegen``, a decorator that marks functions that were generated through unasync codegen.
 
 This module also includes the following:
@@ -175,10 +176,20 @@ Developers working on annotated code will need to run ``scripts/run_codegen.sh``
 Transformation Of Test Code
 ===========================
 
-TODO: write out a spec for generating test code in a similar way. The main change required is to the function renaming
-technique, but otherwise the same principles apply to test code generation as to the rest.
+Tests can be annotated with ``generate_unasynced_test``. The only difference between this and ``@generate_unasynced`` is the naming conventions.
 
-The core point here being that you could write an async variant of a test and then generate the sync variant,
+A test function uses the async variant name as the "canonical" name, and adds the ``_sync`` suffix to the sync variant. So ``test_property`` will be transformed to ``test_property_sync``.
+
+An example::
+
+  @from_codegen
+  async def test_thing_sync(self):
+      self.assertEqual(Model.objects.count(), 0)
+
+  @generate_unasynced_test()
+  async def test_thing(self):
+      self.assertEqual(await Model.objects.acount(), 0)
+
 
 Rationale
 =========
@@ -204,6 +215,8 @@ Reference Implementation
 ========================
 
 `This pull request <https://github.com/fcurella/django/pull/4>`_ includes an implementaiton of code generation to move from having sync and async implementations of functions handling database cursors, to a single async implementation (with the sync implementation being derived through code generation).
+
+It does not include the test function generation.
 
 This code generation uses `libCST <https://libcst.readthedocs.io/en/latest/index.html>`_, which allows for code transformations that in particular preserve comments and whitespace layouts.
 This implementation was done in a couple of hours, almost entirely thanks to the existence of ``libCST``. The simplicity of the implementation should be an indicator of the feasibility.

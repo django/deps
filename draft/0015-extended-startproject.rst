@@ -104,10 +104,10 @@ The initial templates proposed are:
 1. The structure above, with a combined project and app directory. This will be
   the default for the ``new`` command, but not for ``startproject`` for
   backwards compatibility.
-1. A minimal single file project for quick prototyping and testing. This might
+2. A minimal single file project for quick prototyping and testing. This might
   be especially useful for contributors.
-1. A template suitable for writing a third party app.
-2. A "classic" project structure using the current ``startproject`` template.
+3. A template suitable for writing a third party app.
+4. A "classic" project structure using the current ``startproject`` template.
 
 A URL can also be entered that works the same way as ``startproject``.
 

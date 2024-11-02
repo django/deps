@@ -101,6 +101,7 @@ The current tutorial could then be updated to use this new command and
 structure.
 
 The initial templates proposed are:
+
 1. The structure above, with a combined project and app directory. This will be
    the default for the ``new`` command, but not for ``startproject`` for
    backwards compatibility.

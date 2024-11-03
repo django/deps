@@ -198,7 +198,7 @@ Relevant discussions
 * `Updating the default startapp template <https://forum.djangoproject.com/t/updating-the-default-startapp-template/24193>`_
 * `Update startproject with default login/signup/logout options <https://forum.djangoproject.com/t/update-startproject-with-default-login-signup-logout-options/35175>`_
 * `The Single Folder Django Project Layout <https://noumenal.es/notes/django/single-folder-layout/>`_
-
+* `Why do we need apps? <https://forum.djangoproject.com/t/why-do-we-need-apps/827/>`_
 Reference Implementation
 ========================
 

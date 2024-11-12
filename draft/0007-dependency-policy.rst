@@ -25,8 +25,8 @@ policy of "no external dependencies allowed."
 In a nutshell, the policy is that adding a new external dependency should be
 treated similarly to adding a major new feature to Django: it requires a DEP,
 demonstration that the dependency is needed, rough consensus among the
-community and core team that the chosen dependency, and a final decision by
-the Technical Board.
+community and core contributors that the chosen dependency,
+and a final decision by the Steering Council.
 
 The rest of this document explains the guidelines and process for adding new
 dependencies, as well as the background and motivation about why this policy was
@@ -56,7 +56,7 @@ as Django itself. We define "maturity" as:
   issues that wouldn't make it into Django shouldn't be accepted as a dependency,
   either.
 
-- **Maintained** - if we discover bugs in a dependency, we need to be fairly 
+- **Maintained** - if we discover bugs in a dependency, we need to be fairly
   confident that they'll be fixed quickly.
 
 - **Takes security seriously** - we should be confident that if we or our users
@@ -65,18 +65,18 @@ as Django itself. We define "maturity" as:
   should have a vulnerability disclosure policy, security-specific contacts,
   and a history of taking vulnerabilities seriously.
 
-- **Works on all the same platforms as Django does** - Linux, Mac, Windows, 
-  and all supported Python versions (including PyPy). This probably means that 
-  dependencies that require C extensions are probably not acceptable [1]_. 
+- **Works on all the same platforms as Django does** - Linux, Mac, Windows,
+  and all supported Python versions (including PyPy). This probably means that
+  dependencies that require C extensions are probably not acceptable [1]_.
 
 - **Backwards compatible** in minor releases. We should be able to specify as
   wide a range of required versions as possible so that releases of Django
   are de-coupled (as much as possible) from dependencies. Generally, we'll
   want to specify dependencies as ``foo>=1.0,<2.0``, and be confident that
-  point-releases of ``foo`` won't break Django. 
+  point-releases of ``foo`` won't break Django.
 
 Again, these are guidelines. At the end of the day, the criteria comes down to
-"would we include this code in Django?" The Tech Board has the final call.
+"would we include this code in Django?" The Steering Council has the final call.
 
 .. [1] Note the "probably" there. It is, in principle, possible to distribute
        C extensions in a way that no longer requires a compiler -- platform-
@@ -103,8 +103,8 @@ answers a few questions:
 - What's the dependency? Why should we use it over re-inventing this
   particular wheel [2]_?
 
-- Does the package meet the maturity bar laid out above? If there are 
-  any maturity risks -- for example, if the project only has a single 
+- Does the package meet the maturity bar laid out above? If there are
+  any maturity risks -- for example, if the project only has a single
   maintainer -- that should be identified so we can do a cost/benefit
   analysis.
 
@@ -123,11 +123,11 @@ Re-evaluating dependencies
 --------------------------
 
 During each minor release cycle -- and especially before LTS releases -- the
-core team should re-evaluate all existing dependencies. If some dependency is
-starting regress on the maturity front (particularly if it has become
-unmaintained), we want to identify it early and start looking for backup plans.
-This might mean removing the dependency, taking over maintenance ourselves, 
-looking for funding to pay new maintainers, etc.
+core contributors should re-evaluate all existing dependencies. If some
+dependency is starting regress on the maturity front (particularly if it has
+become unmaintained), we want to identify it early and start looking for backup
+plans. This might mean removing the dependency, taking over maintenance
+ourselves, looking for funding to pay new maintainers, etc.
 
 Background and Motivation
 =========================
@@ -151,8 +151,8 @@ occasional downtime, leading to frustration when trying to deploy to production.
 didn't go well. Many users struggled even to get the package installed.
 
 That experience led to a deep suspicion of Python packaging tools among the
-Django core team, and a de-facto policy emerged of only requiring the lowest
-common denominator: installation via direct download and ``python setup.py
+Django core contributors, and a de-facto policy emerged of only requiring the
+lowest common denominator: installation via direct download and ``python setup.py
 install``. This meant not using any of Python's packaging features developed
 since about 2002, including most notably dependencies. In 2016, Django's only
 dependencies are optional.
@@ -186,7 +186,7 @@ we took full advantage of features now available.
 
 In particular, external dependencies -- other packages specified in
 ``setup.py``'s ``install_requires`` argument -- should be fair game to add to
-Django, when appropriate. Django core developers often duplicate effort
+Django, when appropriate. Django core contributors often duplicate effort
 re-implementing  features that are available as dependencies. And, much of the
 time, those external implementations are substantially better than what's
 included in Django. For example:
@@ -213,6 +213,12 @@ To be clear, this DEP isn't suggesting that we add these dependencies
 specifically -- there may be good arguments both for and against each specific
 example. They're offered here as examples to of the types of options that open
 up once we start to allow external dependencies.
+
+Revision History
+================
+
+2024-10-04
+    Updates to reflect current governance.
 
 Copyright
 =========

@@ -52,7 +52,7 @@ terminated by:
 - Becoming disqualified due to actions taken by the Code of Conduct committee
   of the Django Software Foundation.
 
-- A vote of the Technical Board, or full consensus of the rest of the
+- A vote of the Steering Council, or full consensus of the rest of the
   Accessibility Team, if the team is considered too large, the person is not
   making positive contributions, or any other sound reason.
 

@@ -301,7 +301,7 @@ and filling it in as you go.
 
 DEPs may be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ 
 (the same format as Django's documentation) or
-`Markdown <https://www.markdownguide.org>` (the same as GitHub issues). 
+`Markdown <https://www.markdownguide.org>`_ (the same as GitHub issues). 
 
 Each DEP should have the following parts:
 
@@ -312,8 +312,8 @@ Each DEP should have the following parts:
    the names of the various members of the `DEP team <#forming- the-team>`_, and so forth.
    See `DEP Metadata`_ below for specific details.
    This can be provided as a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_
-   or MarkDown frontmatter `https://github.com/Kernix13/markdown-cheatsheet/blob/master/frontmatter.md`_
-   depending on which temaplte you are using.
+   or `Markdown frontmatter <https://github.com/Kernix13/markdown-cheatsheet/blob/master/frontmatter.md>`_
+   depending on which template you are using.
 
 #. Abstract -- a short (~200 word) description of the technical issue
    being addressed.

@@ -27,14 +27,14 @@ outlined below.
 
 Note: if you are reading this DEP via the web, you should first grab
 [the source of this
-DEP](https://raw.githubusercontent.com/django/deps/refs/heads/main/template.rst) in
+DEP](https://raw.githubusercontent.com/django/deps/refs/heads/main/template.md) in
 order to complete the steps below. **DO NOT USE THE HTML FILE AS YOUR
 TEMPLATE!**
 
 To get the source this (or any) DEP, look at the top of the Github page
 and click \"raw\".
 
-If you\'re unfamiliar with MarkDown, this template also exists
+If you\'re unfamiliar with Markdown, this template also exists
 as a [reStructuredText template](./template.rst).
 
 Once you\'ve made a copy of this template, remove this abstract, fill

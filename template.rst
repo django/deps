@@ -29,7 +29,7 @@ To get the source this (or any) DEP, look at the top of the Github page
 and click "raw".
 
 If you're unfamiliar with reStructuredText, this template also exists as a
-`MarkDown template <./template.md>`_.
+`Markdown template <./template.md>`_.
 
 Once you've made a copy of this template, remove this abstract, fill out the
 metadata above and the sections below, then submit the DEP. Follow the 

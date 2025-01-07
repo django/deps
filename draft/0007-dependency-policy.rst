@@ -9,7 +9,6 @@ DEP 7: Dependency Policy
 :Status: Draft
 :Type: Process
 :Created: 2016-06-06
-:Last-Modified: 2016-11-05
 
 .. contents:: Table of Contents
    :depth: 3
@@ -56,7 +55,7 @@ as Django itself. We define "maturity" as:
   issues that wouldn't make it into Django shouldn't be accepted as a dependency,
   either.
 
-- **Maintained** - if we discover bugs in a dependency, we need to be fairly 
+- **Maintained** - if we discover bugs in a dependency, we need to be fairly
   confident that they'll be fixed quickly.
 
 - **Takes security seriously** - we should be confident that if we or our users
@@ -65,15 +64,15 @@ as Django itself. We define "maturity" as:
   should have a vulnerability disclosure policy, security-specific contacts,
   and a history of taking vulnerabilities seriously.
 
-- **Works on all the same platforms as Django does** - Linux, Mac, Windows, 
-  and all supported Python versions (including PyPy). This probably means that 
-  dependencies that require C extensions are probably not acceptable [1]_. 
+- **Works on all the same platforms as Django does** - Linux, Mac, Windows,
+  and all supported Python versions (including PyPy). This probably means that
+  dependencies that require C extensions are probably not acceptable [1]_.
 
 - **Backwards compatible** in minor releases. We should be able to specify as
   wide a range of required versions as possible so that releases of Django
   are de-coupled (as much as possible) from dependencies. Generally, we'll
   want to specify dependencies as ``foo>=1.0,<2.0``, and be confident that
-  point-releases of ``foo`` won't break Django. 
+  point-releases of ``foo`` won't break Django.
 
 Again, these are guidelines. At the end of the day, the criteria comes down to
 "would we include this code in Django?" The Tech Board has the final call.
@@ -103,8 +102,8 @@ answers a few questions:
 - What's the dependency? Why should we use it over re-inventing this
   particular wheel [2]_?
 
-- Does the package meet the maturity bar laid out above? If there are 
-  any maturity risks -- for example, if the project only has a single 
+- Does the package meet the maturity bar laid out above? If there are
+  any maturity risks -- for example, if the project only has a single
   maintainer -- that should be identified so we can do a cost/benefit
   analysis.
 
@@ -126,7 +125,7 @@ During each minor release cycle -- and especially before LTS releases -- the
 core team should re-evaluate all existing dependencies. If some dependency is
 starting regress on the maturity front (particularly if it has become
 unmaintained), we want to identify it early and start looking for backup plans.
-This might mean removing the dependency, taking over maintenance ourselves, 
+This might mean removing the dependency, taking over maintenance ourselves,
 looking for funding to pay new maintainers, etc.
 
 Background and Motivation

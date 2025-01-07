@@ -9,7 +9,6 @@ DEP 191: Composite Fields
 :Status: Draft
 :Type: Feature
 :Created: 2015-03-12
-:Last-Modified: 2015-03-12
 
 .. contents:: Table of Contents
    :depth: 3

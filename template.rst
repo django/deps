@@ -9,7 +9,6 @@ DEP XXXX: DEP template
 :Status: Draft
 :Type: Feature
 :Created: 2014-11-16
-:Last-Modified: 2014-11-18
 
 .. contents:: Table of Contents
    :depth: 3

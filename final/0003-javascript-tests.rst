@@ -9,7 +9,6 @@ JavaScript Tests & Linting
 :Status: Final
 :Type: Process
 :Created: 2014-05-04
-:Last-Modified: 2015-07-24
 
 .. contents:: Table of Contents
    :depth: 3

@@ -297,11 +297,11 @@ To save everyone time reading DEPs, they need to follow a common format
 and outline; this section describes that format. In most cases, it's probably
 easiest to start with copying one of the provided DEP templates
 (`rst template <../template.rst>` - `md template <../template.md>`)_,
-and filling it in as you go. 
+and filling it in as you go.
 
-DEPs may be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ 
+DEPs may be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
 (the same format as Django's documentation) or
-`Markdown <https://www.markdownguide.org>`_ (the same as GitHub issues). 
+`Markdown <https://www.markdownguide.org>`_ (the same as GitHub issues).
 
 Each DEP should have the following parts:
 

@@ -311,8 +311,7 @@ Each DEP should have the following parts:
    the names of the various members of the `DEP team <#forming- the-team>`_, and so forth.
    See `DEP Metadata`_ below for specific details.
    This can be provided as a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_
-   or `Markdown frontmatter <https://github.com/Kernix13/markdown-cheatsheet/blob/master/frontmatter.md>`_
-   depending on which template you are using.
+   or `Markdown frontmatter <https://github.com/Kernix13/markdown-cheatsheet/blob/master/frontmatter.md>`_.
 
 #. Abstract -- a short (~200 word) description of the technical issue
    being addressed.

@@ -9,7 +9,6 @@ DEP 0044: Clarify Release Process
 :Status: Draft
 :Type: Process
 :Created: 2022-11-03
-:Last-Modified: 2022-11-15
 
 .. contents:: Table of Contents
    :depth: 3

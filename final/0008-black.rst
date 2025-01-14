@@ -9,7 +9,6 @@ DEP 0008: Formatting Code with Black
 :Status: Final
 :Type: Process
 :Created: 2019-04-27
-:Last-Modified: 2021-02-11
 
 .. contents:: Table of Contents
    :depth: 3

@@ -9,7 +9,6 @@ DEP 192: Standalone Composite Fields
 :Status: Draft
 :Type: Feature
 :Created: 2015-03-18
-:Last-Modified: 2015-03-18
 
 .. contents:: Table of Contents
    :depth: 3

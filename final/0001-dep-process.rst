@@ -295,7 +295,7 @@ DEP format
 To save everyone time reading DEPs, they need to follow a common format
 and outline; this section describes that format. In most cases, it's probably
 easiest to start with copying one of the provided DEP templates
-(`rst template <../template.rst>` - `md template <../template.md>`)_,
+(`rst template <../template.rst>`_ - `md template <../template.md>`_),
 and filling it in as you go.
 
 DEPs may be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_

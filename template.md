@@ -32,19 +32,19 @@ order to complete the steps below. **DO NOT USE THE HTML FILE AS YOUR
 TEMPLATE!**
 
 To get the source this (or any) DEP, look at the top of the Github page
-and click \"raw\".
+and click "raw".
 
-If you\'re unfamiliar with Markdown, this template also exists
+If you're unfamiliar with Markdown, this template also exists
 as a [reStructuredText template](./template.rst).
 
-Once you\'ve made a copy of this template, remove this abstract, fill
+Once you've made a copy of this template, remove this abstract, fill
 out the metadata above and the sections below, then submit the DEP.
 Follow the guidelines in [DEP
 1](https://github.com/django/deps/final/0001-dep-process.rst).
 
 ## Abstract
 
-This should be a short (\~200 word) description of the technical issue
+This should be a short (~200 word) description of the technical issue
 being addressed.
 
 This (and the above metadata) is the only section strictly required to
@@ -55,7 +55,7 @@ out as you work through the DEP process.
 
 This section should contain a complete, detailed technical specification
 which should describe the syntax and semantics of any new feature. The
-specification should be detailed enough to allow implementation \-- that
+specification should be detailed enough to allow implementation -- that
 is, developers other than the author should (given the right experience)
 be able to independently implement the feature, given only the DEP.
 
@@ -87,7 +87,7 @@ incompatibilities.
 
 ## Reference Implementation
 
-If there\'s an implementation of the feature under discussion in this
+If there's an implementation of the feature under discussion in this
 DEP, this section should include or link to that implementation and
 provide any notes about installing/using/trying out the implementation.
 

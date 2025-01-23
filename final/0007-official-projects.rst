@@ -9,7 +9,6 @@ DEP 0007: Official Django Projects
 :Status: Final
 :Type: Process
 :Created: 2016-06-01
-:Last-Modified: 2016-07-12
 
 .. contents:: Table of Contents
    :depth: 3
@@ -84,13 +83,13 @@ of phases, which are:
    officially and initial discussions about the potential are had.
 
 2. `Forming a team`_: the project gathers together an official maintenance
-   team including a core shepherd.
+   team including a shepherd.
 
 3. `Discussion and debate`_: the community discusses the project and the
    merits of making it an official Django project.
 
-4. `Review & Resolution`_: the project proposal is reviewed by the Technical
-   Board and a decision made if it should be adopted.
+4. `Review & Resolution`_: the project proposal is reviewed by the Steering
+   Council and a decision made if it should be adopted.
 
 5. `Adoption`_: the project is officially adopted and moved into Django
    ownership and maintenance.
@@ -102,7 +101,7 @@ The adoption process begins when a project, new or old, looks like it might
 benefit greatly from adoption as an official Django project, and that Django
 as an overall ecosystem might benefit from the project being made official.
 
-Initial discussions should be held on mailing lists and other venues to
+Initial discussions should be held on forum threads and other venues to
 solicit feedback from the community and work out if there is rough agreement
 that the project is a good thing for Django to adopt, particularly focusing
 on any alternative approaches to the same problem and the relative merits
@@ -134,9 +133,9 @@ Maintenance Team
     manner.
 
 Shepherd
-    The **Shepherd** is the Core Developer who will be the primary point of
-    contact for the project with the Core Team in Django, who will liaise with
-    the Technical Board for the final vote, and who will assist in moving and
+    The **Shepherd** is someone who has contributed to Django for at least two years,
+    who will be the primary point of contact for the project, who will liaise with
+    the Steering Council for the final vote, and who will assist in moving and
     running the project under official Django ownership and infrastructure.
     They can also be part of the Maintenance Team.
 
@@ -154,7 +153,7 @@ Discussion and debate
 ---------------------
 
 Once a team is assembled, the project will be taken for full discussion on
-mailing lists and other archived public fora, and the Shepherd and Maintenance
+the forum and other archived public fora, and the Shepherd and Maintenance
 Team will be responsible for guiding the discussion, making sure it does not
 get too long-winded or descend into "bike-shedding", and for collating the
 arguments for and against into a single document with linked references
@@ -175,7 +174,7 @@ The Shepherd should call an end to discussions after a reasonable time period;
 there is no requirement to wait until all discussions have "finished" before
 moving on (as this may take a very long time); instead, they should move
 on when they are confident that all viewpoints have been heard and collated.
-The Technical Board may refuse the adoption if they think the project was moved
+The Steering Council may refuse the adoption if they think the project was moved
 onto the next phase too quickly.
 
 Review & Resolution
@@ -183,21 +182,21 @@ Review & Resolution
 
 Once a project has been discussed and the discussion collated by the
 Maintenance Team and the Shepherd, it is moved onto review and decision by
-the Technical Board. The Shepherd will submit the project, the list of people
+the Steering Council. The Shepherd will submit the project, the list of people
 signed up for the Maintenance Team, and the collated arguments to the
-Technical Board for decision.
+Steering Council for decision.
 
-The Technical Board are the final authority for deciding on adopting a project
+The Steering Council are the final authority for deciding on adopting a project
 or not. They may choose to rule on the project as a team, or they
-may designate one or more board members to review and decide.
+may designate one or more steering council members to review and decide.
 
-The Technical Board should consider:
+The Steering Council should consider:
 
 * If the project's adoption would benefit Django.
 * If by adopting they are crowding out other, potentially superior solutions.
 * If the maintenance team is sufficient to ensure the project will
   be maintained properly once adopted.
-* If the adoption of the project would place undue stress on the existing core team.
+* If the adoption of the project would place undue stress on existing core contributors.
 * If adopting the project projects the right image and message about what Django is.
 
 They should err on the side of denial if there is some controversy or
@@ -205,7 +204,7 @@ heavy disagreement in the community about the adoption; a project can always
 come back for another attempt at adoption later, but adopting it prematurely
 is very hard to undo.
 
-Once the decision is made, the Technical Board will inform the Shepherd about
+Once the decision is made, the Steering Council will inform the Shepherd about
 the decision, and a public announcement will be made about either the success
 or failure of the project's adoption proposal.
 
@@ -239,7 +238,7 @@ Once a project is an official Django project, it needs to maintain a certain
 quality that comes with the Django name. In particular, an official Django
 project must maintain the following things:
 
-* An up-to-date list of maintainers and a current core Shepherd, listed in
+* An up-to-date list of maintainers and a current Shepherd, listed in
   the top-level README file.
 
 * Tracking and response to security issues on par with Django's official
@@ -270,11 +269,6 @@ Maintainers are free to resign from their position at any time; the team
 should ideally have more than one member so that this does not put the
 project at risk of retirement.
 
-Maintainers or people with commit access on an official Django project do not
-have to be core Django members, nor do they become core members by taking
-those positions, but they should be very strongly considered as candidates for
-the Core Team if they are not already.
-
 The main project documentation does not have to be hosted inside the main
 Django documentation, and can be hosted on a third-party service to ease the
 maintenance load on the Django website team, but should be CNAMEd under an
@@ -299,10 +293,24 @@ Retirement involves the following steps:
 
 * Remove the project from all official Django documentation.
 
-* Publicly announce the retirement of the project on official mailing lists,
+* Publicly announce the retirement of the project on official channels.
 
 * Modify the PyPI (and other) package entries to show that it is no longer
   maintained.
+
+Revision History
+================
+
+2024-09-10
+    Updates to reflect changes in governance since this document was originally
+    written, including changes from "Technical Board" to "Steering Council",
+    the removal of the no-longer-existent "Core Developer" concept.
+
+2016-07-12
+    Subsequent updates to the initial version
+
+2016-06-01
+    Initial version
 
 Copyright
 =========

@@ -9,7 +9,6 @@ DEP 11: Accessibility Team
 :Status: Final
 :Type: Process
 :Created: 2020-06-29
-:Last-Modified: 2023-10-23
 
 .. contents:: Table of Contents
   :depth: 3

@@ -9,7 +9,6 @@ DEP 7: Dependency Policy
 :Status: Draft
 :Type: Process
 :Created: 2016-06-06
-:Last-Modified: 2016-11-05
 
 .. contents:: Table of Contents
    :depth: 3

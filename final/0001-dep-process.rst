@@ -7,7 +7,6 @@ DEP 1: DEP Purpose and Guidelines
 :Status: Final
 :Type: Process
 :Created: 2014-04-14
-:Last-Modified: 2023-10-21
 
 .. contents:: Table of Contents
    :depth: 3
@@ -295,21 +294,24 @@ DEP format
 
 To save everyone time reading DEPs, they need to follow a common format
 and outline; this section describes that format. In most cases, it's probably
-easiest to start with copying the provided `DEP template <../template.rst>`_,
+easiest to start with copying one of the provided DEP templates
+(`rst template <../template.rst>`_ - `md template <../template.md>`_),
 and filling it in as you go.
 
-DEPs must be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
-(the same format as Django's documentation).
+DEPs may be written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_
+(the same format as Django's documentation) or
+`Markdown <https://www.markdownguide.org>`_ (the same as GitHub issues).
 
 Each DEP should have the following parts:
 
 #. A short descriptive title (e.g. "ORM expressions"), which is also reflected
    in the DEP's filename (e.g. ``0181-orm-expressions.rst``).
 
-#. A preamble -- a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_
-   containing metadata about the DEP, including the DEP number, the names of the
-   various members of the `DEP team <#forming- the-team>`_, and so forth. See
-   `DEP Metadata`_ below for specific details.
+#. A preamble --  containing metadata about the DEP, including the DEP number,
+   the names of the various members of the `DEP team <#forming- the-team>`_, and so forth.
+   See `DEP Metadata`_ below for specific details.
+   This can be provided as a rST `field list <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#field-lists>`_
+   or `Markdown frontmatter <https://github.com/Kernix13/markdown-cheatsheet/blob/master/frontmatter.md>`_.
 
 #. Abstract -- a short (~200 word) description of the technical issue
    being addressed.
@@ -369,8 +371,6 @@ The headers must contain the following fields:
     ``Draft``, ``Accepted``, ``Rejected``, ``Withdrawn``, ``Final``, or ``Superseded``
 ``Created``
     Original creation date of the DEP (in ``yyyy-mm-dd`` format)
-``Last-Modified``
-    Date the DEP was last modified (in ``yyyy-mm-dd`` format)
 ``Author``
     The DEP's author(s).
 ``Implementation-Team``

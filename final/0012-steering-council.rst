@@ -9,7 +9,6 @@ DEP 0012: The Steering Council
 :Status: Final
 :Type: Process
 :Created: 2022-10-26
-:Last-Modified: 2023-10-21
 
 .. contents:: Table of Contents
    :depth: 3

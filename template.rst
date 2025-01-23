@@ -9,7 +9,6 @@ DEP XXXX: DEP template
 :Status: Draft
 :Type: Feature
 :Created: 2014-11-16
-:Last-Modified: 2014-11-18
 
 .. contents:: Table of Contents
    :depth: 3
@@ -28,16 +27,19 @@ TEMPLATE!**
 To get the source this (or any) DEP, look at the top of the Github page
 and click "raw".
 
-If you're unfamiliar with reStructuredText (the format required of DEPs),
-see these resources:
+This template uses reStructuredText. A `Markdown version<./template.md>`_ is
+also available. 
 
-* `A ReStructuredText Primer`__, a gentle introduction.
-* `Quick reStructuredText`__, a users' quick reference.
-* `reStructuredText Markup Specification`__, the final authority.
+These resources are a good place to start if you are unfamiliar with
+reStructuredText:
 
-__ http://docutils.sourceforge.net/docs/rst/quickstart.html
-__ http://docutils.sourceforge.net/docs/rst/quickref.html
-__ http://docutils.sourceforge.net/spec/rst/reStructuredText.html
+ * `A ReStructuredText Primer`__, a gentle introduction.
+ * `Quick reStructuredText`__, a users' quick reference.
+ * `reStructuredText Markup Specification`__, the final authority.
+
+ __ http://docutils.sourceforge.net/docs/rst/quickstart.html
+ __ http://docutils.sourceforge.net/docs/rst/quickref.html
+ __ http://docutils.sourceforge.net/spec/rst/reStructuredText.html
 
 Once you've made a copy of this template, remove this abstract, fill out the
 metadata above and the sections below, then submit the DEP. Follow the 

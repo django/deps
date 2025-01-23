@@ -104,8 +104,8 @@ or too broad.  If in doubt, split your DEP into several well-focused ones.
 
 The DEP Author (see below for the formal definition of an Author)
 should first attempt to ascertain whether the idea is DEP-able.  Posting to
-`django-developers <https://docs.djangoproject.com/en/dev/internals/mailing-
-lists /#django-developers-mailing-list>`_ is the best way to go about this.
+`Django Internals on the forum <https://forum.djangoproject.com/c/internals/5>`_
+is the best way to go about this.
 
 Vetting an idea publicly before going as far as writing a DEP is meant to save
 the potential author time. Many ideas have been brought forward for changing
@@ -164,7 +164,7 @@ Submitting the draft
 --------------------
 
 Once the idea's been vetted and the roles are filled, a draft DEP should be
-presented to the Django Forum and/or django-developers. This gives the author a
+presented to the Django Forum. This gives the author a
 chance to flesh out the draft DEP to make sure it's properly formatted, of high
 quality, and to address initial concerns about the proposal.
 
@@ -176,7 +176,7 @@ until proper formatting rules are followed.
 
 At this point, contributors will review the pull request. In most cases the reviewer
 will be the Shepherd of the DEP, but if that's not possible for some reason the
-author may want to ask on django-developers and/or the Django Forum to ensure
+author may want to ask on the Django Forum to ensure
 that this review happens quickly. A reviewer will do the following:
 
 * Read the DEP to check if it is ready: sound and complete.  The ideas
@@ -435,7 +435,7 @@ a competing DEP.
 If you are interested in assuming ownership of a DEP, first try to contact the
 original author and ask for permission. If they approve, ask them to open a pull
 request transferring the DEP to you. If the original author doesn't respond to
-email within a few weeks, contact django-developers.
+email within a few weeks, raise it on the Django Forum.
 
 
 Differences between DEPs and PEPs
@@ -471,7 +471,7 @@ Relative to the PEP process, we made the following changes in DEPs:
     index by status isn't needed.
   - DEP file names are more descriptive (e.g. ``0181-orm-expressions.rst``),
     again to avoid the need for additional tooling.
-  - DEPs are "edited" (e.g. pull request approved) by any core developer,
+  - DEPs are "edited" (e.g. pull request approved) by any core contributor,
     rather than an explicit "editor" role like the PEP editors.
 
 - DEPs are pronounced upon by the Steering Council, rather than a BDFL (because
@@ -481,9 +481,9 @@ Relative to the PEP process, we made the following changes in DEPs:
   and Shepherd) before submission and throughout the process. With PEPs, most
   are authored and implemented by the same person, but the same doesn't seem to
   be true of DEPs (so far), hence the "implementer" role. As for the "shepherd":
-  the BDFL or BDFL-delegate tends to be much more hands-on than the Technical
-  Board, so the role of commenting and critiquing will be fulfilled by the
-  shepherd, rather than the board. Further, we've observed that features are
+  the BDFL or BDFL-delegate tends to be much more hands-on than the Steering
+  Council, so the role of commenting and critiquing will be fulfilled by the
+  shepherd, rather than the Council. Further, we've observed that features are
   tremendously unlikely to make it into Django without a committer on board to
   do the detail-work of merging a patch.
 
@@ -497,6 +497,9 @@ Relative to the PEP process, we made the following changes in DEPs:
 
 Revision History
 ================
+
+2024-10-04
+    Further updates to reflect current governance.
 
 2023-10-23
     Updates to reflect changes in governance since this document was originally

@@ -29,15 +29,13 @@ Specification
 
 The ``django`` command will be added as the preferred spelling
 for the existing ``django-admin`` command.
+The ``django-admin`` command will remain indefinitely,
+with a message that says
 
-.. code-block:: diff
-
-   --- a/pyproject.toml
-   +++ b/pyproject.toml
-   @@ -45,2 +45,3 @@
-    [project.scripts]
-   +django = "django.core.management:execute_from_command_line"
-    django-admin = "django.core.management:execute_from_command_line"
+  The ``django-admin`` command is being renamed to ``django``.
+  You can keep using either name,
+  they are equivalent except for the printing of this message.
+  For more details on the naming change, see DEP XXXX.
 
 Official documentation will be updated
 to reference this new ``django`` command
@@ -52,8 +50,9 @@ Backwards Compatibility
 =======================
 
 The existing ``django-admin`` command will remain indefinitely
-as an alias of the ``django`` command.
-There are no plans to deprecate or remove the ``django-admin`` alias.
+as an alias of the ``django`` command,
+with messaging about the new name.
+There are no plans to remove the ``django-admin`` alias.
 
 Motivation
 ==========
@@ -125,7 +124,7 @@ so we should be cautious with adding this burden.
 
 Because the existing command will remain,
 the benefits of having the command follow common conventions
-and build the right mental model for new developers outweighs the cost.
+and build the right mental model for new developers outweigh the cost.
 
 More than one way to do it
 --------------------------
@@ -136,9 +135,11 @@ and worry what differences there are between them.
 This concern is especially relevant because of the volume
 of external resources that reference the existing command name.
 
-This drawback is partially mitigated by clear documentation
+This drawback is mitigated by clear documentation
 that the two commands are equivalent,
-and the benefits of following common convention again outweight the cost.
+the added messaging in the ``django-admin`` command,
+and because the benefits of
+following common convention outweigh the cost.
 
 Ambiguity
 ---------
@@ -161,7 +162,8 @@ Only add an alias
 -----------------
 
 This could be a less invasive change by only adding the new command name,
-and not modifying the documentation.
+and not modifying the documentation
+or printing a message in the ``django-admin`` command.
 This would avoid the vast majority of the work involved in this change.
 However, some common challenges are caused
 by the command name being different from the package name,

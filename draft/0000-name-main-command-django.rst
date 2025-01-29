@@ -152,6 +152,11 @@ for the clarity gained by consistency with other tools.
 Over time, usage of the current command will be less common,
 and the confusion will be less likely to surface.
 
+Additionally, the existing also ``django-admin`` command name
+has a conceptual conflict with the Django Admin,
+the CRUD admin interface
+that Django enables for new project by default.
+
 Alternatives
 ============
 

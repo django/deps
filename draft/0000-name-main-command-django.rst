@@ -39,10 +39,7 @@ with a message that says
 
 Official documentation will be updated
 to reference this new ``django`` command
-everywhere that ``django-admin`` is currently referenced
-by searching the repository for ``django-admin``
-and auditing each instance to determine
-if it is a reference to the command and should be updated.
+everywhere that ``django-admin`` is currently referenced.
 The implementor will coordinate with the translation team
 to assist in making all necessary translation updates.
 

@@ -49,7 +49,10 @@ Backwards Compatibility
 The existing ``django-admin`` command will remain indefinitely
 as an alias of the ``django`` command,
 with messaging about the new name.
-There are no plans to remove the ``django-admin`` alias.
+There are no plans to remove the ``django-admin`` alias,
+because of the expansive amount of external resources,
+such as blog posts and tutorials,
+that reference the existing command name.
 
 Motivation
 ==========

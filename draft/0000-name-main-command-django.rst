@@ -143,7 +143,9 @@ Ambiguity
 
 The ``django`` command can be seen as a terminology conflict
 with the name of the Python package or the name of the project itself.
-However, Django is an exception to what most tools with a CLI do,
+However, this name overlap is an important feature.
+
+Django is an exception to what most tools with a CLI do,
 so the current situation is already confusing to new users.
 It is worth the trade of some confusion over this ambiguity
 for the clarity gained by consistency with other tools.

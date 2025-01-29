@@ -79,9 +79,18 @@ This pattern has been further reinforced
 by the common pattern of recommending to use, for example,
 ``python -m pip`` to ensure that
 you're using the version of the module
-that is associated with your intended Python interpreter.
+that is associated with your intended Python interpreter,
+and to avoid accidentally installing a library like Django globally.
 The correspondance between the command name and the package name
 allows for a more intuitive mapping to the alternative style.
+
+It is a common tripping point for folks on the forum to see
+``No module named django-admin``
+because they try to run ``python -m django-admin``.
+Others have had difficulty identifying
+the correct ``uvx`` (``uv tool run``) command as
+``uvx --from django django-admin``
+instead of ``uvx django-admin`` or ``uv django``.
 
 The ``django`` command is shorter,
 and while tab completion is a common way to avoid typing long commmands

@@ -41,7 +41,6 @@ A new ``Stylesheet`` implementation can be easily added by reusing the existing 
 
             def __init__(self, path, **attributes):
                 attributes.setdefault("media", "all")
-                # Alter the signature to allow src to be passed as a keyword argument.
                 super().__init__(path, **attributes)
 
 

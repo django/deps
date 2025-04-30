@@ -151,8 +151,7 @@ methods include:
 4. Using a ready built site such as ``django-admind-demo``.
 5. Using one of the various single file templates from the web.
 
-Of these, this proposal makes 3 and 4 easier, and 5 unnecessary as the default
-structure will be faster to spin up and get working with, and the single file
+Of these, this proposal makes 3 and 4 easier, and 5 unnecessary as the single file
 project will always work with the current branch.
 
 Third party apps

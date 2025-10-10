@@ -2,7 +2,7 @@
 DEP XXXX: Name the main command `django`
 ========================================
 
-:DEP: XXXX
+:DEP: 16
 :Author: Ryan Hiebert
 :Implementation Team: Ryan Hiebert
 :Shepherd: Tom Carrick

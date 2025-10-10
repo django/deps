@@ -1,5 +1,5 @@
 ========================================
-DEP XXXX: Name the main command `django`
+DEP 16: Name the main command `django`
 ========================================
 
 :DEP: 16

@@ -6,7 +6,7 @@ DEP 16: Name the main command `django`
 :Author: Ryan Hiebert
 :Implementation Team: Ryan Hiebert
 :Shepherd: Tom Carrick
-:Status: Draft
+:Status: Accepted
 :Type: Feature
 :Created: 2025-01-07
 

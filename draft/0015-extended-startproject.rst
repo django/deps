@@ -148,7 +148,7 @@ methods include:
 1. Using a project using models from the test suite.
 2. The user maintains their own test project that expands over time.
 3. Spinning up a fresh project each time.
-4. Using a ready built site such as ``django-admind-demo``.
+4. Using a ready built site such as ``django-admin-demo``.
 5. Using one of the various single file templates from the web.
 
 Of these, this proposal makes 3 and 4 easier, and 5 unnecessary as the single file

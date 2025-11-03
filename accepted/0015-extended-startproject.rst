@@ -6,7 +6,7 @@ DEP 15: Improved startproject interface
 :Author: Tom Carrick
 :Implementation Team: Tom Carrick
 :Shepherd: Carlton Gibson
-:Status: Draft
+:Status: Accepted
 :Type: Feature
 :Created: 2024-10-26
 :Last-Modified: 2024-10-26

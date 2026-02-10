@@ -514,9 +514,9 @@ During the deprecation period:
   mixed settings scenarios in code that borrows Django's email settings (such
   as third-party mail packages).
 
-* With either *updated settings* or *default settings,* reading `settings.
-  EMAIL_BACKEND` issues a deprecation warning and returns the value of 
-  `EMAIL_PROVIDERS["default"]["BACKEND"]` (possibly from Django's 
+* With either *updated settings* or *default settings,* reading
+  `settings.EMAIL_BACKEND` issues a deprecation warning and returns the value
+  of `EMAIL_PROVIDERS["default"]["BACKEND"]` (possibly from Django's
   global_settings defaults). This exception to the previous rule provides 
   compatibility for, e.g., third party libraries that validate certain 
   settings during system checks.
@@ -594,7 +594,7 @@ Notes:
   `mail.providers.create_connection()` and `mail.get_connection()`. The 
   example code above is not a required implementation, but the resulting 
   behavior of the two APIs must be as described in this section and 
-  [*`get_connection() deprecated*](#get_connection-deprecated) below.)
+  [*`get_connection()` deprecated*](#get_connection-deprecated) below.)
 
 
 ### Testing outbox compatibility
@@ -603,10 +603,10 @@ During the deprecation period, the [testing outbox](#testing-outbox)
 behavior described earlier is modified to maintain compatibility with 
 deprecated settings.
 
-When any *deprecated settings* are defined, `django.test.utils.
-setup_test_environment()` retains its previous behavior of substituting 
-`EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"`, and 
-`teardown_test_environment()` restores the original `EMAIL_BACKEND` (which 
+When any *deprecated settings* are defined, 
+`django.test.utils.setup_test_environment()` retains its previous behavior of 
+substituting `EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"`, 
+and `teardown_test_environment()` restores the original `EMAIL_BACKEND` (which 
 may be undefined). It *does not* create an `EMAIL_PROVIDERS` setting 
 override, which would conflict with the deprecated email settings.
 
@@ -630,7 +630,7 @@ There are three common use cases for `get_connection()`:
    default EmailBackend. This is typically to reuse a single connection 
    across several send calls. (See [*Sending multiple 
    emails*][sending-multiple-emails] and the [EmailBackend context manager 
-   example][email-context-manager]() in Django's docs.)
+   example][email-context-manager] in Django's docs.)
 
    `get_connection()` with no arguments should be replaced with 
    `providers.default`.
@@ -767,8 +767,8 @@ EmailBackend instance. See [ticket-36894].)
 
    Cons: Changes the semantics of `fail_silently` significantly: would 
    ignore *all* errors, not just ones deemed ignorable by the backend 
-   implementor (though this might actually match users' expectations better).
-   Third-party code that calls `EmailBackend.send_messages()` directly.
+   implementor (though this might better match users' expectations).
+   All other code that calls `EmailBackend.send_messages()` directly
    and wants `fail_silently` behavior would need to replicate the try/catch 
    wrapper. (Not sure how we handle that deprecation.)
 
@@ -784,7 +784,7 @@ EmailBackend instance. See [ticket-36894].)
    Cons: Feels a little weird. Doesn't support defaulting `fail_silently=True`
    and overriding to `False` (which I'm not convinced is used anywhere now, 
    but is technically supported by the existing code). Do we have to mirror 
-   other public APIs, like `providers.get()`: `providers.get_silently()`?
+   other public APIs, like `providers.get()`: `providers.get_silent()`?
 
 5. In the existing `providers` APIs, support a virtual `<alias>:silent` option
    for any defined alias: `providers["notifications:silent"]` is the same 
@@ -804,7 +804,7 @@ EmailBackend instance. See [ticket-36894].)
    Cons: Exposes an API other connection managers treat as internal. Can't 
    support provider instance caching. (And would likely encourage 
    `providers.create_connection(alias, fail_silently=fail_silently)` rather 
-   than the cacheable `providers[alias]` when `fail_silently` is False.) 
+   than the cacheable `providers[alias]` even when `fail_silently` is False.) 
    Essentially reintroduces the deprecated `get_connection()` function 
    under a new name.
 
@@ -820,8 +820,9 @@ EmailBackend instance. See [ticket-36894].)
 
 The `auth_user` and `auth_password` args to `send_mail()` and 
 `send_mass_mail()` are deprecated. They are incompatible with an explicit 
-`provider` alias, and they require extra code in `providers.
-create_connection()` (which we'd like to remove after the deprecation period).
+`provider` alias, and they require extra code in
+`providers.create_connection()` (which we'd like to remove after the
+deprecation period).
 
 Using `auth_user` or `auth_password` issues a deprecation warning. They 
 should be moved to `"username"` and `"password"` OPTIONS in an appropriate 
@@ -854,8 +855,8 @@ the `connection` or `fail_silently` args usually don't need updates, but may
 want to consider allowing purpose-specific provider aliases as described here.
 
 Packages that use `get_connection()` should replace it with an updated 
-alternative as discussed in [`get_connection()`
-deprecated](#get_connection-deprecated) above. If the package calls 
+alternative as discussed in [*`get_connection()`
+deprecated*](#get_connection-deprecated) above. If the package calls 
 `get_connection()` with a dotted import path, the replacement should use 
 `mail.providers[alias]` with a package-specific or user-configurable provider 
 alias instead. For packages that support multiple Django versions, this may 
@@ -1202,8 +1203,8 @@ class PasswordResetForm:
 ```
 
 (Because `connection=None` is handled as the default provider, it would be 
-sufficient to write `EmailMultiAlternatives(..., connection=mail.providers.
-get("password-reset"))`.)
+sufficient to write `EmailMultiAlternatives(...,
+connection=mail.providers.get("password-reset"))`.)
 
 Then users could optionally supply a "password-reset" alias in
 `EMAIL_PROVIDERS`:

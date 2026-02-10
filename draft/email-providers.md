@@ -113,6 +113,10 @@ Each entry in `EMAIL_PROVIDERS` is a dict with:
 * an optional `"OPTIONS"` dict with additional parameters to use when creating
   that backend instance
 
+OPTIONS dict keys must be valid Python identifiers. The key `"alias"` is
+reserved. Attempting to include `"alias"` in the OPTIONS dict will raise an
+`ImproperlyConfigured` error when that provider is first used.
+
 Lazy strings are not supported for aliases or OPTIONS dict keys. (Individual 
 backend implementations determine whether lazy strings are allowed for OPTIONS 
 *values*.)

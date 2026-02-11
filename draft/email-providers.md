@@ -301,19 +301,19 @@ compatibility):
 
 ```python
 class EmailProvidersHandler:
-    def create_connection(self, alias, /, **kwargs):
+    def create_connection(self, alias, /):
         try:
             config = settings.EMAIL_PROVIDERS[alias]
         except KeyError:
             raise UnknownEmailProvider(alias) from None
         options = config.get("OPTIONS", {})
         backend_class = import_string(config["BACKEND"])
-        return backend_class(alias=alias, **options, **kwargs)
+        return backend_class(**options, alias=alias)
 ```
 
 Notes:
 
-* In addition to the OPTIONS from settings, create_connection() passes 
+* In addition to the OPTIONS from settings, `create_connection()` passes 
   `alias=alias` to the EmailBackend constructor. The backend can use this 
   parameter to determine whether it is being initialized from EMAIL_PROVIDERS 
   or backwards compatibility code: see [*Upgrading EmailBackend 
@@ -321,16 +321,9 @@ Notes:
   `alias` is consistent with storages, db and caches; see also
   [django/new-features#95].)
 
-* The variable `**kwargs` extend or override any OPTIONS from settings. 
-  This mechanism is used *solely* for backwards compatibility, and it could 
-  be removed at the end of the deprecation period. (See [`get_connection()` 
-  deprecated](#get_connection-deprecated) and [*The `fail_silently` 
-  problem*](#the-fail_silently-problem) in the backwards compatibility 
-  section.)
-
-* During the deprecation period, the behavior of `create_connection()` is 
-  [modified slightly](#default-provider-compatibility) for the default 
-  provider.
+* During the deprecation period, the method's signature and behavior are
+  [modified slightly](#default-provider-compatibility) to handle backwards 
+  compatibility cases.
 
 * In the initial implementation, there's no need to use `django.utils.
   connection.BaseConnectionHandler` for `providers`. (That could [change 
@@ -566,23 +559,31 @@ default provider from the deprecated email settings. This allows updated
 code (including Django itself) to use `providers.default` without worrying 
 about which settings are in use.
 
-Ignoring error handling, the modification is roughly:
+Ignoring detailed error handling, the modified version is roughly:
 
 ```python
 class EmailProvidersHandler:
-    def create_connection(self, alias, /, **kwargs):
-        # RemovedInDjango70Warning
+    def create_connection(self, alias, /, *, _deprecated_kwargs=None):
+        # RemovedInDjango70Warning: providers.default from deprecated settings.
         if (
             alias == DEFAULT_EMAIL_PROVIDER_ALIAS
             and settings._any_deprecated_email_settings_are_defined()
         ):
             with settings._suppress_email_deprecation_warnings():
                 backend_class = import_string(settings.EMAIL_BACKEND)
-                return backend_class(**kwargs)  # no 'alias' arg!
+                return backend_class(_deprecated_kwargs)  # no 'alias' arg!
 
-        # Otherwise construct a backend from settings.EMAIL_PROVIDERS[alias]
-        # as described earlier
-        ...
+        # Otherwise construct a backend from settings.EMAIL_PROVIDERS[alias].
+        try:
+            config = settings.EMAIL_PROVIDERS[alias]
+        except KeyError:
+            raise UnknownEmailProvider(alias) from None
+        options = config.get("OPTIONS", {})
+        # RemovedInDjango70Warning: _deprecated_kwargs.
+        if _deprecated_kwargs:
+            options = options | _deprecated_kwargs
+        backend_class = import_string(config["BACKEND"])
+        return backend_class(**options, alias=alias)
 ```
 
 Notes:
@@ -602,6 +603,11 @@ Notes:
   other than "default" raises `UnknownEmailProvider`. (This doesn't 
   require any extra code; it's a natural consequence of `EMAIL_PROVIDERS` 
   not being defined in the same settings.py as any deprecated settings.)
+
+* `_deprecated_kwargs` is a keyword-only arg used to implement the deprecated
+  `get_connection(..., **kwargs)` functionality. It will be removed after the
+  deprecation period. (A scary named param—rather than variable `**kwargs`—is
+  meant to discourage misuse that would break when this capability is removed.) 
 
 * (There are a few different ways to split the compatibility code between 
   `mail.providers.create_connection()` and `mail.get_connection()`. The 
@@ -686,9 +692,10 @@ During the deprecation period, calling `get_connection(...)`:
   combined with the following case.)
 
 * If called with keyword arguments but no `backend` import path, returns 
-  `providers.create_connection(DEFAULT_EMAIL_PROVIDER_ALIAS, **kwargs)`. This 
-  covers `fail_silently`, the deprecated `auth_user` and `auth_password` params
-  (see below), and other possible deprecated usage involving kwargs.
+  `providers.create_connection(DEFAULT_EMAIL_PROVIDER_ALIAS,
+  _deprecated_kwargs=kwargs)`. This covers `fail_silently`, the deprecated
+  `auth_user` and `auth_password` params (see below), and other possible
+  deprecated usage involving kwargs.
 
 * If called with a backend import path:
   * With *deprecated settings* or *default settings,* uses the existing logic 
@@ -788,7 +795,7 @@ in its `send()` method—*not* in its constructor alongside `connection`.)
    wrapper. (Not sure how we handle that deprecation.)
 
 4. Expose a separate `providers` API for getting an alias with `fail_silently` 
-   set True: `providers.silent[alias]` (?).
+   set True: `mail.providers.silent[alias]` or `mail.providers_silent[alias]`.
 
    Callers would use something like 
    `connection=providers.silent[alias] if fail_silently else providers[alias]`.
@@ -811,8 +818,8 @@ in its `send()` method—*not* in its constructor alongside `connection`.)
    Cons: Same as option 4, but maybe feels a little less weird, and doesn't 
    require additional `providers` APIs.
 
-6. Expose and maintain `create_connection()` with `**kwargs` (or at least a 
-   `fail_silently` arg).
+6. Expose and maintain `providers.create_connection()` with `**kwargs` (or at
+   least a `fail_silently` keyword arg).
 
    Pros: Relatively straightforward to implement.
 

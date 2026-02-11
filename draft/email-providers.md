@@ -724,7 +724,9 @@ of special-case handling in the `providers` code—or forbidding that case.
 
 (Django's existing `connection` args are already incompatible with 
 `fail_silently` for the same reason: you can't retroactively modify an 
-EmailBackend instance. See [ticket-36894].)
+EmailBackend instance. See [ticket-36894]. But one way we know `fail_silently` 
+was intended as a sending option is that EmailMessage takes `fail_silently`
+in its `send()` method—*not* in its constructor alongside `connection`.)
 
 🤔 Some options:
 

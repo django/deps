@@ -6,7 +6,7 @@ Shepherd:
 Status: Draft
 Type: Feature
 Created: 2026-02-09
-Last-Modified: 2026-02-09
+Last-Modified: 2026-02-11
 ---
 # DEP XXXX: Dictionary-based EMAIL_PROVIDERS settings
 

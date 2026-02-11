@@ -162,8 +162,8 @@ to configure the [testing email provider override](#testing-outbox).
 
 ### `provider` argument to mail APIs
 
-Several django.core.mail APIs accept a new `provider` keyword-only argument,
-which specifies the `EMAIL_PROVIDERS` alias to use for sending:
+The django.core.mail APIs which send mail accept a new `provider` keyword-only 
+argument, which specifies the `EMAIL_PROVIDERS` alias to use for sending:
 
 ```pycon
 >>> from django.core.mail import send_mail
@@ -176,14 +176,20 @@ This applies to:
 * `send_mass_mail()`
 * `mail_admins()`
 * `mail_managers()`
-* `EmailMessage()` and `EmailMultiAlternatives()` constructors
+* `EmailMessage.send()` (but *not* the EmailMessage constructor)
 
 Notes:
-* The `provider` is a string alias name, not an EmailBackend instance. This is
-  intentional, mirroring the `using` param in many database methods. It allows
-  future provider-based features (like [message defaults](#future-provider-specific-message-defaults)) that wouldn't
-  be possible directly from a backend instance.
-  * 🤔 Naming? (`provider`? `alias`? `using`?)
+* The `provider` is a string alias name, not an EmailBackend instance. This
+  mirrors the `using` param in many database methods. It allows future 
+  provider-based features (like [message
+  defaults](#future-provider-specific-message-defaults)) that might not be
+  possible directly from a backend instance.
+  * 🤔 Naming: `provider`? `alias`? `using`?
+* `provider` affects how a message is sent, so is an option to the APIs that
+  initiate sending—*not* APIs that construct a message to be sent later. (This
+  avoids potential conflicts in `providers[alias].send_messages([msg1, msg2])`.
+  If `provider` were a constructor-time EmailMessage property, that would cause 
+  similar problems as `connection` in [ticket-35864].)
 * The existing `connection` arg is also still supported, and continues to 
   accept an EmailBackend instance (like the value of `mail.providers[alias]`,
   described in the next section).
@@ -191,7 +197,8 @@ Notes:
     EmailBackend instance, and deprecate `connection`: 
     `send_mail(..., provider=providers["notifications"])`.
 * The `provider` and `connection` args are mutually exclusive. Passing both
-  raises a `TypeError`.
+  raises a `TypeError`. (And calling `EmailMessage.send(provider="alias")`
+  raises a `TypeError` if the message also has a`connection` property.)
 * If neither `provider` nor `connection` is given, the default provider is
   used.
 * The `auth_user` and `auth_password` args to `send_mail()` and 
@@ -201,6 +208,8 @@ Notes:
   [deprecates these args](#auth_user-and-auth_password-deprecated).)
 * Similarly, `fail_silently` and `provider` *might* be mutually exclusive: see 
   [*The `fail_silently` problem*](#the-fail_silently-problem).
+
+[ticket-35864]: https://code.djangoproject.com/ticket/35864
 
 
 ### `providers` factory
@@ -1261,11 +1270,15 @@ contemplated `DEFAULT_EMAIL_HEADERS` capability ([ticket-35365#comment:7]).
 The third-party django-anymail package has a similar feature: "[global send 
 defaults][anymail-send-defaults]."
 
+(Defaults would be applied at send time, immediately before message
+serialization, but once all EmailMessage properties have been finalized
+and the provider alias is known.)
+
 In anticipation of a feature like this, the current `EMAIL_PROVIDERS` proposal:
 * Uses a nested `"OPTIONS"` dict rather than listing EmailBackend parameters
   at the same level as `"BACKEND"`.
 * Uses a string `provider="alias"` argument rather than an EmailBackend
-  instance
+  instance.
 
 [ticket-35365#comment:7]: https://code.djangoproject.com/ticket/35365#comment:7
 [anymail-send-defaults]: https://anymail.dev/en/stable/sending/anymail_additions/#global-send-defaults

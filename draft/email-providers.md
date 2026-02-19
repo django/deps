@@ -726,13 +726,22 @@ There are three common use cases for `get_connection()`
    no backend import path.
 
    The most common use case for this is with `fail_silently=True`. That arg
-   should be moved from `get_connection()` to the `EmailMessage.send()` call.
-   See [*New handling of `fail_silently`*](#new-handling-of-fail_silently)
-   earlier.
+   should be moved from `get_connection()` to the `EmailMessage.send()` call
+   or whatever does the sending. See [*New handling of
+   `fail_silently`*](#new-handling-of-fail_silently) earlier. Example:
 
-   Other calls with keyword args are much less common, and should be replaced 
-   with `providers["some-alias"]` and defining an `EMAIL_PROVIDERS` alias with 
-   the keyword options.
+    ```python
+    # Before
+    send_mail(..., connection=get_connection(fail_silently=True))
+    
+    # After
+    send_mail(..., fail_silently=True)
+    ```
+
+   Other `get_connection()` calls with keyword args are much less common, and
+   should be replaced by defining an `EMAIL_PROVIDERS` alias with the keyword
+   options and then referring to it with `using="alias"` or 
+   `mail.providers["alias"]` wherever the connection had been used.
 
 3. `get_connection("path.to.EmailBackend")` called with a backend import 
    path (and perhaps additional kwargs), to create an instance of a specific
@@ -742,10 +751,10 @@ There are three common use cases for `get_connection()`
    django-anymail docs). It's also used by "wrapper" email backends like 
    django-celery-email and django-mailer.
 
-   Calls with a backend import path should be replaced with 
-   `providers["some-alias"]` and defining an `EMAIL_PROVIDERS` alias for the 
-   desired connection configuration. Any kwargs should be moved to OPTIONS in
-   the provider definition.
+   Calls with a backend import path should be replaced by defining an
+   `EMAIL_PROVIDERS` alias for the desired BACKEND (and OPTIONS for any keyword
+   args). Then substitute `using="alias"` or `mail.providers["alias"]` wherever
+   the connection had been used.
 
 During the deprecation period, the implementation of `get_connection(...)` is
 modified as follows:
@@ -756,12 +765,12 @@ modified as follows:
 * If called with no arguments, return `providers.default`.
 
 * If called with `fail_silently`, issue a deprecation warning indicating
-  that `fail_silently` should be moved to `EmailMessage.send()`.
+  that `fail_silently` should be moved to the sending call.
 
 * If called with keyword arguments but no `backend` import path, return 
   `providers.create_connection(DEFAULT_EMAIL_PROVIDER_ALIAS,
   _deprecated_kwargs=kwargs)`. This covers deprecated `fail_silently`,
-  `auth_user` and `auth_password` params (see below), and other possible
+  `auth_user` and `auth_password` args (see below), as well as other possible
   deprecated usage involving kwargs.
 
 * If called with a backend import path:

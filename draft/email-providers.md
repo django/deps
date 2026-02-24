@@ -1419,11 +1419,13 @@ of dictionary-based email providers, based on an earlier understanding of
 the goals. Some differences from this proposal:
 * The PR doesn't have `mail.providers` (it retains `mail.get_connection()`
   as the way to create EmailBackend instances)
-* `mail.get_connection()` accepts a new `provider` arg (which is mutually
-  exclusive with the existing `backend` dotted import path arg)
+* The `using` arg described here (for specifying a provider alias when sending)
+  is named `provider` in the PR.
+* In the PR, `mail.get_connection()` accepts a new `provider` arg (which is
+  mutually exclusive with the existing `backend` dotted import path arg)
 * The `alias` EmailBackend constructor arg described here is instead named
   `provider` in the PR
-* Because `get_connection()` is not deprecated:
+* Because the PR doesn't deprecate `get_connection()`:
   * It doesn't need to deprecate `auth_user` or `auth_password`
   * It avoids the `fail_silently` problem (`get_connection()` is basically 
     option 6 from the earlier discussion)

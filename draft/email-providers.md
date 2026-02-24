@@ -375,7 +375,7 @@ In `django.core.mail.backends`:
 ### New handling of `fail_silently`
 
 > This section will likely be implemented separately, before `EMAIL_PROVIDERS`.
-> Forum discussion coming shortly.
+> See [Django Forum discussion][forum-fail_silently].
 
 Many django.core.mail APIs support a `fail_silently` boolean arg that
 suppresses some errors during sending. This proposal changes internal details
@@ -441,8 +441,8 @@ moving `fail_silently` out of the backends, and none addressed the ambiguities
 around which errors should be silent.)
 
 [EmailMessage.send-6.0]: https://github.com/django/django/blob/fb3a11071aae27ef869d2b029289b9f59cc41128/django/core/mail/message.py#L352-L358
+[forum-fail_silently]: https://forum.djangoproject.com/t/changing-how-django-core-mail-handles-fail-silently/44278
 [ticket-36907]: https://code.djangoproject.com/ticket/36907
-
 
 ### Related updates to other Django code
 

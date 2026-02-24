@@ -421,10 +421,11 @@ class EmailMessage:
         connection = mail.providers[using or DEFAULT_EMAIL_PROVIDER_ALIAS]
         # _All_ errors in EmailBackend.send_messages() are suppressed.
         try:
-            connection.send_messages([self])
+            return connection.send_messages([self])
         except Exception:
-            if not fail_silently:
-                raise
+            if fail_silently:
+                return 0
+            raise
 ```
 
 A similar change in `send_mass_mail()` covers the only other place where Django
@@ -844,11 +845,15 @@ class EmailMessage:
         else:
             connection = mail.providers[using or DEFAULT_EMAIL_PROVIDER_ALIAS]
         try:
-            connection.send_messages([self])
+            return connection.send_messages([self])
         except Exception:
-            if not fail_silently:
-                raise
+            if fail_silently:
+                return 0
+            raise
 ```
+
+(The deprecation and error messages shown here are kept brief for readability.
+Exact wording would be decided during implementation.)
 
 Similar modifications may be needed in other django.core.mail APIs, though
 most (all but `send_mass_mail()`) end up calling `EmailMessage.send()`.

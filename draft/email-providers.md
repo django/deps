@@ -1260,7 +1260,7 @@ decisions here.
 
 Currently, using a different email provider for a django.contrib.auth 
 password reset email requires subclassing `PasswordResetForm` to override 
-`send_mail()`. Swapping in a different `provider` (or `connection` in 
+`send_mail()`. Swapping in a different `using` (or `connection` in 
 earlier Django versions) isn't possible without also duplicating [all the 
 email rendering logic][PasswordResetForm.send_mail].
 

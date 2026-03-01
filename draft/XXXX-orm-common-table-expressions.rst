@@ -22,7 +22,7 @@ ORM, with an automatic optimization strategy as the primary behavior and an
 explicit API for advanced use cases. The implementation is already available in
 `PR #20713 <https://github.com/django/django/pull/20713>`_ (previously
 `PR #20655 <https://github.com/django/django/pull/20655>`_).
-This DEP is based on those PRs and was explicitly requested by @nessita.
+This DEP is based on those PRs.
 
 The feature addresses repeated subquery evaluation and annotation duplication in
 complex ORM queries by lifting eligible subqueries and annotation chains into
@@ -34,9 +34,9 @@ Benchmarks included in the above PRs (with detailed scenarios and results)
 show performance improvements for complex query shapes, especially where
 correlated aggregate subqueries or deeply reused annotations are involved.
 
-The proposal is 100% compatible with current
-``django-cte`` library usage, allowing users to choose between built-in CTE support and the
-third-party library without migration friction.
+The proposal is designed for interoperability with current ``django-cte``
+usage, allowing users to choose between built-in CTE support and the
+third-party library without forcing immediate migration.
 
 Specification
 =============
@@ -188,7 +188,7 @@ This is an additive feature. Existing ORM APIs continue to work.
 Potential compatibility considerations:
 
 1. Generated SQL text may change shape (e.g., added ``WITH`` blocks), which can
-   affect SQL-string assertions in tests. In the PRs all the tests run successfully.
+   affect SQL-string assertions in tests.
 2. Query plans may change due to CTE materialization/rewriting decisions.
 3. Backend-specific behavior for ``AS MATERIALIZED`` remains subject to backend
    support and validation.

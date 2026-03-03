@@ -34,7 +34,8 @@ Benchmarks included in the above PRs (with detailed scenarios and results)
 show performance improvements for complex query shapes, especially where
 correlated aggregate subqueries or deeply reused annotations are involved.
 
-The proposal is designed for interoperability with current ``django-cte``
+The proposal is designed for interoperability with current `django-cte <https://github.com/dimagi/django-cte>`_
+(`docs <https://dimagi.github.io/django-cte/>`_)
 usage, allowing users to choose between built-in CTE support and the
 third-party library without forcing immediate migration.
 

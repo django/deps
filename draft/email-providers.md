@@ -1,18 +1,20 @@
 ---
 DEP: 0018
 Author: Mike Edmunds
-Implementation Team: Jacob Rief
+Implementation Team: Jacob Rief, Mike Edmunds
 Shepherd: Natalia Bidart
 Status: Draft
 Type: Feature
 Created: 2026-02-09
-Last-Modified: 2026-02-23
+Last-Modified: 2026-03-11
 ---
 # DEP 0018: Dictionary-based EMAIL_PROVIDERS settings
 
 **Table of Contents**
 
 - [Abstract](#abstract)
+- [Motivation](#motivation)
+- [History](#history)
 - [Specification](#specification)
   - [`EMAIL_PROVIDERS` setting](#email_providers-setting)
   - [`using` argument to mail APIs](#using-argument-to-mail-apis)
@@ -38,33 +40,78 @@ Last-Modified: 2026-02-23
   - [Future: Provider-specific message defaults](#future-provider-specific-message-defaults)
   - [Future: Cached `providers`](#future-cached-providers)
   - [Future: Annotate sent messages with `using`](#future-annotate-sent-messages-with-using)
-- [Motivation](#motivation)
 - [Reference implementation](#reference-implementation)
+- [Prior art](#prior-art)
 - [AI disclosure](#ai-disclosure)
 - [Copyright](#copyright)
 
 
 ## Abstract
 
-\[TODO: Abstract the actual feature; move what's here now to "Status"]
+This DEP proposes supporting multiple email provider configurations, via:
+* a new dictionary-based `EMAIL_PROVIDERS` setting
+* a new `mail.providers[alias]` factory
+* adding `using=alias` args to email sending functions
+* reworking how `fail_silently` is handled during email sending
 
-Django [ticket-35514] will implement a dictionary-based `EMAIL_PROVIDERS` 
-setting, similar to `CACHES`, `DATABASES`, `STORAGES` and `TASKS`. The ticket
-was approved following discussion on the django-developers list and at 
-DjangoCon Europe 2024 sprints.
+This will align Django's email backend configuration with similar capabilities
+in caches, databases, storages, and tasks.
 
-The purpose of this DEP is to facilitate discussion and decisions on the 
-proposed API and related deprecations. **🤔 marks open questions.**
+In the process, we will deprecate and remove:
+* most individual `EMAIL_*` settings
+* the `connection` arg to various email functions
+* `mail.get_connection()`
 
-See also:
-* The original [django-developers discussion] from 2022
-* Discussion in [ticket-35514]
-* Django [PR #18421] by Jacob Rief (which helped surface many of the issues 
-  considered here)
+**Status:** The feature was approved in 2024 through the older ticketing
+process. This DEP is rapidly approaching a final draft (**🤔 marks open
+questions**). The implementation is trying to target Django 6.1
+
+
+## Motivation
+
+(See the original [django-developers discussion] for more details and 
+use cases.)
+
+It's common to use different email services—or different configurations of 
+the same email service—for different types of email:
+* transactional notifications vs. bulk marketing
+* internal operational reporting vs. email to end users
+* different providers for specific geographic regions
+* etc.
+
+Django's pluggable email backends and `mail.get_connection()` API do not
+adequately support this. And as a consequence, packages that send email offer
+inconsistent (and sometimes complicated) extension points for overriding the
+email service to use.
+
+In addition, general reluctance to add new top-level settings has been a
+blocking factor for some proposed features and fixes in Django's email
+handling. Moving EmailBackend-specific settings from the top level into
+`EMAIL_PROVIDERS` OPTIONS dicts allows that work to progress.
+
+
+## History
+
+This DEP is a bit unusual in that it postdates the approval of the feature it
+proposes. See the links in this timeline for extensive earlier discussion:
+- early 2022: [django-developers discussion]
+- mid 2024 (?): Discussion at DjangoCon Europe sprints
+- 2024-06-09: New feature [ticket-35514] opened and approved based on earlier
+  discussion
+- 2024-07-28: Jacob Rief opens Django [PR #18421]
+- 2024–2026: Iteration and discussion in the PR, which identifies a number of
+  design issues
+- 2026-02-09: This DEP created to help resolve issues raised by the PR and
+  finalize API
+- 2026-02-23–today: Forum [discussion on `fail_silently`][forum-fail_silently]
+
+Revision history and additional commentary can be found in django/deps [PR #105].
 
 [ticket-35514]: https://code.djangoproject.com/ticket/35514
 [PR #18421]: https://github.com/django/django/pull/18421
 [django-developers discussion]: https://groups.google.com/g/django-developers/c/R8ebGynQjK0/m/Tu-o4mGeAQAJ
+[PR #105]: https://github.com/django/deps/pull/105
+[forum-fail_silently]: https://forum.djangoproject.com/t/changing-how-django-core-mail-handles-fail-silently/44278
 
 
 ## Specification
@@ -441,7 +488,6 @@ moving `fail_silently` out of the backends, and none addressed the ambiguities
 around which errors should be silent.)
 
 [EmailMessage.send-6.0]: https://github.com/django/django/blob/fb3a11071aae27ef869d2b029289b9f59cc41128/django/core/mail/message.py#L352-L358
-[forum-fail_silently]: https://forum.djangoproject.com/t/changing-how-django-core-mail-handles-fail-silently/44278
 [ticket-36907]: https://code.djangoproject.com/ticket/36907
 
 ### Related updates to other Django code
@@ -805,10 +851,6 @@ wasn't already issued in `__init__()`).
 `send_mail(connection)` issues a warning and then calls 
 `EmailMessage(connection=connection).send()`. The code below attaches an
 internal `_has_warned` connection attribute to track that.)
-
-\[TODO: The earlier work to deprecate most posargs in django.core.mail missed
-`EmailMessage.send(fail_silently)`. I'll open a separate ticket/discussion
-for that.]
 
 During the deprecation period, the [updated
 `EmailMessage.send()`](#new-handling-of-fail_silently) implementation shown
@@ -1382,36 +1424,6 @@ Or a more expansive approach would add `using` to *every* EmailMessage as it
 is sent—with any backend—roughly analogous to Django's `QuerySet.db` property.
 
 
-## Motivation
-
-(See the original [django-developers discussion] for more details and 
-use cases.)
-
-It's common to use different email services—or different configurations of 
-the same email service—for different types of email:
-* transactional notifications vs. bulk marketing
-* internal operational reporting vs. email to end users
-* different providers for specific geographic regions
-* etc.
-
-Django's pluggable email backends and `mail.get_connection()` API do not 
-adequately support this. And as a consequence, packages that send email 
-offer inconsistent (and sometimes complicated) extension points for 
-overriding the email service to use.
-
-Also, the general reluctance to add new top-level settings has been a 
-blocking factor for some proposed features and fixes in Django's email 
-handling. Moving EmailBackend-specific settings from the top level into 
-`EMAIL_PROVIDERS` OPTIONS dicts allows that work to progress.
-
-Prior art: The django-lorien-common package implemented a similar 
-dictionary-based `EMAIL_CONNECTIONS` setting with a `get_custom_connection()` 
-function to create EmailBackend instances from it: 
-[django-lorien-common/common/mail.py].
-
-[django-lorien-common/common/mail.py]: https://github.com/govtrack/django-lorien-common/blob/27241ff72536b442dfd64fad8589398b8a6e9f4d/common/mail.py
-
-
 ## Reference implementation
 
 Django [PR #18421] by Jacob Rief provides a mostly complete implementation
@@ -1429,6 +1441,16 @@ the goals. Some differences from this proposal:
   * It doesn't need to deprecate `auth_user` or `auth_password`
   * It avoids the `fail_silently` problem (`get_connection()` is basically 
     option 6 from the earlier discussion)
+
+
+## Prior art
+
+The django-lorien-common package implemented a similar 
+dictionary-based `EMAIL_CONNECTIONS` setting with a `get_custom_connection()` 
+function to create EmailBackend instances from it: 
+[django-lorien-common/common/mail.py].
+
+[django-lorien-common/common/mail.py]: https://github.com/govtrack/django-lorien-common/blob/27241ff72536b442dfd64fad8589398b8a6e9f4d/common/mail.py
 
 
 ## AI disclosure

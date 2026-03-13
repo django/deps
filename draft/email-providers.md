@@ -955,8 +955,8 @@ offer a mode that ignores some errors. Each EmailBackend decides for itself
 whether to retain `fail_silently` capabilities (and, as before, exactly which
 errors should be silenced).
 
-After the deprecation period, backend `fail_silently` mode will be available
-only as a configuration option:
+`fail_silently` mode is available as a configuration option. (After the 
+deprecation period, this is the *only* way it will be available.)
 
 ```python
 EMAIL_PROVIDERS = {
@@ -983,14 +983,12 @@ Django's `BaseEmailBackend` is being phased out:
 * Backends that will continue supporting `fail_silently` should handle the
   constructor arg locally, rather than forwarding it to `BaseEmailBackend`.
 * During the deprecation period, the `BaseEmailBackend` will issue a 
-  deprecation warning if given a `fail_silently` value that is not `None`.
-* The default value of `fail_silently` params in all django.core.mail functions
-  is changed from `False` to `None` to facilitate this transition.
+  deprecation warning if given a `fail_silently` keyword arg (but will
+  continue to set the backend's `fail_silently` attribute from it).
 * After the deprecation period Django's `BaseEmailBackend` will no longer set a
-  `fail_silently` *attribute* on the backend from a constructor param.
-* `BaseEmailBackend` will continue to ignore all `*args` and `**kwargs`, so if 
-  subclasses pass `fail_silently` after the deprecation period it will just
-  be ignored.
+  `fail_silently` attribute on the backend.
+* `BaseEmailBackend` will continue to ignore all `**kwargs`, so if subclasses
+  pass `fail_silently` after the deprecation period it will just be ignored.
 
 This DEP *does* recommend removing variable `**kwargs` from all concrete
 EmailBackends to ensure typos and incorrect OPTIONS keys result in errors,
@@ -1021,29 +1019,27 @@ class EmailBackend(BaseEmailBackend):
     ...
 ```
 
-However, Django 6.0's dummy EmailBackend allowed `*args` and `**kwargs`
-(including `fail_silently`). For compatibility during the deprecation period,
-the code above is modified to something like this (using placeholder errors):
+However, Django 6.0's dummy EmailBackend allowed `**kwargs` (including
+`fail_silently`). For compatibility during the deprecation period, the code
+above is modified to something like this (exact error text TBD):
 
 ```python
 # django/core/mail/backends/dummy.py (Django 6.1--6.2)
 
 class EmailBackend(BaseEmailBackend):
-    # RemovedInDjango70Warning: *args, **kwargs params and compatibility handling.
-    def __init__(self, alias=None, *args, **kwargs):
-        if args:
-            warnings.warn("…args not supported…", RemovedInDjango70Warning)
+    # RemovedInDjango70Warning: **kwargs params and compatibility handling.
+    def __init__(self, alias=None, **kwargs):
         if kwargs:
             if alias is not None:
                 # Being initialized from EMAIL_PROVIDERS,
                 # so any kwargs are incorrect OPTIONS.
                 raise TypeError(
                     "dummy.EmailBackend() got an unexpected keyword"
-                    f"argument '{kwargs.keys()[0]}'")
+                    f"argument '{next(iter(kwargs))}'")
             else:
                 warnings.warn("…kwargs not supported…", RemovedInDjango70Warning)
 
-        super().__init__(*args, alias=alias, **kwargs)
+        super().__init__(alias=alias, **kwargs)
 ```
 
 Similar changes apply in Django's other EmailBackend implementations.

@@ -6,7 +6,7 @@ Shepherd: Natalia Bidart
 Status: Draft
 Type: Feature
 Created: 2026‑02‑09
-Last-Modified: 2026‑03‑12
+Last-Modified: 2026‑03‑13
 ---
 # DEP 0018: Dictionary-based EMAIL_PROVIDERS settings
 

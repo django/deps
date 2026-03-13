@@ -352,8 +352,11 @@ Error: InvalidEmailProvider(...)
   option](#fail_silently-sending-option-deprecated).)
 
   (`is_configured()` does not initialize an EmailBackend instance or otherwise
-  validate the provider definition, so is not quite the same as `try:
-  mail.providers[alias]; except InvalidEmailProvider: pass`.)
+  validate the provider definition. It is equivalent to writing `(alias or
+  DEFAULT_EMAIL_PROVIDER_ALIAS) in settings.EMAIL_PROVIDERS`, but that requires
+  using an internal constant. It is not the same as `try: mail.providers[alias];
+  except InvalidEmailProvider: pass`, which would also mask some configuration
+  errors.)
 
 The `providers` factory is read-only. It does *not* support `__setitem__()` 
 or `__delitem__()`. At least initially it does not support `__iter__()`,

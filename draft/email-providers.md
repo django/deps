@@ -280,34 +280,33 @@ This applies to:
 * `EmailMessage.send()` (but *not* the EmailMessage constructor)
 
 Notes:
+
 * `using` is a string alias name, not an EmailBackend instance. (This
   mirrors the `using` param in many database methods. It allows future 
   provider-based features, like [message
   defaults](#future-provider-specific-message-defaults), that might not be
   possible directly from a backend instance.)
+
 * `using` conceptually replaces the existing `connection` arg, which is 
   [deprecated](#connection-arguments-deprecated) as part of this proposal.
-* `using` affects how a message is sent, so is an option to the APIs that
-  initiate sending—*not* APIs that construct a message to be sent later. (This
-  avoids potential conflicts in `providers[alias].send_messages([msg1, msg2])`.
-  If `using` were a constructor-time EmailMessage property, that would cause 
-  similar problems as `connection` in [ticket-35864].)
-* The `using` and `connection` args are mutually exclusive. Passing both
-  raises a `TypeError`. (And calling `EmailMessage.send(using="alias")`
-  raises a `TypeError` if the message also has a `connection` property.)
-* The `using` and `fail_silently` args are mutually exclusive. Passing both
-  raises a `TypeError`. (`fail_silently` is similarly incompatible with
-  `connection`. Note that [`fail_silently` is also being
-  deprecated](#fail_silently-sending-option-deprecated) as part of this DEP.)
+
 * If neither `using` nor `connection` is given, the default provider is used.
-* The `auth_user` and `auth_password` args to `send_mail()` and 
-  `send_mass_mail()` are not compatible with `using`. Supplying both raises
-  a `TypeError`. (They are already incompatible with the existing `connection`
-  arg: [ticket-36894]. Also note that this proposal
-  [deprecates these args](#auth_user-and-auth_password-deprecated).)
+
+* `using` affects how a message is sent, so is an option to the APIs that
+  initiate sending—*not* APIs that construct a message to be sent later. (So
+  `using` is *not* an EmailMessage attribute or constructor option. If it were,
+  `providers[alias].send_messages([msg1, msg2])` would be ambiguous. See
+  [ticket-35864] for the equivalent problem with `connection`.)
+
+The `using` arg is mutually exlusive with all sending options deprecated in
+this DEP. Providing both `using` and any of these raises a `TypeError`:
+* [deprecated `connection`](#connection-arguments-deprecated) arg or
+  `EmailMessage` attribute
+* [deprecated `fail_silently`](#fail_silently-sending-option-deprecated) arg
+* [deprecated `auth_user` and 
+  `auth_password`](#auth_user-and-auth_password-deprecated) args
 
 [ticket-35864]: https://code.djangoproject.com/ticket/35864
-[ticket-36894]: https://code.djangoproject.com/ticket/36894
 
 ### `providers` factory
 

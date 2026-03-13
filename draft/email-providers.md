@@ -17,6 +17,7 @@ Last-Modified: 2026‑03‑12
 - [History](#history)
 - [Specification](#specification)
   - [`EMAIL_PROVIDERS` setting](#email_providers-setting)
+  - [`InvalidEmailProvider`](#invalidemailprovider)
   - [`using` argument to send functions](#using-argument-to-send-functions)
   - [`providers` factory](#providers-factory)
   - [Updates to built-in EmailBackend classes](#updates-to-built-in-emailbackend-classes)
@@ -248,6 +249,18 @@ That works fine with Django, but could prevent using reusable apps that haven't
 been updated. See [*Third-party compatibility*](#third-party-compatibility).
 
 
+### `InvalidEmailProvider`
+
+The new `django.core.mail.InvalidEmailProvider` error is a subclass of
+`ImproperlyConfigured`. It is raised to report problems in `EMAIL_PROVIDERS`
+configuration.
+
+(It is analagous to `InvalidCacheBackendError`, `InvalidStorageError`,
+`InvalidTaskBackend`, and `InvalidTemplateEngineError`. Omitting "error" in the
+name is consistent with `ImproperlyConfigured` and follows the lead of the most
+recent addition, `InvalidTaskBackend`.)
+
+
 ### `using` argument to send functions
 
 The django.core.mail APIs which send mail accept a new `using` keyword-only 
@@ -317,8 +330,7 @@ Error: InvalidEmailProvider(...)
 
 * `providers[alias]` (`__getitem__(alias)`) returns an EmailBackend instance
   configured from the matching key in `EMAIL_PROVIDERS`. Aliases are 
-  case-sensitive. Raises `django.core.mail.InvalidEmailProvider` (a new
-  subclass of `ImproperlyConfigured`) for an unknown alias.
+  case-sensitive. Raises `InvalidEmailProvider` for an unknown alias.
 
 * `providers.default` is equivalent to `providers["default"]`
   (using the [`DEFAULT_EMAIL_PROVIDER_ALIAS`](#default_email_provider_alias)).

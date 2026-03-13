@@ -359,8 +359,10 @@ Error: InvalidEmailProvider(...)
   errors.)
 
 The `providers` factory is read-only. It does *not* support `__setitem__()` 
-or `__delitem__()`. At least initially it does not support `__iter__()`,
-though this could be added if a use case is identified.
+or `__delitem__()`. 
+
+At least initially, `providers` does not support `get()`, `__contains__()` or
+`__iter__()`. Any of these could be added if a use case is identified.
 
 
 #### `providers` instances are *not* cached

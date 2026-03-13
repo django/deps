@@ -200,11 +200,15 @@ Attempts to send mail when no provider is defined will raise an
 This forces users who want to send email to decide how to configure it, and
 issues a clear error message if sending is attempted in an unconfigured state.
 It is a deliberate change from earlier Django releases, where attempting to
-send email with the default (unconfigured) settings often resulted in a
+send email with the default (unconfigured SMTP) settings often resulted in a
 confusing error like "ConnectionRefusedError: \[Errno 61] Connection refused."
 
-During the deprecation period, the default `EMAIL_PROVIDERS` is modified: see
-[*Settings compatibility*](#settings-compatibility).
+During the deprecation period, `EMAIL_PROVIDERS` is *not* defined by default
+(does not appear in global_settings.py). Before Django 7.0,
+`django.conf.settings.EMAIL_PROVIDERS` exists only if the user opts into it by
+defining `EMAIL_PROVIDERS` in their settings.py. This is important for
+compatibility during the transition: see [*Settings
+compatibility*](#settings-compatibility).
 
 
 #### New project settings.py template
@@ -677,6 +681,17 @@ During the deprecation period:
   Using a hard error prevents ambiguous mixed settings scenarios in code that
   borrows Django's email settings (such as third-party mail packages).
 
+* If neither `EMAIL_BACKEND` nor `EMAIL_PROVIDERS` is defined in settings.py
+  (so either "deprecated settings" or "default settings" using `EMAIL_BACKEND`
+  from the global settings defaults), the settings module issues a warning that 
+  the default email provider will change from SMTP to none after the 
+  deprecation period. Something like (exact wording TBD), "Django 7.0 will not 
+  have a default email provider. Define EMAIL_PROVIDERS in settings.py to 
+  continue using the SMTP EmailBackend."
+
+  (If `EMAIL_BACKEND` *is* defined in settings.py, the settings module instead
+  warns that setting is deprecated, per the first rule in this section.)
+
 [email-related settings]: https://docs.djangoproject.com/en/6.0/ref/settings/#email
 
 
@@ -701,54 +716,27 @@ EmailBackend instances:
 
 ### Settings compatibility
 
-During the deprecation period, the [default `EMAIL_PROVIDERS`](#default-email_providers)
-setting specified earlier is changed from the empty dict `{}` to:
+During the deprecation period, the [default
+`EMAIL_PROVIDERS`](#default-email_providers) setting specified earlier is *not*
+defined in Django's global settings defaults.
 
-```python
-# django/conf/global_settings.py
+This ensures projects with "default settings" run with the same (deprecated)
+settings defaults as in earlier releases: `EMAIL_BACKEND` is set to Django's
+SMTP backend with all its default options.
 
-EMAIL_PROVIDERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-    },
-}
-```
-
-(This uses the SMTP EmailBackend's default OPTIONS, which are localhost port 25
-with no SMTP auth as in earlier releases.)
-
-Per the rules in the previous section, this default applies *only* when
-"default settings" are in use—when the user's settings.py doesn't define
-`EMAIL_PROVIDERS` or any deprecated `EMAIL_*` settings. It provides backwards
-compatibility with Django's previous default `EMAIL_BACKEND` and related
-settings.
-
-When initialized with "default settings" (so this modification applies), the
-settings module issues a warning that the default email provider will change
-from SMTP to none after the deprecation period. Something like (exact wording
-TBD): "Django 7.0 will not have a default email provider. Define
-EMAIL_PROVIDERS in settings.py to continue using the SMTP EmailBackend."
-
-The net effect for a project with *no* email settings explicitly defined is:
-
-* Django 6.1–6.2 (deprecation period): startup time deprecation warning "Django
-  7.0 will not have a default email provider…." Emails are sent using SMTP
-  default settings, which on unconfigured systems will often raise confusing
-  send-time errors like ConnectionError (as in earlier Django releases).
-
-* Django 7.0 (after deprecation): send-time errors "InvalidEmailProvider: The
-  email provider 'default' doesn't exist."
-
-(Note that *new projects* that use the settings.py template will [include an
-explicit `EMAIL_PROVIDERS` setting](#new-project-settingspy-template). That
-falls under "updated settings" rules so won't provoke the startup deprecation
-warning.)
+It also allows checking whether the user has opted into `EMAIL_PROVIDERS`
+("updated settings") via `hasattr(django.conf.settings, "EMAIL_PROVIDERS")`.
+(During the deprecation period, both Django and third-party code may need to
+distinguish "updated settings" from default or deprecated settings. The
+[`AdminEmailHandler.send_mail()` compatibility](#fail_silently-compatibility)
+logic below includes a case where this is necessary.)
 
 
 ### Default provider compatibility
 
-During the deprecation period if any "deprecated settings" are defined, the
-behavior of `providers.create_connection()` [described
+During the deprecation period if "deprecated settings" or "default settings"
+are in use (`EMAIL_PROVIDERS` is not defined), the behavior of
+`providers.create_connection()` [described
 earlier](#providerscreate_connection) is modified to support constructing the
 default provider from the deprecated email settings. This allows updated code
 (including Django itself) to use `providers.default` without worrying about
@@ -761,14 +749,17 @@ Ignoring detailed error handling, the modified version is roughly:
 
 class EmailProvidersHandler:
     def create_connection(self, alias, /, *, _deprecated_kwargs=None):
-        # RemovedInDjango70Warning: providers.default from deprecated settings.
-        if (
-            alias == DEFAULT_EMAIL_PROVIDER_ALIAS
-            and settings._any_deprecated_email_settings_are_defined()
-        ):
-            with settings._suppress_email_deprecation_warnings():
-                backend_class = import_string(settings.EMAIL_BACKEND)
-                return backend_class(**_deprecated_kwargs)  # no 'alias' arg!
+        # RemovedInDjango70Warning: providers.default from "deprecated settings"
+        # or "default settings".
+        if not hasattr(settings, "EMAIL_PROVIDERS"):
+            if alias == DEFAULT_EMAIL_PROVIDER_ALIAS:
+                with settings._suppress_email_deprecation_warnings():
+                    backend_class = import_string(settings.EMAIL_BACKEND)
+                    return backend_class(**_deprecated_kwargs)  # no 'alias' arg!
+            else:
+                raise InvalidEmailProvider(
+                    f"The email provider '{alias}' doesn't exist."
+                )
 
         # Otherwise construct a backend from settings.EMAIL_PROVIDERS[alias].
         try:
@@ -799,10 +790,8 @@ Notes:
   settings. (Django has already issued a deprecation warning on startup for 
   anything defined in settings.py.)
 
-* When using "deprecated settings," attempting to access any `providers[alias]`
-  other than "default" raises `InvalidEmailProvider`. (This doesn't 
-  require any extra code; it's a natural consequence of `EMAIL_PROVIDERS` 
-  not being defined in the same settings.py as any deprecated settings.)
+* When using "deprecated settings" or "default settings," attempting to access
+  any `providers[alias]` other than "default" raises `InvalidEmailProvider`.
 
 * `_deprecated_kwargs` is a keyword-only arg used to implement the deprecated
   `get_connection(..., **kwargs)` functionality. It will be removed after the
@@ -940,7 +929,7 @@ class AdminEmailHandler(logging.Handler):
         ...
   
     def send_mail(self, subject, message, *args, **kwargs):
-        if not settings.is_overridden("EMAIL_PROVIDERS"):
+        if not hasattr(settings, "EMAIL_PROVIDERS"):
             # RemovedInDjango70Warning: email "deprecated settings" or "default
             # settings" in effect. Use old logic with fail_silently=True.
             connection = mail.get_connection(
@@ -1280,6 +1269,10 @@ alias instead.
 For packages that support multiple Django versions, support for the features
 and changes described here can be detected with `django.VERSION >= (6, 1)` or
 `hasattr(django.core.mail, "providers")`.
+
+To detect whether the user has opted into `EMAIL_PROVIDERS` (what the
+[compatibility section](#backwards-compatibility) calls "updated settings"),
+check `hasattr(django.conf.settings, "EMAIL_PROVIDERS")`.
 
 
 ## Upgrading EmailBackend implementations

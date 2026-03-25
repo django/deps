@@ -368,11 +368,22 @@ Error: EmailProviderDoesNotExist("The email provider 'DEFault' is not configured
   (A module-level default property is not possible: Django's `ConnectionProxy`
   and `LazyObject` helpers require cacheable instances. See the next section.)
 
-The `providers` factory is read-only. It does *not* support `__setitem__()` 
-or `__delitem__()`. 
+The `providers` factory also implements these mapping methods:
 
-At least initially, `providers` does not support `get()`, `__contains__()` or
-`__iter__()`. Any of these could be added if a use case is identified.
+* `providers.get(alias=DEFAULT_EMAIL_PROVIDER_ALIAS, default=None, /)`
+  is like `providers[alias]` but returns the `default` value if `alias` is
+  not configured (is not a key of `EMAIL_PROVIDERS`).
+
+* `providers.__contains__(alias)` returns `True` if `alias` is configured,
+  `False` otherwise. This call will never initialize an EmailBackend instance 
+  (unlike `providers[alias]` or `providers.get(alias)`).
+
+* `providers.__iter__()` returns an iterator over the keys of
+  `EMAIL_PROVIDERS`.
+
+`providers` is read-only. It does *not* support `__setitem__()` or
+`__delitem__()`. (These might be added later, as part of a future [cached
+providers](#future-cached-providers) feature.)
 
 
 #### `providers` instances are *not* cached
@@ -1724,6 +1735,11 @@ False
 >>> mail.providers["archive"] is mail.providers["archive"]
 False
 ```
+
+This change would also implement `__delitem__()` on `mail.providers` (or
+possibly `__setitem__()` allowing only a `None` value), which would discard a
+cached backend instance and force creation of a new one on the next access.
+
 
 ### Future: Annotate sent messages with `using`
 

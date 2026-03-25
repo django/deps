@@ -6,7 +6,7 @@ Shepherd: Natalia Bidart
 Status: Draft
 Type: Feature
 Created: 2026‑02‑09
-Last-Modified: 2026‑03‑13
+Last-Modified: 2026‑03‑25
 ---
 # DEP 0018: Dictionary-based EMAIL_PROVIDERS settings
 
@@ -17,7 +17,7 @@ Last-Modified: 2026‑03‑13
 - [History](#history)
 - [Specification](#specification)
   - [`EMAIL_PROVIDERS` setting](#email_providers-setting)
-  - [`InvalidEmailProvider`](#invalidemailprovider)
+  - [New exceptions](#new-exceptions)
   - [`using` argument to send functions](#using-argument-to-send-functions)
   - [`providers` factory](#providers-factory)
   - [Updates to built-in EmailBackend classes](#updates-to-built-in-emailbackend-classes)
@@ -181,7 +181,7 @@ Although strongly recommended, the `"default"` alias is not strictly required
 in `EMAIL_PROVIDERS`. Django does not check for it on startup (but see
 [*Future: System checks*](#future-system-checks) below). If `"default"` is
 missing, attempts to send mail using the default alias will fail with
-`InvalidEmailProvider`.
+`EmailProviderDoesNotExist`.
 
 #### Default `EMAIL_PROVIDERS`
 
@@ -195,7 +195,7 @@ EMAIL_PROVIDERS = {}
 ```
 
 Attempts to send mail when no provider is defined will raise an
-`InvalidEmailProvider` error that "The email provider 'default' doesn't exist."
+`EmailProviderDoesNotExist` error that "The email provider 'default' is not configured."
 
 This forces users who want to send email to decide how to configure it, and
 issues a clear error message if sending is attempted in an unconfigured state.
@@ -252,8 +252,9 @@ settings") as defined in [*Backwards compatibility*](#backwards-compatibility).
 That works fine with Django, but could prevent using reusable apps that haven't
 been updated. See [*Third-party compatibility*](#third-party-compatibility).
 
+### New exceptions
 
-### `InvalidEmailProvider`
+#### `InvalidEmailProvider`
 
 The new `django.core.mail.InvalidEmailProvider` error is a subclass of
 `ImproperlyConfigured`. It is raised to report problems in `EMAIL_PROVIDERS`
@@ -263,6 +264,29 @@ configuration.
 `InvalidTaskBackend`, and `InvalidTemplateEngineError`. Omitting "error" in the
 name is consistent with `ImproperlyConfigured` and follows the lead of the most
 recent addition, `InvalidTaskBackend`.)
+
+#### `EmailProviderDoesNotExist`
+
+The new `django.core.mail.EmailProviderDoesNotExist` error is a subclass of
+`InvalidEmailProvider` and `KeyError`. It is raised *only* on attempts to use
+an email provider alias that has not been defined in `EMAIL_PROVIDERS`.
+
+This can be helpful for reusable libraries that want to send email when email
+is configured but not raise errors when it isn't:
+
+```python
+try:
+    # Mail admins (using the default email provider).
+    mail_admins("subject", "message")
+except EmailProviderDoesNotExist:
+    # settings.py does not define a default email provider. 
+    pass
+```
+
+(The [deprecated `fail_silently`
+option](#fail_silently-sending-option-deprecated) was often used for this
+purpose, but had the undesirable side effect of also suppressing genuine
+configuration and runtime errors.)
 
 
 ### `using` argument to send functions
@@ -324,7 +348,7 @@ configured EmailBackend instances from provider aliases.
 >>> providers["notifications"]
 <anymail.backends.mailtrap.EmailBackend object ...>
 >>> providers["DEFault"]
-Error: InvalidEmailProvider(...)
+Error: EmailProviderDoesNotExist("The email provider 'DEFault' is not configured.")
 ```
 
 `providers` is meant to parallel `django.core.cache.caches`, 
@@ -333,7 +357,8 @@ Error: InvalidEmailProvider(...)
 
 * `providers[alias]` (`__getitem__(alias)`) returns an EmailBackend instance
   configured from the matching key in `EMAIL_PROVIDERS`. Aliases are 
-  case-sensitive. Raises `InvalidEmailProvider` for an unknown alias.
+  case-sensitive. Raises `EmailProviderDoesNotExist` for an unknown alias
+  or `InvalidEmailProvider` for other configuration problems.
 
 * `providers.default` is equivalent to `providers["default"]`
   (using the [`DEFAULT_EMAIL_PROVIDER_ALIAS`](#default_email_provider_alias)).
@@ -342,21 +367,6 @@ Error: InvalidEmailProvider(...)
   `default_storage`, `default_task_backend`, and `db.connection`.
   (A module-level default property is not possible: Django's `ConnectionProxy`
   and `LazyObject` helpers require cacheable instances. See the next section.)
-
-* `providers.is_configured(alias="default", /)` returns `True` if the given alias
-  is defined in `EMAIL_PROVIDERS`, or `False` otherwise.
-
-  This can be helpful for reusable libraries that want to send email when email
-  is configured but not raise errors when it isn't. (It replaces certain uses
-  of the [deprecated `fail_silently`
-  option](#fail_silently-sending-option-deprecated).)
-
-  (`is_configured()` does not initialize an EmailBackend instance or otherwise
-  validate the provider definition. It is equivalent to writing `(alias or
-  DEFAULT_EMAIL_PROVIDER_ALIAS) in settings.EMAIL_PROVIDERS`, but that requires
-  using an internal constant. It is not the same as `try: mail.providers[alias];
-  except InvalidEmailProvider: pass`, which would also mask some configuration
-  errors.)
 
 The `providers` factory is read-only. It does *not* support `__setitem__()` 
 or `__delitem__()`. 
@@ -417,8 +427,8 @@ class EmailProvidersHandler:
         try:
             config = settings.EMAIL_PROVIDERS[alias]
         except KeyError:
-            raise InvalidEmailProvider(
-                f"The email provider '{alias}' doesn't exist."
+            raise EmailProviderDoesNotExist(
+                f"The email provider '{alias}' is not configured."
             ) from None
         options = config.get("OPTIONS", {})
         backend_path = config.get("BACKEND", DEFAULT_EMAIL_BACKEND)
@@ -550,9 +560,9 @@ There are two changes in Django's logging `AdminEmailHandler`:
 
 2. `AdminEmailHandler.send_mail()` is updated to replace the
    [deprecated `fail_silently=True`](#fail_silently-sending-option-deprecated)
-   with an `is_configured()` check. (This appears to best match the intent of
-   the previous `fail_silently` usage. See related discussion in the deprecation
-   section.)
+   with an `EmailProviderDoesNotExist` check. (This appears to best match the
+   intent of the previous `fail_silently` usage. See related discussion in the
+   deprecation section.)
 
 Before:
 
@@ -573,8 +583,10 @@ After:
 ```python
 class AdminEmailHandler(logging.Handler):
     def send_mail(self, subject, message, *args, **kwargs):
-        if mail.providers.is_configured(self.using):
+        try:
             mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
+        except EmailProviderDoesNotExist:
+            pass
 ```
 
 This change also removes the undocumented `AdminEmailHandler.connection()`
@@ -593,9 +605,9 @@ compatibility*](#fail_silently-compatibility).
 
 The call to `mail_managers()` in Django's `BrokenLinkEmailsMiddleware` is
 modified to replace [deprecated](#fail_silently-sending-option-deprecated)
-`fail_silently` with an `is_configured()` check. The details are similar to the
-second item in `AdminEmailHandler` above, and are similarly modified during the
-deprecation period.
+`fail_silently` with an `EmailProviderDoesNotExist` check. The details are
+similar to the second item in `AdminEmailHandler` above, and are similarly
+modified during the deprecation period.
 
 
 ## Backwards compatibility
@@ -762,16 +774,16 @@ class EmailProvidersHandler:
                     backend_class = import_string(settings.EMAIL_BACKEND)
                     return backend_class(**_deprecated_kwargs)  # no 'alias' arg!
             else:
-                raise InvalidEmailProvider(
-                    f"The email provider '{alias}' doesn't exist."
+                raise EmailProviderDoesNotExist(
+                    f"The email provider '{alias}' is not configured."
                 )
 
         # Otherwise construct a backend from settings.EMAIL_PROVIDERS[alias].
         try:
             config = settings.EMAIL_PROVIDERS[alias]
         except KeyError:
-            raise InvalidEmailProvider(
-                f"The email provider '{alias}' doesn't exist."
+            raise EmailProviderDoesNotExist(
+                f"The email provider '{alias}' is not configured."
             ) from None
         options = config.get("OPTIONS", {})
         # RemovedInDjango70Warning: _deprecated_kwargs.
@@ -796,7 +808,7 @@ Notes:
   anything defined in settings.py.)
 
 * When using "deprecated settings" or "default settings," attempting to access
-  any `providers[alias]` other than "default" raises `InvalidEmailProvider`.
+  any `providers[alias]` other than "default" raises `EmailProviderDoesNotExist`.
 
 * `_deprecated_kwargs` is a keyword-only arg used to implement the deprecated
   `get_connection(..., **kwargs)` functionality. It will be removed after the
@@ -845,8 +857,8 @@ Investigation of existing code using `fail_silently` suggests that, despite its
 with one of these options, depending on the caller's intent:
 
 * To send a message if email has been configured but avoid raising an error
-  if it hasn't (e.g., in a reusable app), gate the send call with `if
-  mail.providers.is_configured():`.
+  if it hasn't (e.g., in a reusable app), wrap the send call in `try:` / 
+  `except EmailProviderDoesNotExist: pass`.
 
 * To ignore *all* exceptions (e.g., to avoid cascading failures in an error
   handler), wrap the send call in `try:` / `except Exception: pass`.
@@ -894,15 +906,16 @@ feature is:
 
 Given the overall confusion about its behavior, the pragmatic choice seemed to
 be removing `fail_silently` entirely and recommending specific replacements
-(`providers.is_configured()`, language features like `try`/`except`) for the
-various use cases.
+(language features like `try`/`except`, granular exceptions like
+`EmailProviderDoesNotExist`) for the various use cases.
 
 [ticket-36907]: https://code.djangoproject.com/ticket/36907
 
 #### `fail_silently` compatibility
 
 Django's two internal uses of `fail_silently=True` are being replaced with an
-`is_configured()` check. (See [`AdminEmailHandler`](#adminemailhandler) and
+`EmailProviderDoesNotExist` check. (See
+[`AdminEmailHandler`](#adminemailhandler) and
 [`BrokenLinkEmailsMiddleware`](#brokenlinkemailsmiddleware) earlier.)
 
 During the deprecation period, the updated code shown earlier must be modified.
@@ -943,8 +956,10 @@ class AdminEmailHandler(logging.Handler):
             mail.mail_admins(subject, message, *args, connection=connection, **kwargs)
         else:
             # "Updated settings" in use. Use post-deprecation logic.
-            if mail.providers.is_configured(self.using):
+            try:
                 mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
+            except EmailProviderDoesNotExist:
+                pass
 ```
 
 #### `fail_silently` in EmailBackend implementations
@@ -1258,7 +1273,7 @@ provider](#future-password-reset-email-provider) and
 Packages that use `fail_silently=True` should rework that code per the guidance
 in [*`fail_silently` deprecated*](#fail_silently-sending-option-deprecated). In
 many cases, either removing `fail_silently` altogether or replacing it with a
-`providers.is_configured()` check is appropriate.
+`EmailProviderDoesNotExist` check is appropriate.
 
 Packages that use `get_connection()` should replace it with an updated 
 alternative as discussed in [*`get_connection()`

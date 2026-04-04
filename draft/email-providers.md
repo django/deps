@@ -386,6 +386,24 @@ The `providers` factory also implements these mapping methods:
 providers](#future-cached-providers) feature.)
 
 
+#### Convenience handling for `alias=None`
+
+The `__getitem__()` and `get()` methods treat `None` as a synonym for the
+default provider. This is meant as a convenience for code that takes an 
+optional `using` argument:
+
+```python
+def send_mail(..., using=None):
+    mail.providers[using].send_messages(...)
+```
+
+That avoids having to repeat the verbose `using if using is not None else
+DEFAULT_EMAIL_PROVIDER_ALIAS` (or the less accurate `using or
+DEFAULT_EMAIL_PROVIDER_ALIAS`) several times in Django's own code. It also
+helps similar cases in third-party code avoid depending on the *internal*
+[`DEFAULT_EMAIL_PROVIDER_ALIAS` constant](#default_email_provider_alias).
+
+
 #### `providers` instances are *not* cached
 
 `providers[alias]` and other accessors return a new EmailBackend instance 
@@ -1138,8 +1156,7 @@ class EmailMessage:
     def send(self, *, using=None):
         if not self.recipients():
             return 0
-        connection = mail.providers[using or DEFAULT_EMAIL_PROVIDER_ALIAS]
-        return connection.send_messages([self])
+        return mail.providers[using].send_messages([self])
 ```
 
 During deprecation (Django 6.1–6.2), handling `fail_silently`, `connection`,

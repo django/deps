@@ -99,7 +99,7 @@ proposes. See the links in this timeline for extensive earlier discussion:
 - mid 2024 (?): Discussion at DjangoCon Europe sprints
 - 2024-06-09: New feature [ticket-35514] opened and approved based on earlier
   discussion
-- 2024-07-28: Jacob Rief opens Django [PR #18421]
+- 2024-07-28: Jacob Rief opens Django [PR #18421] with an initial implementation
 - 2024–2026: Iteration and discussion in the PR, which identifies a number of
   design issues
 - 2026-02-09: This DEP created to help resolve issues raised by the PR and
@@ -1718,20 +1718,9 @@ is sent—with any backend—roughly analogous to Django's `QuerySet.db` propert
 
 ## Reference implementation
 
-Django [PR #18421] by Jacob Rief provides a mostly complete implementation
-of dictionary-based email providers, based on an earlier understanding of 
-the goals. Some differences from this proposal:
-* The PR doesn't have `mail.providers` (it retains `mail.get_connection()`
-  as the way to create EmailBackend instances)
-* The PR retains Django's SMTP EmailBackend as the default
-* The `using` arg described here (for specifying a provider alias when sending)
-  is named `provider` in the PR
-* In the PR, `mail.get_connection()` accepts a new `provider` arg (which is
-  mutually exclusive with the existing `backend` dotted import path arg)
-* The `alias` EmailBackend constructor arg described here is instead named
-  `provider` in the PR
-* Because the PR doesn't deprecate `get_connection()`, it doesn't need to
-  deprecate `fail_silently` or `auth_user` or `auth_password`
+Django [PR #18421] provides a reference implementation.
+
+[PR #21052]: https://github.com/django/django/pull/21052
 
 
 ## Prior art

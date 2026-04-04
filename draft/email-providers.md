@@ -685,8 +685,21 @@ During the deprecation period:
   defines `EMAIL_PROVIDERS`, the deprecated email settings are no longer 
   usable, and trying to mix them is an error.
 
-* Code can use `django.core.mail.providers.default` (and similar references 
-  to the default email provider) regardless of which settings are defined.
+* `providers.default` and similar references to the default email provider
+  work regardless of which settings are defined. If `EMAIL_PROVIDERS` is not
+  defined, the default email provider will return the default
+  `mail.get_connection()` initialized from deprecated or default settings.
+  This allows updated code (including Django itself) to switch to `providers`
+  without worrying about which settings are in use.
+
+* When `EMAIL_PROVIDERS` is defined, `mail.get_connection()` will return the
+  default email provider (with a deprecation warning). This allows a project
+  to update its own settings even if some external dependencies are still
+  using `get_connection()`.
+
+The discussion below details how this is achieved and covers several related
+deprecations and compatibility concerns.
+
 
 ### Deprecated email settings
 
@@ -798,13 +811,15 @@ logic below includes a case where this is necessary.)
 
 ### Default provider compatibility
 
-During the deprecation period if "deprecated settings" or "default settings"
-are in use (`EMAIL_PROVIDERS` is not defined), the behavior of
-`providers.create_connection()` [described
-earlier](#providerscreate_connection) is modified to support constructing the
-default provider from the deprecated email settings. This allows updated code
-(including Django itself) to use `providers.default` without worrying about
-which settings are in use.
+During the deprecation period, the behavior of `providers.create_connection()`
+[described earlier](#providerscreate_connection) is modified to:
+
+* Fall back to `mail.get_connection()` when `EMAIL_PROVIDERS` is not defined
+  ("deprecated" or "default settings").
+
+* Support constructing a default provider with additional keyword args when
+  called from `get_connection()` in certain compatibility scenarios, [described
+  below](#get_connection-deprecated).
 
 Ignoring detailed error handling, the modified version is roughly:
 
@@ -817,9 +832,9 @@ class EmailProvidersHandler:
         # or "default settings".
         if not hasattr(settings, "EMAIL_PROVIDERS"):
             if alias == DEFAULT_EMAIL_PROVIDER_ALIAS:
-                with settings._suppress_email_deprecation_warnings():
-                    backend_class = import_string(settings.EMAIL_BACKEND)
-                    return backend_class(**_deprecated_kwargs)  # no 'alias' arg!
+                assert _deprecated_kwargs is None
+                with _suppress_email_deprecation_warnings():
+                    return mail.get_connection()
             else:
                 raise EmailProviderDoesNotExist(
                     f"The email provider '{alias}' is not configured."
@@ -833,8 +848,9 @@ class EmailProvidersHandler:
                 f"The email provider '{alias}' is not configured."
             ) from None
         options = config.get("OPTIONS", {})
-        # RemovedInDjango70Warning: _deprecated_kwargs.
+        # RemovedInDjango70Warning: called from get_connection() with kwargs.
         if _deprecated_kwargs:
+            assert alias == DEFAULT_EMAIL_PROVIDER_ALIAS
             options = options | _deprecated_kwargs
         backend_path = config.get("BACKEND", DEFAULT_EMAIL_BACKEND)
         backend_class = import_string(backend_path)
@@ -843,16 +859,11 @@ class EmailProvidersHandler:
 
 Notes:
 
-* In the compatibility branch, no `alias` argument is passed to the 
-  EmailBackend constructor. This is the backend's cue to configure itself 
-  from deprecated settings (plus any kwargs, just like in earlier Django 
-  releases).
-
-* Warnings for reading deprecated email settings are suppressed while 
-  constructing the EmailBackend instance. This avoids a flood of confusing 
-  deprecation messages while the backend constructor reads its deprecated 
-  settings. (Django has already issued a deprecation warning on startup for 
-  anything defined in settings.py.)
+* Warnings for reading deprecated email settings are suppressed while calling
+  `get_connection()`. This avoids a flood of confusing deprecation messages
+  while the backend constructor reads its deprecated settings. (Django has
+  already issued a deprecation warning on startup for anything defined in
+  settings.py.)
 
 * When using "deprecated settings" or "default settings," attempting to access
   any `providers[alias]` other than "default" raises `EmailProviderDoesNotExist`.
@@ -861,12 +872,6 @@ Notes:
   `get_connection(..., **kwargs)` functionality. It will be removed after the
   deprecation period. (A scary named param—rather than variable `**kwargs`—is
   meant to discourage misuse that would break when this capability is removed.) 
-
-* (There are a few different ways to split the compatibility code between 
-  `mail.providers.create_connection()` and `mail.get_connection()`. The 
-  example code above is not a required implementation, but the resulting 
-  behavior of the two APIs must be as described in this section and 
-  [*`get_connection()` deprecated*](#get_connection-deprecated) below.)
 
 
 ### Testing outbox compatibility
@@ -1123,7 +1128,8 @@ There are three common use cases for `get_connection()`
    the connection had been used.
 
 During the deprecation period, the implementation of `get_connection(...)` is
-modified as follows:
+modified to issue deprecation warnings, but to continue supporting the first
+two use cases even if the updated `EMAIL_PROVIDERS` setting is defined: 
 
 * In all cases issue a deprecation warning, ideally mentioning the suggested 
   replacement from above.
@@ -1203,7 +1209,6 @@ class EmailMessage:
     def send(self, fail_silently=None, *, using=None):
         if not self.recipients():
             return 0
-        # RemovedInDjango70Warning.
         if fail_silently is not None:
             warnings.warn("'fail_silently' deprecated", RemovedInDjango70Warning)
             if using:
@@ -1223,16 +1228,15 @@ class EmailMessage:
             raise AttributeError(
                 "EmailMessage no longer calls undocumented get_connection()"
             )
-        if self.connection:
+        if using is not None:
+            connection = mail.providers[using]
+        elif self.connection:
             connection = self.connection
-        elif fail_silently is not None:
-            connection = mail.providers.create_connection(
-                DEFAULT_EMAIL_PROVIDER_ALIAS,
-                _deprecated_kwargs={"fail_silently": fail_silently}
-            )
         else:
-            # End of RemovedInDjango70Warning.
-            connection = mail.providers[using or DEFAULT_EMAIL_PROVIDER_ALIAS]
+            # Note that get_connection() returns providers.default
+            # when EMAIL_PROVIDERS is defined.
+            with _suppress_email_deprecation_warnings():
+                connection = mail.get_connection(fail_silently=fail_silently)
         return connection.send_messages([self])
 ```
 

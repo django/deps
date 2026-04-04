@@ -1163,6 +1163,19 @@ constructing a message) is deprecated. Calling `EmailMessage.send()` issues
 a deprecation warning if the `connection` property was set (and the warning
 wasn't already issued in `__init__()`).
 
+Two related, undocumented behaviors are removed immediately in Django 6.1,
+without deprecation:
+
+* The undocumented `EmailMessage.get_connection()` method is no longer called
+  and is removed. As a courtesy to subclasses that may have overridden it,
+  `EmailMessage.send()` will raise an error if `get_connection()` is defined.
+
+* `EmailMessage.send()` no longer sets the message's `connection` property to
+  the connection actually used for sending. (This undocumented behavior was
+  also unreliable, as it didn't apply when using `backend.send_messages()`.)
+  `EmailMessage.send()` still *uses* a `connection` set *before* sending,
+  but no longer sets that property as a side effect of sending.
+
 
 ### `EmailMessage.send()` compatibility
 

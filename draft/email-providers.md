@@ -41,7 +41,6 @@ Last-Modified: 2026‑04‑04
   - [Future: Password reset email provider](#future-password-reset-email-provider)
   - [Future: Provider-specific message defaults](#future-provider-specific-message-defaults)
   - [Future: Cached `providers`](#future-cached-providers)
-  - [Future: Annotate sent messages with `using`](#future-annotate-sent-messages-with-using)
 - [Reference implementation](#reference-implementation)
 - [Prior art](#prior-art)
 - [AI disclosure](#ai-disclosure)
@@ -541,6 +540,12 @@ These changes apply only when the SMTP backend is being initialized through
 `EMAIL_PROVIDERS`. For compatibility, the old behavior remains when deprecated
 settings are in use.
 
+#### Locmem (testing outbox) `sent_using`
+
+When placing copies of sent messages in the `mail.outbox` testing outbox, the
+locmem backend adds a `sent_using` property set to its own alias. This helps
+tests verify which email provider was used to send a particular message.
+
 
 ### Related updates to other Django code
 
@@ -571,10 +576,6 @@ This replicates the previous behavior that substituted `EMAIL_BACKEND =
 "django.core.mail.backends.locmem.EmailBackend"` during tests. (Note that 
 behavior is retained in certain backwards compatibility scenarios: see 
 [*Testing outbox compatibility*](#testing-outbox-compatibility).)
-
-Tests may want to check which email provider (alias) handled each message
-in the testing outbox. A future enhancement could [make `using` available on
-sent messages](#future-annotate-sent-messages-with-using).
 
 [testing-email]: https://docs.djangoproject.com/en/6.0/topics/testing/tools/#topics-testing-email
 
@@ -883,6 +884,10 @@ override, which would conflict with the deprecated email settings.
 
 The test runner setting `EMAIL_BACKEND` does not count as deprecated email 
 setting use, so should *not* issue a deprecation warning.
+
+Messages in the test `mail.outbox` will have their `sent_using` properties set
+to `None` when they are sent through an email backend initialized from "default
+settings" or "deprecated settings."
 
 
 ### `fail_silently` sending option deprecated
@@ -1739,16 +1744,6 @@ False
 This change would also implement `__delitem__()` on `mail.providers` (or
 possibly `__setitem__()` allowing only a `None` value), which would discard a
 cached backend instance and force creation of a new one on the next access.
-
-
-### Future: Annotate sent messages with `using`
-
-The locmem (testing) EmailBackend could set `using` properties on the copies
-of sent messages it writes to the testing outbox, to allow tests to verify
-which provider alias was used.
-
-Or a more expansive approach would add `using` to *every* EmailMessage as it
-is sent—with any backend—roughly analogous to Django's `QuerySet.db` property.
 
 
 ## Reference implementation

@@ -6,7 +6,7 @@ Shepherd: Natalia Bidart
 Status: Draft
 Type: Feature
 Created: 2026‑02‑09
-Last-Modified: 2026‑03‑25
+Last-Modified: 2026‑04‑04
 ---
 # DEP 0018: Dictionary-based EMAIL_PROVIDERS settings
 
@@ -485,23 +485,22 @@ translated or overridden. Compare `DEFAULT_STORAGE_ALIAS`,
 
 In `django.core.mail.backends`:
 
-* `base.BaseEmailBackend.__init__()` is updated to accept an `alias` arg 
-  (defaulting to `None`) and store its value on a new `alias` instance 
-  property. (For compatibility, BaseEmailBackend must continue to accept 
-  and ignore all unknown kwargs.)
+* `base.BaseEmailBackend.__init__()` is updated to accept an `alias` arg
+  (defaulting to `None`) and store its value on a new `alias` instance
+  property.
 
-* The filebased and smtp EmailBackends are updated following the 
-  guidance for [upgrading third-party EmailBackend 
+  In addition, the `BaseEmailBackend` will report any unexpected `**kwargs` as
+  unknown `EMAIL_PROVIDERS` OPTIONS with an `InvalidEmailProvider` error. This
+  is meant to provide a more helpful error message than Python's default
+  `TypeError` for unknown arguments.
+
+* Django's built-in email backends are updated following the guidance for
+  [upgrading third-party EmailBackend
   implementations](#upgrading-emailbackend-implementations) later in this
-  document. This involves significant changes to backend initialization. Using
-  our own recommendations ("dogfooding") helps ensure this proposal will be 
-  workable for other Django packages.
-
-* The dummy, locmem (testing) and console email backends are updated to require
-  explicit named keyword args in `__init__()`, not variable `**kwargs`. This
-  helps ensure typos or unsupported OPTIONS for them in settings.py will cause
-  errors, not be swallowed silently. (These three backends shouldn't require
-  any additional work to support `EMAIL_PROVIDERS`.)
+  document. For the console, filebased and SMTP backends this will involve
+  significant changes to initialization. Using our own recommendations
+  ("dogfooding") helps ensure this proposal will be workable for other Django
+  packages.
 
 There are some additional compatibility changes related to [*`fail_silently` in
 EmailBackend implementations*](#fail_silently-in-emailbackend-implementations).
@@ -1013,62 +1012,26 @@ Django's `BaseEmailBackend` is being phased out:
   continue to set the backend's `fail_silently` attribute from it).
 * After the deprecation period Django's `BaseEmailBackend` will no longer set a
   `fail_silently` attribute on the backend.
-* `BaseEmailBackend` will continue to ignore all `**kwargs`, so if subclasses
-  pass `fail_silently` after the deprecation period it will just be ignored.
 
-This DEP *does* recommend removing variable `**kwargs` from all concrete
-EmailBackends to ensure typos and incorrect OPTIONS keys result in errors,
-rather than being silently ignored. As part of that, backends must explicitly
-name keyword params for supported options and should remove params for options
-they don't implement. (Backends also need to add an `alias` keyword param. See
-[*Upgrading EmailBackend
+Related to this, the `BaseEmailBackend` handling for unknown `**kwargs`
+described earlier in [*Updates to built-in EmailBackend
+classes*](#updates-to-built-in-emailbackend-classes) is modified during the
+deprecation period:
+
+* The `InvalidEmailProvider` error for unknown `**kwargs` is raised only when
+  "updated settings" are in use (the backend has been initialized with an 
+  `alias`).
+
+* With "default settings" or "deprecated settings" (no `alias`), unknown
+  `**kwargs` will issue a deprecation warning.
+
+(See also [*Upgrading EmailBackend
 implementations*](#upgrading-emailbackend-implementations) later.)
 
 Three of Django's built-in EmailBackends have specific support for
 `fail_silently` mode: the console, filebased, and SMTP backends. They will
 follow the guidelines above. (Whether and when to remove that support is
 outside the scope of this DEP. It's not required for any of the work here.)
-
-Django's dummy and locmem backends don't specifically have `fail_silently`
-functionality, so will remove `fail_silently` mode after the deprecation period.
-Using the dummy backend as an example, after the deprecation period it will
-prevent unknown OPTIONS like this:
-
-```python
-# django/core/mail/backends/dummy.py (Django 7.0)
-
-class EmailBackend(BaseEmailBackend):
-    def __init__(self, alias=None):
-        # (alias is the only supported keyword)
-        super().__init__(alias=alias)
-
-    ...
-```
-
-However, Django 6.0's dummy EmailBackend allowed `**kwargs` (including
-`fail_silently`). For compatibility during the deprecation period, the code
-above is modified to something like this (exact error text TBD):
-
-```python
-# django/core/mail/backends/dummy.py (Django 6.1--6.2)
-
-class EmailBackend(BaseEmailBackend):
-    # RemovedInDjango70Warning: **kwargs params and compatibility handling.
-    def __init__(self, alias=None, **kwargs):
-        if kwargs:
-            if alias is not None:
-                # Being initialized from EMAIL_PROVIDERS,
-                # so any kwargs are incorrect OPTIONS.
-                raise TypeError(
-                    "dummy.EmailBackend() got an unexpected keyword"
-                    f"argument '{next(iter(kwargs))}'")
-            else:
-                warnings.warn("…kwargs not supported…", RemovedInDjango70Warning)
-
-        super().__init__(alias=alias, **kwargs)
-```
-
-Similar changes apply in Django's other EmailBackend implementations.
 
 
 ### `get_connection()` deprecated
@@ -1311,18 +1274,15 @@ project, and Django's own built-in email backends.
 
 To support `EMAIL_PROVIDERS`, an EmailBackend implementation should:
 
-1. Accept a new `alias` keyword arg, defaulting to `None`. Forward it to 
-   superclass init, which will result in `self.alias` set to either an 
-   `EMAIL_PROVIDERS` alias string or `None`.
+1. Accept and forward unknown `**kwargs` to superclass init. This covers the
+   new `alias` keyword arg and helpful errors for unknown OPTIONS in the
+   `BaseEmailBackend`. (Ensure any backend-specific keywords are removed from
+   `**kwargs` before passing to the superclass.)
 
-   If the backend has a `fail_silently` arg, decide whether to keep it. If keeping
-   it, handle it locally rather than passing it to the `BaseEmailBackend`. See
+   If the backend has a `fail_silently` arg, decide whether to keep it. If
+   keeping it, handle it locally (don't pass it to the superclass). See
    [*`fail_silently` in EmailBackend
    implementations*](#fail_silently-in-emailbackend-implementations) earlier.
- 
-   (Alternatively, a backend can accept and forward all `**kwargs` to the
-   superclass. But **explicit keyword params are preferred** to avoid
-   swallowing typos in the settings OPTIONS dict.)
 
 2. Optionally issue deprecation warnings for settings that should be moved into
    `EMAIL_PROVIDERS` OPTIONS. And optionally raise an error if deprecated
@@ -1338,19 +1298,21 @@ To support `EMAIL_PROVIDERS`, an EmailBackend implementation should:
    EmailBackends, these warnings and errors are all implemented in Django's
    settings module rather than in the individual backends.)
 
-3. When `alias is not None`, the backend is being initialized from updated
+3. When `self.alias is not None`, the backend is being initialized from updated
    `EMAIL_PROVIDERS` settings via `providers.create_connection()`. The provided
    keyword args include all OPTIONS from the settings. The backend should
    initialize and validate strictly from those args, without checking any
-   settings. (`alias` will be set only in Django 6.1 or later, so there's no
-   need to guard it in packages supporting multiple versions.)
+   settings.
 
-4. Or if `alias is None`, the backend is being initialized in deprecated
+   `self.alias` is set only in Django 6.1 or later. Packages also supporting
+   earlier Django versions should use `getattr(self, "alias", None)` instead.
+
+4. Or if `self.alias is None`, the backend is being initialized in deprecated
    compatibility mode (or in a version of Django before 6.1). The backend
    should use its original logic, including reading any top-level settings.
 
 ❗️ Backend implementations **should not directly read**
-`settings.EMAIL_PROVIDERS[alias]["OPTIONS"]`. It seems tempting, but the
+`settings.EMAIL_PROVIDERS[self.alias]["OPTIONS"]`. It seems tempting, but the
 OPTIONS are already in the `__init__()` args. Trying to read them directly
 from settings may break backwards compatibility or future features. 
 
@@ -1365,7 +1327,7 @@ initializing the backend instance?)
 
 Here's an example. Before migration, this EmailBackend for the hypothetical
 Wheemail service gets a required WHEEMAIL_API_KEY and optional WHEEMAIL_REGION
-from settings:
+from settings. It also looks for "debug" in `**kwargs` to enable extra logging:
 
 ```python
 from django.conf import settings
@@ -1377,6 +1339,7 @@ class WheemailBackend(BaseEmailBackend):
         super().__init__(fail_silently=fail_silently, **kwargs)
         self.api_key = api_key or getattr(settings, "WHEEMAIL_API_KEY", None)
         self.region = region or getattr(settings, "WHEEMAIL_REGION", "eu")
+        self.debug = kwargs.get("debug", False)
         if not self.api_key:
             raise ImproperlyConfigured("Add WHEEMAIL_API_KEY to your settings")
 
@@ -1389,12 +1352,14 @@ To update it for `EMAIL_PROVIDERS` (maintaining pre-Django 6.1 compatibility):
 class WheemailBackend(BaseEmailBackend):
     DEFAULT_REGION = "eu"
 
-    # 1. Add alias=None and forward it to BaseEmailBackend to initialize self.alias.
+    # 1. Forward unused **kwargs to BaseEmailBackend to initialize self.alias.
     #    Handle fail_silently locally if keeping it (or remove it if not).
-    #    Remove unhandled **kwargs to improve error reporting.
-    def __init__(self, api_key=None, region=None, fail_silently=False, alias=None):
-        super().__init__(alias=alias)
-        self.fail_silently = bool(fail_silently)  # (None -> False)
+    def __init__(self, api_key=None, region=None, fail_silently=False, **kwargs):
+        self.debug = kwargs.pop("debug", False)  # pop() to remove "debug" from kwargs
+        super().__init__(**kwargs)  # don't pass fail_silently to base class
+        self.fail_silently = fail_silently
+        
+        alias = getattr(self, "alias", None)  # or just self.alias for Django >= 6.1
 
         # 2. Issue warnings/errors (optional).
         if hasattr(settings, "WHEEMAIL_API_KEY") or hasattr(settings, "WHEEMAIL_REGION"):
@@ -1405,7 +1370,7 @@ class WheemailBackend(BaseEmailBackend):
                 )
             elif django.VERSION >= (6, 1):
                 warnings.warn(
-                    "Replace WHEEMAIL_* settings with EMAIL_PROVIDERS[alias]['OPTIONS'].",
+                    f"Replace WHEEMAIL_* settings with OPTIONS in EMAIL_PROVIDERS.",
                     DeprecationWarning
                 )
 

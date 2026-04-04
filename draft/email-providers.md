@@ -523,6 +523,24 @@ In `django.core.mail.backends`:
 There are some additional compatibility changes related to [*`fail_silently` in
 EmailBackend implementations*](#fail_silently-in-emailbackend-implementations).
 
+#### SMTP host and port
+
+The SMTP backend treats a few configuration OPTIONS differently from the
+corresponding settings used in earlier releases:
+
+* `"host"` is required. An `InvalidEmailProvider` exception is raised if host
+  is missing from OPTIONS. (The earlier `EMAIL_HOST` default of "localhost"
+  leads to confusing errors or lengthy timeouts when an SMTP server is not
+  configured on the local machine.)
+
+* `"port"` dynamically defaults to 25, 465, or 587 depending on the `"use_ssl"`
+  and `"use_tls"` OPTIONS, so can be omitted unless a non-standard port is
+  required.
+
+These changes apply only when the SMTP backend is being initialized through
+`EMAIL_PROVIDERS`. For compatibility, the old behavior remains when deprecated
+settings are in use.
+
 
 ### Related updates to other Django code
 

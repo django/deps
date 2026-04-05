@@ -369,7 +369,7 @@ Error: EmailProviderDoesNotExist("The email provider 'DEFault' is not configured
 
 The `providers` factory also implements these mapping methods:
 
-* `providers.get(alias=DEFAULT_EMAIL_PROVIDER_ALIAS, default=None, /)`
+* `providers.get(alias, /, default=None)`
   is like `providers[alias]` but returns the `default` value if `alias` is
   not configured (is not a key of `EMAIL_PROVIDERS`).
 
@@ -383,24 +383,6 @@ The `providers` factory also implements these mapping methods:
 `providers` is read-only. It does *not* support `__setitem__()` or
 `__delitem__()`. (These might be added later, as part of a future [cached
 providers](#future-cached-providers) feature.)
-
-
-#### Convenience handling for `alias=None`
-
-The `__getitem__()` and `get()` methods treat `None` as a synonym for the
-default provider. This is meant as a convenience for code that takes an 
-optional `using` argument:
-
-```python
-def send_mail(..., using=None):
-    mail.providers[using].send_messages(...)
-```
-
-That avoids having to repeat the verbose `using if using is not None else
-DEFAULT_EMAIL_PROVIDER_ALIAS` (or the less accurate `using or
-DEFAULT_EMAIL_PROVIDER_ALIAS`) several times in Django's own code. It also
-helps similar cases in third-party code avoid depending on the *internal*
-[`DEFAULT_EMAIL_PROVIDER_ALIAS` constant](#default_email_provider_alias).
 
 
 #### `providers` instances are *not* cached
@@ -1198,7 +1180,8 @@ class EmailMessage:
     def send(self, *, using=None):
         if not self.recipients():
             return 0
-        return mail.providers[using].send_messages([self])
+        provider = providers.default if using is None else providers[using]
+        return provider.send_messages([self])
 ```
 
 During deprecation (Django 6.1–6.2), handling `fail_silently`, `connection`,

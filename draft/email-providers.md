@@ -1739,7 +1739,7 @@ cached backend instance and force creation of a new one on the next access.
 
 ## Reference implementation
 
-Django [PR #18421] provides a reference implementation.
+Django [PR #21052] provides a reference implementation.
 
 [PR #21052]: https://github.com/django/django/pull/21052
 

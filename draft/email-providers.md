@@ -14,7 +14,6 @@ Last-Modified: 2026‑04‑21
 
 - [Abstract](#abstract)
 - [Motivation](#motivation)
-- [History](#history)
 - [Specification](#specification)
   - [`EMAIL_PROVIDERS` setting](#email_providers-setting)
   - [New exceptions](#new-exceptions)
@@ -26,23 +25,24 @@ Last-Modified: 2026‑04‑21
   - [Deprecated email settings](#deprecated-email-settings)
   - [Settings compatibility](#settings-compatibility)
   - [Default provider compatibility](#default-provider-compatibility)
+  - [`using` arg compatibility](#using-arg-compatibility)
   - [Testing outbox compatibility](#testing-outbox-compatibility)
   - [`fail_silently` sending option deprecated](#fail_silently-sending-option-deprecated)
   - [`get_connection()` deprecated](#get_connection-deprecated)
   - [`connection` arguments deprecated](#connection-arguments-deprecated)
-  - [`EmailMessage.send()` compatibility](#emailmessagesend-compatibility)
-  - [Other related deprecations](#other-related-deprecations)
+  - [`auth_user` and `auth_password` deprecated](#auth_user-and-auth_password-deprecated)
+  - [`AdminEmailHandler.email_backend` deprecated](#adminemailhandleremail_backend-deprecated)
   - [Third-party compatibility](#third-party-compatibility)
-- [Upgrading EmailBackend implementations](#upgrading-emailbackend-implementations)
-  - [Upgrading a wrapper EmailBackend](#upgrading-a-wrapper-emailbackend)
-- [django-upgrade recommendations](#django-upgrade-recommendations)
+  - [Upgrading EmailBackend implementations](#upgrading-emailbackend-implementations)
+  - [django-upgrade recommendations](#django-upgrade-recommendations)
+- [Reference implementation](#reference-implementation)
 - [Future work](#future-work)
-  - [Future: System checks](#future-system-checks) 
+  - [Future: System checks](#future-system-checks)
   - [Future: Password reset email provider](#future-password-reset-email-provider)
   - [Future: Provider-specific message defaults](#future-provider-specific-message-defaults)
   - [Future: Cached `providers`](#future-cached-providers)
-- [Reference implementation](#reference-implementation)
 - [Prior art](#prior-art)
+- [History](#history)
 - [AI disclosure](#ai-disclosure)
 - [Copyright](#copyright)
 
@@ -63,66 +63,41 @@ In the process, we will deprecate and remove:
 * `mail.get_connection()`
 
 **Status:** The feature was approved in 2024 through the older ticketing
-process. This DEP is rapidly approaching a final draft (**🤔 marks open
-questions**). The implementation is targeted to land in Django 6.1.
+process. This DEP is rapidly approaching a final draft. The
+[implementation][PR #21052] is targeted to land in Django 6.1.
 
 
 ## Motivation
 
-It's common to use different email services—or different configurations of 
-the same email service—for different types of email:
-* transactional notifications vs. bulk marketing
+It's not uncommon for Django projects to use different email services—or
+different configurations of the same email service—for different types of
+email. For example:
+* transactional notifications vs. bulk marketing emails
 * internal operational reporting vs. email to end users
-* different providers for specific geographic regions
-* etc.
+* different email services or hosts for specific geographic regions
 
 Django's pluggable email backends and `mail.get_connection()` API do not
-adequately support this. And as a consequence, packages that send email offer
-inconsistent (and sometimes complicated) extension points for overriding the
-email configuration to use.
+adequately support this need. And as a consequence, packages that send email
+offer inconsistent (and sometimes complicated) extension points for overriding
+the email configuration to use.
 
 In addition, general reluctance to add new top-level settings has been a
-blocking factor for some proposed features and fixes in Django's email
+blocking factor for some proposed features and fixes in Django's core email
 handling. Moving EmailBackend-specific settings from the top level into
-`EMAIL_PROVIDERS` OPTIONS dicts allows that work to progress.
-
-
-## History
-
-This DEP is a bit unusual in that it postdates the approval of the feature it
-proposes. See the links in this timeline for extensive earlier discussion:
-- early 2022: [django-developers discussion]
-- mid 2024 (?): Discussion at DjangoCon Europe sprints
-- 2024-06-09: New feature [ticket-35514] opened and approved based on earlier
-  discussion
-- 2024-07-28: Jacob Rief opens Django [PR #18421] with an initial implementation
-- 2024–2026: Iteration and discussion in the PR, which identifies a number of
-  design issues
-- 2026-02-09: This DEP created to help resolve issues raised by the PR and
-  finalize API
-- 2026-02-23–2026-03-12: Forum [discussion on `fail_silently`][forum-fail_silently]
-  and other details
-
-Revision history and additional commentary can be found in django/deps [PR #105].
-
-[ticket-35514]: https://code.djangoproject.com/ticket/35514
-[PR #18421]: https://github.com/django/django/pull/18421
-[django-developers discussion]: https://groups.google.com/g/django-developers/c/R8ebGynQjK0/m/Tu-o4mGeAQAJ
-[PR #105]: https://github.com/django/deps/pull/105
-[forum-fail_silently]: https://forum.djangoproject.com/t/changing-how-django-core-mail-handles-fail-silently/44278
+`EMAIL_PROVIDERS` OPTIONS dicts will allow that work to progress.
 
 
 ## Specification
 
 Introducing dictionary-based EMAIL_PROVIDERS involves:
-* A new `EMAIL_PROVIDERS` setting, replacing several existing ones
-* A new `using` argument to many django.core.mail APIs, identifying the 
-  provider alias to use for sending
-* A new `mail.providers[alias]` factory for getting EmailBackend instances
-* Related updates to built-in EmailBackend classes, the testing mail outbox, 
-  and some other affected Django code 
+* a new `EMAIL_PROVIDERS` setting, replacing several existing ones.
+* a new `using` argument to many django.core.mail APIs, identifying the
+  provider alias to use for sending.
+* a new `mail.providers[alias]` factory for getting EmailBackend instances.
+* related updates to built-in EmailBackend classes, the testing mail outbox,
+  and some other affected Django code.
 
-This "specification" section defines (mostly) the final,
+This "specification" section defines the final,
 post-deprecation-period behavior. A [later "compatibility"
 section](#backwards-compatibility) details deprecations, transitional behavior
 required to maintain compatibility during the deprecation period, and
@@ -130,7 +105,7 @@ considerations for third-party code.
 
 ### `EMAIL_PROVIDERS` setting
 
-The new `EMAIL_PROVIDERS` setting is a dict mapping email provider "alias" 
+The new `EMAIL_PROVIDERS` setting is a dict mapping email provider "alias"
 strings to EmailBackend import paths and options for those backends. Example:
 
 ```python
@@ -156,8 +131,9 @@ EMAIL_PROVIDERS = {
 }
 ```
 
-`EMAIL_PROVIDERS` replaces the `EMAIL_BACKEND` setting and all backend-specific 
-`EMAIL_*` settings. (See [*Deprecated email settings*](#deprecated-email-settings) later.)
+`EMAIL_PROVIDERS` replaces the `EMAIL_BACKEND` setting and all backend-specific
+`EMAIL_*` settings. (See [*Deprecated email
+settings*](#deprecated-email-settings).)
 
 Each entry in `EMAIL_PROVIDERS` is a dict with two optional keys:
 * `"BACKEND"` specifies the import path to an EmailBackend class, defaulting
@@ -170,13 +146,13 @@ reserved. Attempting to include `"alias"` in the OPTIONS dict will raise
 `InvalidEmailProvider` when that provider is first used.
 
 Aliases, BACKEND paths, and OPTIONS dict *keys* must be strings. (Lazy strings
-are not supported. Individual backend implementations determine whether lazy 
+are not supported. Individual backend implementations determine whether lazy
 strings are allowed for OPTIONS *values.*)
 
 Although strongly recommended, the `"default"` alias is not strictly required
 in `EMAIL_PROVIDERS`. Django does not check for it on startup (but see
-[*Future: System checks*](#future-system-checks) below). If `"default"` is
-missing, attempts to send mail using the default alias will fail with
+[*Future: System checks*](#future-system-checks)). If `"default"` is missing,
+attempts to send mail using the default alias will fail with
 `EmailProviderDoesNotExist`.
 
 #### Default `EMAIL_PROVIDERS`
@@ -191,7 +167,8 @@ EMAIL_PROVIDERS = {}
 ```
 
 Attempts to send mail when no provider is defined will raise an
-`EmailProviderDoesNotExist` error that "The email provider 'default' is not configured."
+`EmailProviderDoesNotExist` error that "The email provider 'default' is not
+configured."
 
 This forces users who want to send email to decide how to configure it, and
 issues a clear error message if sending is attempted in an unconfigured state.
@@ -216,14 +193,12 @@ modified to enable sending email. Something like:
 ```python
 # django/conf/project_template/project_name/settings.py-tpl
 
-# Email
-# https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#email-providers
+# Email providers
+# https://docs.djangoproject.com/en/{{ docs_version }}/topics/email/
+
 EMAIL_PROVIDERS = {
-    "default": {
-        # Prints emails to the console. To enable sending email, change to
-        # "...smtp.EmailBackend" with appropriate "OPTIONS" for your environment
-        # or use a third-party EmailBackend package.
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
+    'default': {
+        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
 ```
@@ -231,22 +206,17 @@ EMAIL_PROVIDERS = {
 Using the console backend in the new project template (but not the global
 settings defaults):
 
-* provides a useful default for development (one which is guaranteed not to raise
-  cryptic errors, unlike a default SMTP backend when local SMTP service is not
-  available)
-* makes visible that emails will not be sent until the setting is changed (unlike
-  a hidden global settings default to the console backend)
+* provides a useful default for development—one which is guaranteed not to
+  raise cryptic errors (unlike a default SMTP backend when local SMTP service
+  is not available).
+* makes visible that emails will not be sent until the setting is changed
+  (unlike a hidden global settings default to the console backend).
 * preserves the useful behavior that an unconfigured (missing from settings.py)
   `EMAIL_PROVIDERS` setting is interpreted as "Django doesn't know how to send
-  email"—and results in clear error messages if sending is attempted
-* during the deprecation period, prevents a confusing deprecation warning for 
-  new projects when `EMAIL_PROVIDERS` isn't defined (see [*Settings
-  compatibility*](#settings-compatibility))
-
-🤔 This means new projects have opted into `EMAIL_PROVIDERS` ("updated
-settings") as defined in [*Backwards compatibility*](#backwards-compatibility).
-That works fine with Django, but could prevent using reusable apps that haven't
-been updated. See [*Third-party compatibility*](#third-party-compatibility).
+  email"—and results in clear error messages if sending is attempted.
+* during the deprecation period, prevents a confusing deprecation warning for
+  newly created projects when `EMAIL_PROVIDERS` isn't defined (see [*Settings
+  compatibility*](#settings-compatibility)).
 
 ### New exceptions
 
@@ -275,7 +245,7 @@ try:
     # Mail admins (using the default email provider).
     mail_admins("subject", "message")
 except EmailProviderDoesNotExist:
-    # settings.py does not define a default email provider. 
+    # settings.py does not define a default email provider.
     pass
 ```
 
@@ -287,8 +257,8 @@ configuration and runtime errors.)
 
 ### `using` argument to send functions
 
-The django.core.mail APIs which send mail accept a new `using` keyword-only 
-argument, which specifies the `EMAIL_PROVIDERS` alias to use for sending:
+The django.core.mail APIs which send email accept a new `using` keyword-only
+argument which specifies the `EMAIL_PROVIDERS` alias to use for sending:
 
 ```pycon
 >>> from django.core.mail import send_mail
@@ -301,34 +271,25 @@ This applies to:
 * `send_mass_mail()`
 * `mail_admins()`
 * `mail_managers()`
-* `EmailMessage.send()` (but *not* the EmailMessage constructor)
+* `EmailMessage.send()`
 
-Notes:
+`using` is a string alias name, not an EmailBackend instance. (This mirrors the
+`using` param in many database methods. It allows future provider-based
+features, like [message defaults](#future-provider-specific-message-defaults),
+that might not be possible directly from a backend instance.)
 
-* `using` is a string alias name, not an EmailBackend instance. (This
-  mirrors the `using` param in many database methods. It allows future 
-  provider-based features, like [message
-  defaults](#future-provider-specific-message-defaults), that might not be
-  possible directly from a backend instance.)
+If `using` is omitted, the default email provider is used.
 
-* `using` conceptually replaces the existing `connection` arg, which is 
-  [deprecated](#connection-arguments-deprecated) as part of this proposal.
+The `using` arg conceptually replaces the existing `connection` arg, which is
+[deprecated](#connection-arguments-deprecated) as part of this proposal.
+`using` is [mutually exclusive](#using-arg-compatibility) with `connection` and
+all other sending options deprecated in this DEP.
 
-* If neither `using` nor `connection` is given, the default provider is used.
-
-* `using` affects how a message is sent, so it's an option to the APIs that
-  initiate sending—*not* APIs that construct a message to be sent later. (So
-  `using` is *not* an EmailMessage attribute or constructor option. If it were,
-  `providers[alias].send_messages([msg1, msg2])` would be ambiguous. See
-  [ticket-35864] for the equivalent problem with `connection`.)
-
-The `using` arg is mutually exlusive with all sending options deprecated in
-this DEP. Providing both `using` and any of these raises a `TypeError`:
-* [deprecated `connection`](#connection-arguments-deprecated) arg or
-  `EmailMessage` attribute
-* [deprecated `fail_silently`](#fail_silently-sending-option-deprecated) arg
-* [deprecated `auth_user` and 
-  `auth_password`](#auth_user-and-auth_password-deprecated) args
+`using` affects how a message is sent. It's an option to the APIs that
+initiate sending, *not* APIs that construct a message to be sent later. (So
+`using` is *not* an EmailMessage attribute or constructor option. If it were,
+`providers[alias].send_messages([msg1, msg2])` would be ambiguous. See
+[ticket-35864] for the equivalent problem with `connection`.)
 
 [ticket-35864]: https://code.djangoproject.com/ticket/35864
 
@@ -347,19 +308,19 @@ configured EmailBackend instances from provider aliases.
 Error: EmailProviderDoesNotExist("The email provider 'DEFault' is not configured.")
 ```
 
-`providers` is meant to parallel `django.core.cache.caches`, 
-`django.core.files.storage.storages`, `django.core.tasks.task_backends` and 
+`providers` is meant to parallel `django.core.cache.caches`,
+`django.core.files.storage.storages`, `django.core.tasks.task_backends` and
 `django.db.connections`. It has this public API:
 
 * `providers[alias]` (`__getitem__(alias)`) returns an EmailBackend instance
-  configured from the matching key in `EMAIL_PROVIDERS`. Aliases are 
+  configured from the matching key in `EMAIL_PROVIDERS`. Aliases are
   case-sensitive. Raises `EmailProviderDoesNotExist` for an unknown alias
   or `InvalidEmailProvider` for other configuration problems.
 
 * `providers.default` is equivalent to `providers["default"]`
   (using the [`DEFAULT_EMAIL_PROVIDER_ALIAS`](#default_email_provider_alias)).
 
-  This is django.core.mail's equivalent of the default `cache.cache`, 
+  This is django.core.mail's equivalent of the default `cache.cache`,
   `default_storage`, `default_task_backend`, and `db.connection`.
   (A module-level default property is not possible: Django's `ConnectionProxy`
   and `LazyObject` helpers require cacheable instances. See the next section.)
@@ -371,7 +332,7 @@ The `providers` factory also implements these mapping methods:
   not configured (is not a key of `EMAIL_PROVIDERS`).
 
 * `providers.__contains__(alias)` returns `True` if `alias` is configured,
-  `False` otherwise. This call will never initialize an EmailBackend instance 
+  `False` otherwise. This call will never initialize an EmailBackend instance
   (unlike `providers[alias]` or `providers.get(alias)`).
 
 * `providers.__iter__()` returns an iterator over the keys of
@@ -384,7 +345,7 @@ providers](#future-cached-providers) feature.)
 
 #### `providers` instances are *not* cached
 
-`providers[alias]` and other accessors return a new EmailBackend instance 
+`providers[alias]` and other accessors return a new EmailBackend instance
 each time they are called:
 
 ```pycon
@@ -395,35 +356,33 @@ False
 ```
 
 To ensure backwards compatibility, `providers` generally cannot cache and reuse
-backend instances. (This differs from caches/storages/tasks/db.connections, 
-all of which provide instance caching.)
+backend instances. (This differs from caches/storages/tasks/db.connections, all
+of which provide instance caching.)
 
-Historically, Django's mail-sending APIs have created an EmailBackend 
-instance, used it for a single `send_messages()` call, and then discarded 
-it. Although most backend implementations probably *do* support repeated 
-`open()`/`close()` cycles, this behavior has never been specified in 
-Django's docs (or even implicitly required in typical use). And even if a 
-backend *does* technically support reuse across multiple `send_messages()` 
-calls, that may have different behavior from creating a new instance. (For 
-example, Django's filebased EmailBackend generates a new timestamped 
-filename for each new instance.)
+Historically, Django's mail-sending APIs have created an EmailBackend instance,
+used it for a single `send_messages()` call, and then discarded it. Although
+most backend implementations probably *do* support repeated `open()`/`close()`
+cycles, this behavior has never been specified in Django's docs (or even
+implicitly required in typical use). And even if a backend *does* technically
+support reuse across multiple `send_messages()` calls, that may have different
+behavior from creating a new instance. (For example, Django's file email
+backend generates a new timestamped filename for each new instance.)
 
-Some of Django's built-in backends *could* safely allow instance reuse, at 
-least within a single thread. Caching providers could be supported as a 
+Some of Django's built-in backends *could* safely allow instance reuse, at
+least within a single thread. Caching providers could be supported as a
 separate [follow-on feature](#future-cached-providers).
-
 
 #### `providers.create_connection()`
 
 `providers` also has one internal method:
 
-* `providers.create_connection(alias, /)`: Creates a new 
+* `providers.create_connection(alias, /)`: Creates a new
   EmailBackend instance for alias, based on the `EMAIL_PROVIDERS` setting.
 
-This method is used to implement the public API, backwards compatibility in 
+This method is used to implement the public API, backwards compatibility in
 other django.core.mail APIs, and may be useful in test cases.
 
-Roughly (ignoring detailed error handling and special cases for backwards 
+Roughly (ignoring detailed error handling and special cases for backwards
 compatibility):
 
 ```python
@@ -443,26 +402,23 @@ class EmailProvidersHandler:
         return backend_class(alias=alias, **options)
 ```
 
-Notes:
+In addition to the OPTIONS from settings, `create_connection()` passes
+`alias=alias` to the EmailBackend constructor. The backend can use this
+argument to determine whether it is being initialized from EMAIL_PROVIDERS or
+backwards compatibility code: see [*Upgrading EmailBackend
+implementations*](#upgrading-emailbackend-implementations). (The name `alias`
+is consistent with storages, db, and caches; see also
+[django/new-features#95].)
 
-* In addition to the OPTIONS from settings, `create_connection()` passes 
-  `alias=alias` to the EmailBackend constructor. The backend can use this 
-  argument to determine whether it is being initialized from EMAIL_PROVIDERS 
-  or backwards compatibility code: see [*Upgrading EmailBackend 
-  implementations*](#upgrading-emailbackend-implementations) later. (The name 
-  `alias` is consistent with storages, db and caches; see also
-  [django/new-features#95].)
+In the initial implementation, there's no need to use `django.utils.
+connection.BaseConnectionHandler` for `providers`. (That could [change
+later](#future-cached-providers).)
 
-* During the deprecation period, the method's signature and behavior are
-  [modified slightly](#default-provider-compatibility) to handle backwards 
-  compatibility cases.
-
-* In the initial implementation, there's no need to use `django.utils.
-  connection.BaseConnectionHandler` for `providers`. (That could [change 
-  later](#future-cached-providers).)
+During the deprecation period, the method's behavior is [modified
+slightly](#default-provider-compatibility) to handle backwards compatibility
+cases.
 
 [django/new-features#95]: https://github.com/django/new-features/issues/95
-
 
 #### `DEFAULT_EMAIL_PROVIDER_ALIAS`
 
@@ -473,7 +429,7 @@ For brevity and clarity, this spec sometimes writes `"default"` where the
 implementation would actually use `DEFAULT_EMAIL_PROVIDER_ALIAS`.
 
 (`DEFAULT_EMAIL_PROVIDER_ALIAS` is *not* a setting and is not meant to be
-translated or overridden. Compare `DEFAULT_STORAGE_ALIAS`, 
+translated or overridden. Compare `DEFAULT_STORAGE_ALIAS`,
 `DEFAULT_TASK_BACKEND_ALIAS`, and similar constants for caches and DB.)
 
 
@@ -493,7 +449,7 @@ In `django.core.mail.backends`:
 * Django's built-in email backends are updated following the guidance for
   [upgrading third-party EmailBackend
   implementations](#upgrading-emailbackend-implementations) later in this
-  document. For the console, filebased and SMTP backends this will involve
+  document. For the console, file, and SMTP backends this will involve
   significant changes to initialization.
 
 There are some additional compatibility changes related to [*`fail_silently` in
@@ -528,12 +484,12 @@ tests verify which email provider was used to send a particular message.
 
 #### Testing outbox
 
-Django's [test runner temporarily replaces][testing-email] *all* defined 
-`EMAIL_PROVIDERS` with the locmem EmailBackend (testing outbox). The change 
-is made in `django.test.utils.setup_test_environment()` and restored in 
+Django's [test runner temporarily replaces][testing-email] *all* defined
+`EMAIL_PROVIDERS` with the locmem EmailBackend (testing outbox). The change
+is made in `django.test.utils.setup_test_environment()` and restored in
 `teardown_test_environment()`.
 
-For the earlier settings example that defines "default" and "notifications" 
+For the earlier settings example that defines "default" and "notifications"
 providers, `setup_test_environment()` effectively substitutes:
 
 ```python
@@ -549,9 +505,9 @@ EMAIL_PROVIDERS = {
 }
 ```
 
-This replicates the previous behavior that substituted `EMAIL_BACKEND = 
-"django.core.mail.backends.locmem.EmailBackend"` during tests. (Note that 
-behavior is retained in certain backwards compatibility scenarios: see 
+This replicates the previous behavior that substituted `EMAIL_BACKEND =
+"django.core.mail.backends.locmem.EmailBackend"` during tests. (Note that
+behavior is retained in certain backwards compatibility scenarios: see
 [*Testing outbox compatibility*](#testing-outbox-compatibility).)
 
 [testing-email]: https://docs.djangoproject.com/en/6.0/topics/testing/tools/#topics-testing-email
@@ -568,7 +524,7 @@ There are two changes in Django's logging `AdminEmailHandler`:
 
     ```python
     # settings.py
-    
+
     LOGGING = {
         # ...
         "handlers": {
@@ -587,31 +543,6 @@ There are two changes in Django's logging `AdminEmailHandler`:
    with an `EmailProviderDoesNotExist` check. (This appears to best match the
    intent of the previous `fail_silently` usage. See related discussion in the
    deprecation section.)
-
-Before:
-
-```python
-# django/utils/log.py
-class AdminEmailHandler(logging.Handler):
-    def send_mail(self, subject, message, *args, **kwargs):
-        mail.mail_admins(
-            subject, message, *args, connection=self.connection(), **kwargs
-        )
-
-    def connection(self):
-        return get_connection(backend=self.email_backend, fail_silently=True)
-```
-
-After:
-
-```python
-class AdminEmailHandler(logging.Handler):
-    def send_mail(self, subject, message, *args, **kwargs):
-        try:
-            mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
-        except EmailProviderDoesNotExist:
-            pass
-```
 
 This change also removes the undocumented `AdminEmailHandler.connection()`
 method and its call to [deprecated
@@ -636,30 +567,30 @@ modified during the deprecation period.
 
 ## Backwards compatibility
 
-The dictionary-based `EMAIL_PROVIDERS` features will be introduced with a 
-standard deprecation period. (Assuming this feature lands in Django 6.1, 
-the deprecations listed here would be removed in Django 7.0.)
+The dictionary-based `EMAIL_PROVIDERS` features will be introduced with a
+standard deprecation period. (Assuming this feature lands in Django 6.1, the
+deprecations listed here would be removed in Django 7.0.)
 
 Some backwards compatibility behavior depends on which settings are defined.
 There are three supported settings.py states, identified throughout this
 section using the following shorthand:
 
-* "Deprecated settings": settings.py defines at least one of the deprecated 
-  email settings (listed below), but not `EMAIL_PROVIDERS`
+* "Deprecated settings": settings.py defines at least one of the deprecated
+  email settings (listed below), but not `EMAIL_PROVIDERS`.
 
-* "Updated settings": settings.py defines `EMAIL_PROVIDERS`, but none of the 
-  deprecated email settings
+* "Updated settings": settings.py defines `EMAIL_PROVIDERS`, but none of the
+  deprecated email settings.
 
-* "Default settings": neither `EMAIL_PROVIDERS` nor any deprecated email 
+* "Default settings": neither `EMAIL_PROVIDERS` nor any deprecated email
   setting is defined in settings.py (so only Django's default global_settings
-  apply)
+  apply).
 
 During the deprecation period:
 
-* Using `EMAIL_PROVIDERS` is opt-in. If `EMAIL_PROVIDERS` is not defined in 
-  settings.py, all deprecated settings and APIs continue to work as they 
-  did before (but issue deprecation warnings). However, once a project 
-  defines `EMAIL_PROVIDERS`, the deprecated email settings are no longer 
+* Using `EMAIL_PROVIDERS` is opt-in. If `EMAIL_PROVIDERS` is not defined in
+  settings.py, all deprecated settings and APIs continue to work as they
+  did before (but issue deprecation warnings). However, once a project
+  defines `EMAIL_PROVIDERS`, the deprecated email settings are no longer
   usable, and trying to mix them is an error.
 
 * `providers.default` and similar references to the default email provider
@@ -669,10 +600,10 @@ During the deprecation period:
   This allows updated code (including Django itself) to switch to `providers`
   without worrying about which settings are in use.
 
-* When `EMAIL_PROVIDERS` is defined, `mail.get_connection()` will return the
-  default email provider (with a deprecation warning). This allows a project
-  to update its own settings even if some external dependencies are still
-  using `get_connection()`.
+* When `EMAIL_PROVIDERS` is defined, most uses of `mail.get_connection()` will
+  return the default email provider (with a deprecation warning). This allows a
+  project to update its own settings even if some external dependencies are
+  still using `get_connection()`.
 
 The discussion below details how this is achieved and covers several related
 deprecations and compatibility concerns.
@@ -696,70 +627,82 @@ The following Django [email-related settings] are deprecated:
   * `EMAIL_USE_SSL`
   * `EMAIL_USE_TLS`
 
-They should be replaced with OPTIONS entries in the appropriate 
-`EMAIL_PROVIDERS` alias. (See [*django-upgrade 
-recommendations*](#django-upgrade-recommendations) later.)
+They should be replaced with OPTIONS entries in the appropriate
+`EMAIL_PROVIDERS` alias. (See [*django-upgrade
+recommendations*](#django-upgrade-recommendations).)
 
 During the deprecation period:
 
-* Defining any of these deprecated settings (but not `EMAIL_PROVIDERS`) 
+* Defining any of these deprecated settings (but not `EMAIL_PROVIDERS`)
   issues deprecation warnings when the settings module is initialized.
 
-* Defining both `EMAIL_PROVIDERS` and any deprecated setting **is not 
+* Defining both `EMAIL_PROVIDERS` and any deprecated setting **is not
   supported** and raises an `ImproperlyConfigured` error preventing startup.
   This avoids ambiguities and conflicts between the two mechanisms.
 
-  Projects using multiple email backends **cannot switch** to 
-  `EMAIL_PROVIDERS` until *all* backends used have been updated to support 
-  providers-based initialization. For example, a project using 
-  django-celery-email to wrap Django's SMTP EmailBackend cannot upgrade its 
-  settings to use `EMAIL_PROVIDERS` until django-celery-email supports 
+  Projects using multiple email backends **cannot switch** to
+  `EMAIL_PROVIDERS` until *all* backends used have been updated to support
+  providers-based initialization. For example, a project using
+  django-celery-email to wrap Django's SMTP EmailBackend cannot upgrade its
+  settings to use `EMAIL_PROVIDERS` until django-celery-email supports
   `EMAIL_PROVIDERS` (even though Django's SMTP EmailBackend is provider-ready).
 
-* When "deprecated settings" are in use, attempting to read *any* deprecated 
-  email setting (whether or not defined in settings.py) issues a deprecation 
-  warning and returns the setting value. This ensures warnings for third-party 
+* When "deprecated settings" are in use, attempting to read *any* deprecated
+  email setting (whether or not defined in settings.py) issues a deprecation
+  warning and returns the setting value. This ensures warnings for third-party
   code that accesses deprecated settings, even if they aren't specifically
   defined in settings.py. (These warnings are suppressed during certain
   operations described later.)
 
-  During the deprecation period, all deprecated email settings retain their 
+  During the deprecation period, all deprecated email settings retain their
   default values from earlier releases (in Django's global_settings defaults).
 
-* With "updated settings," reading any deprecated settings **becomes a hard 
-  error**, not just a warning. Attempting to access any deprecated setting 
-  raises an `AttributeError` explaining the setting is not available when 
-  `EMAIL_PROVIDERS` is defined. (After the deprecation period, this becomes
-  Django's usual `AttributeError: 'Settings' object has no attribute…`.) 
+* When "updated settings" are defined, Django behaves as though the deprecated
+  email settings do not exist, ignoring their global_settings defaults. This
+  is meant to prevent ambiguous mixed settings scenarios in code that borrows
+  Django's email settings (such as third-party mail packages).
 
-  Using a hard error prevents ambiguous mixed settings scenarios in code that
-  borrows Django's email settings (such as third-party mail packages).
+  With `EMAIL_PROVIDERS` defined, reading any deprecated settings **becomes an
+  `AttributeError`** with a message that the setting is not available when
+  `EMAIL_PROVIDERS` is defined—not just a deprecation warning. (An
+  `AttributeError` is required for correctly handling `hasattr(settings, ...)`.
+  After the deprecation period, this becomes Python's usual `AttributeError:
+  'Settings' object has no attribute…`.)
 
-* If neither `EMAIL_BACKEND` nor `EMAIL_PROVIDERS` is defined in settings.py
-  (so either "deprecated settings" or "default settings" using `EMAIL_BACKEND`
-  from the global settings defaults), the settings module issues a warning that 
-  the default email provider will change from SMTP to none after the 
-  deprecation period. Something like (exact wording TBD), "Django 7.0 will not 
-  have a default email provider. Define EMAIL_PROVIDERS in settings.py to 
-  continue using the SMTP EmailBackend."
+  Similarly, with `EMAIL_PROVIDERS` defined, the deprecated email settings
+  are omitted from `dir(settings)`.
 
-  (If `EMAIL_BACKEND` *is* defined in settings.py, the settings module instead
-  warns that setting is deprecated, per the first rule in this section.)
+  This behavior may impact newly created projects (which define
+  `EMAIL_PROVIDERS`) if they try to use third-party packages still using the
+  deprecated settings. Django's release notes or migration docs should
+  specifically cover this situation and suggest replacing `EMAIL_PROVIDERS`
+  with deprecated settings until upgraded dependencies are available.
+
+* When "default settings" are in use (no specific email configuration in
+  settings.py), the settings module issues a warning that the default email
+  provider will change from SMTP to none after the deprecation period.
+  Something like (exact wording TBD), "Django 7.0 will not have a default email
+  provider. Define EMAIL_PROVIDERS in settings.py to continue using the SMTP
+  EmailBackend."
+
+  (If `EMAIL_BACKEND` or any other deprecated setting *is* defined in
+  settings.py, the settings module instead warns that setting is deprecated,
+  per the first rule in this section.)
 
 [email-related settings]: https://docs.djangoproject.com/en/6.0/ref/settings/#email
 
 
 #### Unchanged settings
 
-Implementation of this feature does not affect any of these other 
-[email-related settings], because they are not used for constructing 
+Implementation of this feature does not affect any of these other
+[email-related settings], because they are not used for constructing
 EmailBackend instances:
 
 * Settings for construction and serialization of EmailMessage objects
   * `DEFAULT_FROM_EMAIL`
   * `EMAIL_USE_LOCALTIME`
-  * (A separate, future ticket might move these into `EMAIL_PROVIDERS`: see 
-    [*Provider-specific message 
+  * (A separate, future ticket might move these into `EMAIL_PROVIDERS`: see
+    [*Provider-specific message
     defaults*](#future-provider-specific-message-defaults).)
 * Settings used by `mail_admins()` and `mail_managers()`
   * `ADMINS`
@@ -788,83 +731,53 @@ logic below includes a case where this is necessary.)
 
 ### Default provider compatibility
 
-During the deprecation period, the behavior of `providers.create_connection()`
-[described earlier](#providerscreate_connection) is modified to:
+During the deprecation period, the behavior of
+[`providers.create_connection()`](#providerscreate_connection) is modified to:
 
-* Fall back to `mail.get_connection()` when `EMAIL_PROVIDERS` is not defined
-  ("deprecated" or "default settings").
+* Fall back to `mail.get_connection()` for the default email provider when
+  `EMAIL_PROVIDERS` is not defined ("deprecated" or "default settings"). This
+  allows using `providers.default` without worrying about which settings are
+  defined. (Attempting to access any `providers[alias]` other than "default"
+  still raises `EmailProviderDoesNotExist`.)
 
-* Support constructing a default provider with additional keyword args when
-  called from `get_connection()` in certain compatibility scenarios, [described
-  below](#get_connection-deprecated).
+* Support constructing the default `EMAIL_PROVIDER` with additional keyword args
+  when called from `get_connection()` in certain compatibility scenarios,
+  [described below](#get_connection-deprecated). (To discourage misues,
+  additional keyword args are accepted only via a scarily-named
+  `_deprecated_kwargs` param, rather than generic variable `**kwargs`.)
 
-Ignoring detailed error handling, the modified version is roughly:
+In both cases, warnings for deprecated email settings and other features
+deprecated in this DEP are suppressed while using those deprecated features to
+implement this compatibility behavior.
 
-```python
-# django/core/mail/__init__.py
 
-class EmailProvidersHandler:
-    def create_connection(self, alias, /, *, _deprecated_kwargs=None):
-        # RemovedInDjango70Warning: providers.default from "deprecated settings"
-        # or "default settings".
-        if not hasattr(settings, "EMAIL_PROVIDERS"):
-            if alias == DEFAULT_EMAIL_PROVIDER_ALIAS:
-                assert _deprecated_kwargs is None
-                with _suppress_email_deprecation_warnings():
-                    return mail.get_connection()
-            else:
-                raise EmailProviderDoesNotExist(
-                    f"The email provider '{alias}' is not configured."
-                )
+### `using` arg compatibility
 
-        # Otherwise construct a backend from settings.EMAIL_PROVIDERS[alias].
-        try:
-            config = settings.EMAIL_PROVIDERS[alias]
-        except KeyError:
-            raise EmailProviderDoesNotExist(
-                f"The email provider '{alias}' is not configured."
-            ) from None
-        options = config.get("OPTIONS", {})
-        # RemovedInDjango70Warning: called from get_connection() with kwargs.
-        if _deprecated_kwargs:
-            assert alias == DEFAULT_EMAIL_PROVIDER_ALIAS
-            options = options | _deprecated_kwargs
-        backend_path = config.get("BACKEND", DEFAULT_EMAIL_BACKEND)
-        backend_class = import_string(backend_path)
-        return backend_class(alias=alias, **options)
-```
+The new [`using` argument](#using-argument-to-send-functions) is incompatible
+with sending options deprecated in this DEP. Providing both `using` and any of
+these raises a `TypeError`:
 
-Notes:
-
-* Warnings for reading deprecated email settings are suppressed while calling
-  `get_connection()`. This avoids a flood of confusing deprecation messages
-  while the backend constructor reads its deprecated settings. (Django has
-  already issued a deprecation warning on startup for anything defined in
-  settings.py.)
-
-* When using "deprecated settings" or "default settings," attempting to access
-  any `providers[alias]` other than "default" raises `EmailProviderDoesNotExist`.
-
-* `_deprecated_kwargs` is a keyword-only arg used to implement the deprecated
-  `get_connection(..., **kwargs)` functionality. It will be removed after the
-  deprecation period. (A scary named param—rather than variable `**kwargs`—is
-  meant to discourage misuse that would break when this capability is removed.) 
+* [deprecated `connection`](#connection-arguments-deprecated) arg or
+  `EmailMessage` attribute
+* [deprecated `fail_silently`](#fail_silently-sending-option-deprecated) arg
+* [deprecated `auth_user` and
+  `auth_password`](#auth_user-and-auth_password-deprecated) args
 
 
 ### Testing outbox compatibility
 
-During the deprecation period, the [testing outbox](#testing-outbox) 
-behavior described earlier is modified to maintain compatibility with 
+During the deprecation period, the [testing outbox](#testing-outbox)
+behavior described earlier is modified to maintain compatibility with
 deprecated settings.
 
-When any "deprecated settings" are defined, 
-`django.test.utils.setup_test_environment()` retains its previous behavior of 
-substituting `EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"`, 
-and `teardown_test_environment()` restores the original `EMAIL_BACKEND` (which 
-may be undefined). It *does not* create an `EMAIL_PROVIDERS` setting 
-override, which would conflict with the deprecated email settings.
+When "deprecated settings" or "default settings" are in use,
+`django.test.utils.setup_test_environment()` retains its previous behavior of
+substituting `EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"`,
+and `teardown_test_environment()` restores the original `EMAIL_BACKEND` (which
+may be undefined). It *does not* create an `EMAIL_PROVIDERS` setting override,
+which would conflict with the deprecated email settings.
 
-The test runner setting `EMAIL_BACKEND` does not count as deprecated email 
+The test runner setting `EMAIL_BACKEND` does not count as deprecated email
 setting use, so should *not* issue a deprecation warning.
 
 Messages in the test `mail.outbox` will have their `sent_using` properties set
@@ -890,7 +803,7 @@ Investigation of existing code using `fail_silently` suggests that, despite its
 with one of these options, depending on the caller's intent:
 
 * To send a message if email has been configured but avoid raising an error
-  if it hasn't (e.g., in a reusable app), wrap the send call in `try:` / 
+  if it hasn't (e.g., in a reusable app), wrap the send call in `try:` /
   `except EmailProviderDoesNotExist: pass`.
 
 * To ignore *all* exceptions (e.g., to avoid cascading failures in an error
@@ -904,7 +817,12 @@ with one of these options, depending on the caller's intent:
 * To ignore end user typos in `to` addresses and other delivery problems,
   remove the `fail_silently` arg. Recipient errors are not generally detected
   at send time, so using `fail_silently` for this purpose doesn't accomplish
-  anything (and could mask other problems like configuration errors).
+  anything and could mask other problems like configuration errors.
+
+  (In some local-delivery configurations, SMTP servers *may* report recipient
+  errors at send time. Intercept `SMTPRecipientsRefused` and/or
+  `SMTPResponseException` with particular `smtp_code` values to detect those
+  cases.)
 
 * To create an email configuration that ignores certain backend-dependent
   errors and reuse it for multiple sending operations, define an alias in
@@ -933,9 +851,9 @@ to be compatible with this proposal, but investigation into current usage and
 feature is:
 
 * poorly understood by users (all the caller intents listed earlier have been
-  observed in the wild)
-* inadequately and inaccurately documented ([ticket-36907])
-* inconsistently implemented in third-party email backends
+  observed in the wild).
+* inadequately and inaccurately documented ([ticket-36907]).
+* inconsistently implemented in third-party email backends.
 
 Given the overall confusion about its behavior, the pragmatic choice seemed to
 be removing `fail_silently` entirely and recommending specific replacements
@@ -946,70 +864,34 @@ be removing `fail_silently` entirely and recommending specific replacements
 
 #### `fail_silently` compatibility
 
-Django's two internal uses of `fail_silently=True` are being replaced with an
+Django's two internal uses of `fail_silently=True` will be replaced with an
 `EmailProviderDoesNotExist` check. (See
 [`AdminEmailHandler`](#adminemailhandler) and
 [`BrokenLinkEmailsMiddleware`](#brokenlinkemailsmiddleware) earlier.)
 
-During the deprecation period, the updated code shown earlier must be modified.
-When "deprecated settings" or "default settings" are in effect, the logic from
-previous releases must be used to ensure compatibility. In particular, when the
-SMTP EmailBackend is in use (due to [settings
-compatibility](#settings-compatibility)), it must be initialized with
-`fail_silently=True` to retain the behavior of the earlier code.
-
-In `AdminEmailHandler`, that looks roughly like:
-
-```python
-# django/utils/log.py
-
-class AdminEmailHandler(logging.Handler):
-    def __init__(self, ..., using=None, email_backend=None):
-        # RemovedInDjango70Warning: email_backend and other compatibility checks.
-        if email_backend:
-            warnings.warn("'email_backend' deprecated", RemovedInDjango70Warning)
-        if using and email_backend:
-            raise TypeError("'using' conflicts with deprecated 'email_backend'")
-        if hasattr(self, "connection"):
-            raise AttributeError(
-                "AdminEmailHandler no longer calls undocumented connection() method"
-            )
-        super().__init__()
-        self.using = using
-        self.email_backend = email_backend
-        ...
-  
-    def send_mail(self, subject, message, *args, **kwargs):
-        if not hasattr(settings, "EMAIL_PROVIDERS"):
-            # RemovedInDjango70Warning: email "deprecated settings" or "default
-            # settings" in effect. Use old logic with fail_silently=True.
-            connection = mail.get_connection(
-                backend=self.email_backend, fail_silently=True
-            )
-            mail.mail_admins(subject, message, *args, connection=connection, **kwargs)
-        else:
-            # "Updated settings" in use. Use post-deprecation logic.
-            try:
-                mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
-            except EmailProviderDoesNotExist:
-                pass
-```
+During the deprecation period, `AdminEmailHandler` and
+`BrokenLinkEmailsMiddleware` must ensure compatibility when "deprecated
+settings" or "default settings" are in effect. In particular, when
+`EMAIL_PROVIDERS` is not defined, the backends those handlers use to send mail
+must be initialized with `fail_silently=True` to retain the behavior of the
+earlier code. (This internal compatibility use of deprecated features must not
+result in additional deprecation warnings.)
 
 #### `fail_silently` in EmailBackend implementations
 
-Although this DEP removes the `fail_silently` *argument* to sending APIs, it
+Although this DEP removes the `fail_silently` *argument to sending APIs*, it
 takes no position on whether *EmailBackend* implementations should continue to
 offer a mode that ignores some errors. Each EmailBackend decides for itself
 whether to retain `fail_silently` capabilities (and, as before, exactly which
 errors should be silenced).
 
-`fail_silently` mode is available as a configuration option. (After the 
+`fail_silently` mode is available as a configuration option. (After the
 deprecation period, this is the *only* way it will be available.)
 
 ```python
 EMAIL_PROVIDERS = {
-    "default": { 
-        ... 
+    "default": {
+        ...
     },
     "unimportant": {
         "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
@@ -1030,9 +912,11 @@ Django's `BaseEmailBackend` is being phased out:
 
 * Backends that will continue supporting `fail_silently` should handle the
   constructor arg locally, rather than forwarding it to `BaseEmailBackend`.
-* During the deprecation period, the `BaseEmailBackend` will issue a 
+* During the deprecation period, the `BaseEmailBackend` will issue a
   deprecation warning if given a `fail_silently` keyword arg (but will
   continue to set the backend's `fail_silently` attribute from it).
+* Attempting to read a backend's `fail_silently` attribute issues a deprecation
+  warning if the backend subclass has not specifically defined that attribute.
 * After the deprecation period Django's `BaseEmailBackend` will no longer set a
   `fail_silently` attribute on the backend.
 
@@ -1042,14 +926,14 @@ classes*](#updates-to-built-in-emailbackend-classes) is modified during the
 deprecation period:
 
 * The `InvalidEmailProvider` error for unknown `**kwargs` is raised only when
-  "updated settings" are in use (the backend has been initialized with an 
+  "updated settings" are in use (the backend has been initialized with an
   `alias`).
 
 * With "default settings" or "deprecated settings" (no `alias`), unknown
   `**kwargs` will issue a deprecation warning.
 
 (See also [*Upgrading EmailBackend
-implementations*](#upgrading-emailbackend-implementations) later.)
+implementations*](#upgrading-emailbackend-implementations).)
 
 Three of Django's built-in EmailBackends have specific support for
 `fail_silently` mode: the console, filebased, and SMTP backends. They will
@@ -1061,13 +945,13 @@ outside the scope of this DEP. It's not required for any of the work here.)
 
 The `django.core.mail.get_connection()` function is deprecated.
 
-There are three common use cases for `get_connection()` 
+There are three common use cases for `get_connection()`
 ([GitHub code search][get-connection-usage]):
 
-1. `get_connection()` with no arguments, to create an instance of the 
-   default EmailBackend. This is typically to reuse a single connection 
-   across several send calls. (See [*Sending multiple 
-   emails*][sending-multiple-emails] and the [EmailBackend context manager 
+1. `get_connection()` with no arguments, to create an instance of the
+   default EmailBackend. This is typically to reuse a single connection
+   across several send calls. (See [*Sending multiple
+   emails*][sending-multiple-emails] and the [EmailBackend context manager
    example][email-context-manager] in Django's docs.)
 
    `get_connection()` with no arguments should be replaced with
@@ -1075,11 +959,11 @@ There are three common use cases for `get_connection()`
    django-upgrade](#django-upgrade-recommendations).)
 
    (Or it should be removed entirely if it is not being reused:
-   `send_mail(..., connection=get_connection())` is equivalent to 
+   `send_mail(..., connection=get_connection())` is equivalent to
    `send_mail(..., connection=None)` is equivalent to just `send_mail(...)`
    without the `connection` arg.)
 
-2. `get_connection(arg1=..., arg2=...)` called with keyword arguments but 
+2. `get_connection(arg1=..., arg2=...)` called with keyword arguments but
    no backend import path.
 
    The most common use case for this is with `fail_silently=True`. That should
@@ -1088,15 +972,15 @@ There are three common use cases for `get_connection()`
 
    Other `get_connection()` calls with keyword args are much less common, and
    should be replaced by defining an `EMAIL_PROVIDERS` alias with the keyword
-   options and then referring to it with `using="alias"` or 
+   options and then referring to it with `using="alias"` or
    `mail.providers["alias"]` wherever the connection had been used.
 
-3. `get_connection("path.to.EmailBackend")` called with a backend import 
+3. `get_connection("path.to.EmailBackend")` called with a backend import
    path (and perhaps additional kwargs), to create an instance of a specific
-   EmailBackend. This may be used as a pre-`EMAIL_PROVIDERS` approach to having 
+   EmailBackend. This may be used as a pre-`EMAIL_PROVIDERS` approach to having
    multiple providers and configurations (see, e.g.,
-   [*Mixing email backends*][anymail-multiple-backends] in the third-party 
-   django-anymail docs). It's also used by "wrapper" email backends like 
+   [*Mixing email backends*][anymail-multiple-backends] in the third-party
+   django-anymail docs). It's also used by "wrapper" email backends like
    django-celery-email and django-mailer.
 
    Calls with a backend import path should be replaced by defining an
@@ -1106,27 +990,27 @@ There are three common use cases for `get_connection()`
 
 During the deprecation period, the implementation of `get_connection(...)` is
 modified to issue deprecation warnings, but to continue supporting the first
-two use cases even if the updated `EMAIL_PROVIDERS` setting is defined: 
+two use cases even if the updated `EMAIL_PROVIDERS` setting is defined:
 
-* In all cases issue a deprecation warning, ideally mentioning the suggested 
+* In all cases issue a deprecation warning, ideally mentioning the suggested
   replacement from above.
 
 * If called with no arguments, return `providers.default`.
 
-* If called with keyword arguments but no `backend` import path, return 
+* If called with keyword arguments but no `backend` import path, return
   `providers.create_connection(DEFAULT_EMAIL_PROVIDER_ALIAS,
   _deprecated_kwargs=kwargs)`. This covers deprecated `fail_silently`,
   `auth_user` and `auth_password` args (see below), as well as other possible
   deprecated usage involving kwargs.
 
 * If called with a backend import path:
-  * With "deprecated settings" or "default settings" use the existing logic 
-    to construct and return a specific backend instance. The backend 
-    constructor must be called without an `alias` argument (*not* with 
-    `alias=None`), to ensure compatibility with third-party backends that may 
+  * With "deprecated settings" or "default settings" use the existing logic
+    to construct and return a specific backend instance. The backend
+    constructor must be called without an `alias` argument (*not* with
+    `alias=None`), to ensure compatibility with third-party backends that may
     not support extra kwargs. Warnings for reading deprecated email settings
     should be suppressed while constructing the EmailBackend.
-  * With "updated settings" raise a `RuntimeError` indicating 
+  * With "updated settings" raise a `RuntimeError` indicating
     `get_connection(backend)` is not compatible with `EMAIL_PROVIDERS`.
 
 [get-connection-usage]: https://github.com/search?q=django.core.mail+AND+%22get_connection%28%22+AND+language%3APython+AND+NOT+path%3Adjango%2F&type=code
@@ -1137,14 +1021,13 @@ two use cases even if the updated `EMAIL_PROVIDERS` setting is defined:
 
 ### `connection` arguments deprecated
 
-The `connection` argument to all django.core.mail functions and the Django 
+The `connection` argument to all django.core.mail functions and the Django
 `EmailMessage()` constructor is deprecated. Providing it issues a deprecation
 warning.
 
 Similarly, the `EmailMessage.connection` property (which can be set after
-constructing a message) is deprecated. Calling `EmailMessage.send()` issues
-a deprecation warning if the `connection` property was set (and the warning
-wasn't already issued in `__init__()`).
+constructing a message) is deprecated. Attempting to set or get it issues a
+deprecation warning.
 
 Two related, undocumented behaviors are removed immediately in Django 6.1,
 without deprecation:
@@ -1160,103 +1043,24 @@ without deprecation:
   but no longer sets that property as a side effect of sending.
 
 
-### `EmailMessage.send()` compatibility
+### `auth_user` and `auth_password` deprecated
 
-Because code is sometimes clearer than text, here is a sample implementation
-of `EmailMessage.send()` after and during the deprecation period. (You might
-compare this to [Django 6.0's implementation][EmailMessage.send-6.0].)
-
-After deprecation (Django 7.0):
-
-```python
-# django/core/mail/message.py
-
-class EmailMessage:
-    def send(self, *, using=None):
-        if not self.recipients():
-            return 0
-        provider = providers.default if using is None else providers[using]
-        return provider.send_messages([self])
-```
-
-During deprecation (Django 6.1–6.2), handling `fail_silently`, `connection`,
-and other changes:
-
-```python
-class EmailMessage:
-    def send(self, fail_silently=None, *, using=None):
-        if not self.recipients():
-            return 0
-        if fail_silently is not None:
-            warnings.warn("'fail_silently' deprecated", RemovedInDjango70Warning)
-            if using:
-                raise TypeError("'fail_silently' conflicts with 'using'")
-            # Existing check from ticket-36894.
-            if self.connection:
-                raise TypeError("'fail_silently' conflicts with 'connection'")
-        if self.connection:
-            # Warn about connection attribute set after __init__().
-            if not getattr(self.connection, "_has_warned", False):
-                warnings.warn("'connection' attr deprecated", RemovedInDjango70Warning)
-                self.connection._has_warned = True
-            if using is not None:
-                raise TypeError("'using' conflicts with 'connection'")
-        if hasattr(self, "get_connection"):
-            # Courtesy error for subclasses overriding undocumented internals.
-            raise AttributeError(
-                "EmailMessage no longer calls undocumented get_connection()"
-            )
-        if using is not None:
-            connection = mail.providers[using]
-        elif self.connection:
-            connection = self.connection
-        else:
-            # Note that get_connection() returns providers.default
-            # when EMAIL_PROVIDERS is defined.
-            with _suppress_email_deprecation_warnings():
-                connection = mail.get_connection(fail_silently=fail_silently)
-        return connection.send_messages([self])
-```
-
-A few notes:
-
-* This is not a required implementation, but is meant to illustrate several
-  of the deprecations and compatibility issues discussed above.
-
-* The deprecation and error messages shown here are kept brief for readability.
-  Exact wording would be decided during implementation.
-
-* We need some way to avoid multiple deprecation warnings when, e.g.,
-  `send_mail(connection=...)` issues a warning and then calls
-  `EmailMessage(connection=connection).send()`. This code uses an internal
-  `_has_warned` connection attribute to track that. (We'd likely create a
-  shared deprecation warning helper for use by all email methods.)
-
-* Something similar is needed to prevent duplicate warnings for `fail_silently`
-  (not shown in this example).
-
-[EmailMessage.send-6.0]: https://github.com/django/django/blob/fb3a11071aae27ef869d2b029289b9f59cc41128/django/core/mail/message.py#L352-L358
-
-
-### Other related deprecations
-
-#### `auth_user` and `auth_password` deprecated
-
-The `auth_user` and `auth_password` args to `send_mail()` and 
+The `auth_user` and `auth_password` args to `send_mail()` and
 `send_mass_mail()` are deprecated. They are incompatible with `mail.providers`
 for the same reasons as `fail_silently`.
 
-Using `auth_user` or `auth_password` issues a deprecation warning. They 
-should be moved to `"username"` and `"password"` OPTIONS in an appropriate 
-`EMAIL_PROVIDERS` alias, and the call should then be updated to use 
+Using `auth_user` or `auth_password` issues a deprecation warning. They
+should be moved to `"username"` and `"password"` OPTIONS in an appropriate
+`EMAIL_PROVIDERS` alias, and the call should then be updated to use
 `using="alias"`.
 
-#### `AdminEmailHandler.email_backend` deprecated
+
+### `AdminEmailHandler.email_backend` deprecated
 
 The dotted import path [`email_backend`
 argument][AdminEmailHandler.email_backend]
-to `django.utils.log.AdminEmailHandler` is deprecated. It should be replaced 
-by defining an alias in `EMAIL_PROVIDERS` and using the new 
+to `django.utils.log.AdminEmailHandler` is deprecated. It should be replaced
+by defining an alias in `EMAIL_PROVIDERS` and using the new
 [`AdminEmailHandler.using` option](#adminemailhandlerusing).
 
 [AdminEmailHandler.email_backend]: https://docs.djangoproject.com/en/6.0/ref/logging/#django.utils.log.AdminEmailHandler:~:text=email_backend%20argument
@@ -1269,7 +1073,7 @@ working with existing apps as they do today—unless and until the user opts int
 `EMAIL_PROVIDERS` in their settings.py. (Using deprecated features will, of
 course, result in deprecation warnings.)
 
-Packages that implement EmailBackends usually require updates to work with
+Packages that implement EmailBackends may require updates to work with
 `EMAIL_PROVIDERS`, covered [below](#upgrading-emailbackend-implementations).
 
 Packages that send email by calling `django.core.mail` APIs *without* using the
@@ -1284,11 +1088,11 @@ in [*`fail_silently` deprecated*](#fail_silently-sending-option-deprecated). In
 many cases, either removing `fail_silently` altogether or replacing it with a
 `EmailProviderDoesNotExist` check is appropriate.
 
-Packages that use `get_connection()` should replace it with an updated 
+Packages that use `get_connection()` should replace it with an updated
 alternative as discussed in [*`get_connection()`
-deprecated*](#get_connection-deprecated) above. If the package calls 
-`get_connection()` with a dotted import path, the replacement should use 
-`mail.providers[alias]` with a package-specific or user-configurable provider 
+deprecated*](#get_connection-deprecated) above. If the package calls
+`get_connection()` with a dotted import path, the replacement should use
+`mail.providers[alias]` with a package-specific or user-configurable provider
 alias instead.
 
 For packages that support multiple Django versions, support for the features
@@ -1300,61 +1104,66 @@ To detect whether the user has opted into `EMAIL_PROVIDERS` (what the
 check `hasattr(django.conf.settings, "EMAIL_PROVIDERS")`.
 
 
-## Upgrading EmailBackend implementations
+### Upgrading EmailBackend implementations
 
-Code that implements an EmailBackend with any configurable options almost 
-always needs to be updated for `EMAIL_PROVIDERS`. The approach here is 
-meant to work for third-party backends, first-party backends directly in a 
-project, and Django's own built-in email backends.
+Code that implements an EmailBackend may need to be updated for email
+providers. To work correctly with `mail.providers` an EmailBackend
+implementation:
 
-To support `EMAIL_PROVIDERS`, an EmailBackend implementation should:
+1. Must accept and forward unknown `**kwargs` to superclass init. This lets the
+   `BaseEmailBackend` handle the new `alias` argument and issue helpful errors
+   for unknown OPTIONS.
 
-1. Accept and forward unknown `**kwargs` to superclass init. This covers the
-   new `alias` keyword arg and helpful errors for unknown OPTIONS in the
-   `BaseEmailBackend`. (Ensure any backend-specific keywords are removed from
-   `**kwargs` before passing to the superclass.)
+   Any backend-specific keywords must be removed from `**kwargs` before passing
+   to the superclass. The preferred way to do this is with explicit keyword
+   parameters for all supported options.
 
    If the backend has a `fail_silently` arg, decide whether to keep it. If
    keeping it, handle it locally (don't pass it to the superclass). See
    [*`fail_silently` in EmailBackend
-   implementations*](#fail_silently-in-emailbackend-implementations) earlier.
+   implementations*](#fail_silently-in-emailbackend-implementations).
 
-2. Optionally issue deprecation warnings for settings that should be moved into
-   `EMAIL_PROVIDERS` OPTIONS. And optionally raise an error if deprecated
-   settings are being used alongside `EMAIL_PROVIDERS` (which can be detected
-   by `alias is not None`).
+2. Must treat keyword arguments as overriding settings or default values. When
+   initialized through `mail.providers`, the keyword args come from OPTIONS
+   in the `EMAIL_PROVIDERS` setting, so should take precedence
 
-   If the package supports multiple Django versions, only warn on Django 6.1 or
-   later. (Either check `django.VERSION >= (6, 1)` or feature test for
-   `hasattr(django.core.mail, "providers")`.)
+   For required options, it's usually best to detect missing values and raise
+   `InvalidEmailProvider`. (Defining a keyword param with no default also
+   works, but results in a less helpful, generic `TypeError` from Python.)
 
-   Some packages might prefer to handle settings checks elsewhere, such
-   as using Django's system check framework. (For Django's built-in
-   EmailBackends, these warnings and errors are all implemented in Django's
-   settings module rather than in the individual backends.)
+   ❗️ Backend implementations **should not directly read**
+   `settings.EMAIL_PROVIDERS[self.alias]["OPTIONS"]`. It seems tempting, but
+   the OPTIONS are already in the `__init__()` args. Trying to read them
+   directly from settings may break backwards compatibility or future features.
 
-3. When `self.alias is not None`, the backend is being initialized from updated
-   `EMAIL_PROVIDERS` settings via `providers.create_connection()`. The provided
-   keyword args include all OPTIONS from the settings. The backend should
-   initialize and validate strictly from those args, without checking any
-   settings.
+3. Should decide whether to continue supporting existing custom settings.
 
-   `self.alias` is set only in Django 6.1 or later. Packages also supporting
-   earlier Django versions should use `getattr(self, "alias", None)` instead.
+   If a backend *only* wants to allow configuration through `EMAIL_PROVIDERS`,
+   existing custom settings can be deprecated or dropped. Some custom backends
+   may want to retain existing settings as a common fallback when a value isn't
+   provided in OPTIONS. (E.g., use `api_key` if in OPTIONS but default to
+   `settings.CUSTOM_BACKEND_API_KEY` when not provided.)
 
-4. Or if `self.alias is None`, the backend is being initialized in deprecated
-   compatibility mode (or in a version of Django before 6.1). The backend
-   should use its original logic, including reading any top-level settings.
+   Django's own backends are switching to OPTIONS-only configuration after the
+   deprecation period. During deprecation, they use settings values only when
+   being initialized in compatibility mode (not through `mail.providers`). To
+   differentiate, check `self.alias` after calling superclass init. If
+   `self.alias is None`, compatibility applies; when `self.alias` is set the
+   backend was initialized from `EMAIL_PROVIDERS` OPTIONS.
 
-❗️ Backend implementations **should not directly read**
-`settings.EMAIL_PROVIDERS[self.alias]["OPTIONS"]`. It seems tempting, but the
-OPTIONS are already in the `__init__()` args. Trying to read them directly
-from settings may break backwards compatibility or future features. 
+   For packages supporting multiple Django versions, either check
+   `django.VERSION >= (6, 1)` or feature test for `hasattr(django.core.mail,
+   "providers")` to determine if the email providers feature is available. And
+   substitute `getattr(self, "alias", None)` for `self.alias` since it's not
+   set in earlier Django versions.
 
-A good rule of thumb is to use `alias` *only* in error messages (to identify
-the offending `EMAIL_PROVIDERS` entry) or to distinguish updated from
-deprecated initialization (by checking for `None`). Any other use of `alias` is
-likely problematic.
+4. Must not access Django's deprecated email settings when `EMAIL_PROVIDERS` is
+   defined. Trying to read them will raise an `AttributeError`. This may affect
+   custom email backends that borrow Django settings like `EMAIL_HOST`.
+
+   A backend that wants to mimic Django's compatibility behavior should check
+   `self.alias` as described in the previous item, and only access Django's
+   deprecated email settings in compatibility mode (when `self.alias is None`).
 
 Here's an example. Before migration, this EmailBackend for the hypothetical
 Wheemail service gets a required WHEEMAIL_API_KEY and optional WHEEMAIL_REGION
@@ -1377,48 +1186,56 @@ class WheemailBackend(BaseEmailBackend):
     # ... other methods ...
 ```
 
-To update it for `EMAIL_PROVIDERS` (maintaining pre-Django 6.1 compatibility):
+To update it for `EMAIL_PROVIDERS`, maintaining pre-Django 6.1 compatibility
+and deprecating the custom settings in Django 6.1 and later:
 
 ```python
+import django.core.mail
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from django.core.mail import InvalidEmailProvider
+from django.core.mail.backends.base import BaseEmailBackend
+
 class WheemailBackend(BaseEmailBackend):
     DEFAULT_REGION = "eu"
 
-    # 1. Forward unused **kwargs to BaseEmailBackend to initialize self.alias.
-    #    Handle fail_silently locally if keeping it (or remove it if not).
+    # Forward unused **kwargs to BaseEmailBackend to initialize self.alias.
+    # Handle fail_silently locally if keeping it (or remove it if not).
     def __init__(self, api_key=None, region=None, fail_silently=False, **kwargs):
         self.debug = kwargs.pop("debug", False)  # pop() to remove "debug" from kwargs
         super().__init__(**kwargs)  # don't pass fail_silently to base class
         self.fail_silently = fail_silently
-        
+
         alias = getattr(self, "alias", None)  # or just self.alias for Django >= 6.1
 
-        # 2. Issue warnings/errors (optional).
+        # Issue deprecation warnings/errors for custom settings (optional).
         if hasattr(settings, "WHEEMAIL_API_KEY") or hasattr(settings, "WHEEMAIL_REGION"):
             if alias is not None:
                 # This can only occur on Django 6.1+ with EMAIL_PROVIDERS defined.
                 raise ImproperlyConfigured(
                     "Don't mix WHEEMAIL_* settings with EMAIL_PROVIDERS"
                 )
-            elif django.VERSION >= (6, 1):
+            elif hasattr(django.core.mail, "providers"):
+                # Running on Django 6.1+.
                 warnings.warn(
                     f"Replace WHEEMAIL_* settings with OPTIONS in EMAIL_PROVIDERS.",
                     DeprecationWarning
                 )
 
         if alias is not None:
-            # 3. Being initialized in Django 6.1+ by providers.create_connection() with
-            #    updated settings. *All* options are in params. Don't use old settings.
-            #    (And don't access settings.EMAIL_PROVIDERS directly.)
+            # Being initialized in Django 6.1+ by mail.providers.
+            # *All* options are in params. Don't use old settings.
+            # (And don't access settings.EMAIL_PROVIDERS directly.)
             if not api_key:
                 # It's helpful to identify the alias in the error message.
-                raise ImproperlyConfigured(
-                    f"Add 'api_key' to EMAIL_PROVIDERS['{alias}']['OPTIONS']"
+                raise InvalidEmailProvider(
+                    "WheeMail requires 'api_key' in OPTIONS", alias=alias
                 )
             self.api_key = api_key
             self.region = region or self.DEFAULT_REGION
         else:
-            # 4. Being initialized from deprecated settings or in an older Django version.
-            #    Use the original logic.
+            # Being initialized from deprecated settings or in an older Django version.
+            # Use the original logic.
             self.api_key = api_key or getattr(settings, "WHEEMAIL_API_KEY", None)
             self.region = (
                 region or getattr(settings, "WHEEMAIL_REGION", self.DEFAULT_REGION)
@@ -1427,15 +1244,10 @@ class WheemailBackend(BaseEmailBackend):
                 raise ImproperlyConfigured("Add WHEEMAIL_API_KEY to your settings")
 ```
 
-After the deprecation period, sections 2 and 4 can be removed.
 
-If this is a first-party EmailBackend (implemented in the same project that
-uses it), sections 2 and 4 are unnecessary and can be omitted.
+#### Upgrading a wrapper EmailBackend
 
-
-### Upgrading a wrapper EmailBackend
-
-Packages like [django-celery-email] and [django-mailer] "wrap" some other 
+Packages like [django-celery-email] and [django-mailer] "wrap" some other
 EmailBackend to add functionality, such as queuing and retry. They typically
 have their own setting to specify an import path to the wrapped backend:
 
@@ -1452,8 +1264,8 @@ MAILER_EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
 ```
 
 The recommended upgrade for wrapper backends is:
-* Follow the [instructions above](#upgrading-emailbackend-implementations), which apply generally to all
-  EmailBackend implementations
+* Follow the [instructions above](#upgrading-emailbackend-implementations),
+  which apply generally to all EmailBackend implementations
 * When initializing from updated settings (`alias is not None`):
   * Require a new `using` parameter that identifies the provider alias
     to wrap (and raise an error if it's missing)
@@ -1461,7 +1273,7 @@ The recommended upgrade for wrapper backends is:
     `mail.get_connection(settings.WRAPPED_EMAIL_BACKEND)`,
     instead use `mail.providers[using]`
 
-With that change, the updated settings from the django-mailer example above 
+With that change, the updated settings from the django-mailer example above
 would be:
 
 ```python
@@ -1506,11 +1318,11 @@ specific fixed alias: e.g., `mail.providers["mailer-wrapped"]`.
 [django-mailer]: https://pypi.org/project/django-mailer/
 
 
-## django-upgrade recommendations
+### django-upgrade recommendations
 
-In some cases, [django-upgrade] *may* be able to convert the deprecated 
-email settings to an `EMAIL_PROVIDERS` dict. For projects that use *only* 
-the default SMTP EmailBackend (and the standard test-time override), 
+In some cases, [django-upgrade] *may* be able to convert the deprecated
+email settings to an `EMAIL_PROVIDERS` dict. For projects that use *only*
+the default SMTP EmailBackend (and the standard test-time override),
 django-upgrade could convert the related settings:
 
 ```python
@@ -1535,12 +1347,12 @@ EMAIL_PROVIDERS = {
 If settings.py defines some other `EMAIL_BACKEND`, django-upgrade should not
 convert anything.
 
-Things get trickier if a project uses multiple email backends, e.g., via 
+Things get trickier if a project uses multiple email backends, e.g., via
 `mail.get_connection()` or test-time `EMAIL_BACKEND` overrides. For example,
-here's a settings file that strongly suggests the project is using multiple 
-email backends—but probably not in a way django-upgrade could detect or 
-properly convert. And upgrading just the `EMAIL_*` settings as above would 
-lead to errors when the other backends are used (due to the "no mixed 
+here's a settings file that strongly suggests the project is using multiple
+email backends—but probably not in a way django-upgrade could detect or
+properly convert. And upgrading just the `EMAIL_*` settings as above would
+lead to errors when the other backends are used (due to the "no mixed
 settings" rule):
 
 ```python
@@ -1577,7 +1389,7 @@ Apart from settings, django-upgrade could also:
   APIs (but not `connection=foo` where `foo = mail.get_connection()` and is
   being used to share a single connection between calls)
 
-In addition, a surprisingly large body of existing code and tutorials 
+In addition, a surprisingly large body of existing code and tutorials
 (mis-)uses `EMAIL_HOST_USER` as the `from_email`:
 
 ```python
@@ -1597,10 +1409,17 @@ settings.py to `DEFAULT_FROM_EMAIL = "old EMAIL_HOST_USER"` and then replace
 [django-upgrade]: https://django-upgrade.readthedocs.io/
 
 
+## Reference implementation
+
+Django [PR #21052] provides a reference implementation.
+
+[PR #21052]: https://github.com/django/django/pull/21052
+
+
 ## Future work
 
-This section describes some **potential**, **future**, related features that 
-are *not* part of this proposal but may help inform some of the design 
+This section describes some **potential**, **future**, related features that
+are *not* part of this proposal but may help inform some of the design
 decisions here.
 
 ### Future: System checks
@@ -1618,11 +1437,11 @@ for this proposal and have been omitted here to control scope.)
 
 ### Future: Password reset email provider
 
-Currently, using a different email provider for a django.contrib.auth 
-password reset email requires subclassing `PasswordResetForm` to override 
-`send_mail()`. Swapping in a different `using` (or `connection` in 
-earlier Django versions) isn't possible without also duplicating [all the 
-email rendering logic][PasswordResetForm.send_mail].
+Currently, using a different email provider for a django.contrib.auth password
+reset email requires subclassing `PasswordResetForm` to override `send_mail()`.
+Swapping in a different `using` (or `connection` in earlier Django versions)
+isn't possible without also duplicating [all the email rendering
+logic][PasswordResetForm.send_mail].
 
 [PasswordResetForm.send_mail]: https://github.com/django/django/blob/7bc9d39fbdae6c09f630c6e5d51ea4ad2484fc46/django/contrib/auth/forms.py#L394-L421
 
@@ -1633,7 +1452,7 @@ variable extension point for subclasses to override:
 # django/contrib/auth/forms.py
 class PasswordResetForm:
     email_using = None
-    
+
     def send_mail(self, ...):
         ...
         email_message = EmailMultiAlternatives(...)
@@ -1669,12 +1488,12 @@ EMAIL_PROVIDERS = {
 }
 ```
 
-The DEFAULTS would be used by the EmailMessage class (not EmailBackend 
-instances). This could replace the existing `DEFAULT_FROM_EMAIL` setting 
-(and with a little extra work, potentially `EMAIL_USE_LOCALTIME`, 
-`EMAIL_SUBJECT_PREFIX` and `SERVER_EMAIL`). DEFAULTS would also support a 
-contemplated `DEFAULT_EMAIL_HEADERS` capability ([ticket-35365#comment:7]). 
-The third-party django-anymail package has a similar feature: "[global send 
+The DEFAULTS would be used by the EmailMessage class (not EmailBackend
+instances). This could replace the existing `DEFAULT_FROM_EMAIL` setting
+(and with a little extra work, potentially `EMAIL_USE_LOCALTIME`,
+`EMAIL_SUBJECT_PREFIX` and `SERVER_EMAIL`). DEFAULTS would also support a
+contemplated `DEFAULT_EMAIL_HEADERS` capability ([ticket-35365#comment:7]).
+The third-party django-anymail package has a similar feature: "[global send
 defaults][anymail-send-defaults]."
 
 (Defaults would be applied at send time, immediately before message
@@ -1684,8 +1503,7 @@ and the provider alias is known.)
 In anticipation of a feature like this, the current `EMAIL_PROVIDERS` proposal:
 * Uses a nested `"OPTIONS"` dict rather than listing EmailBackend parameters
   at the same level as `"BACKEND"`.
-* Uses a string `using="alias"` argument rather than an EmailBackend
-  instance.
+* Uses a string `using="alias"` argument rather than an EmailBackend instance.
 
 [ticket-35365#comment:7]: https://code.djangoproject.com/ticket/35365#comment:7
 [anymail-send-defaults]: https://anymail.dev/en/stable/sending/anymail_additions/#global-send-defaults
@@ -1694,10 +1512,10 @@ In anticipation of a feature like this, the current `EMAIL_PROVIDERS` proposal:
 ### Future: Cached `providers`
 
 Although EmailBackend instances are [not cacheable in
-general](#providers-instances-are-not-cached), specific EmailBackend 
+general](#providers-instances-are-not-cached), specific EmailBackend
 implementations may be. For example, Django's SMTP EmailBackend is cacheable
-and reusable within a single thread (though cannot be shared between threads
-as currently implemented).
+and reusable within a single thread (though cannot be shared between threads as
+currently implemented).
 
 We could allow backends to opt into `mail.providers` caching via a future
 `cacheable` class property:
@@ -1710,8 +1528,8 @@ class EmailBackend(BaseEmailBackend):
     ...
 ```
 
-With this change, `mail.providers` would be implemented using 
-django.utils.BaseConnectionHandler (overriding `__getitem__()` to ensure 
+With this change, `mail.providers` would be implemented using
+`django.utils.BaseConnectionHandler` (overriding `__getitem__()` to ensure
 non-cacheable backends are always created anew).
 
 ```pycon
@@ -1737,21 +1555,41 @@ possibly `__setitem__()` allowing only a `None` value), which would discard a
 cached backend instance and force creation of a new one on the next access.
 
 
-## Reference implementation
-
-Django [PR #21052] provides a reference implementation.
-
-[PR #21052]: https://github.com/django/django/pull/21052
-
-
 ## Prior art
 
-The django-lorien-common package implemented a similar 
-dictionary-based `EMAIL_CONNECTIONS` setting with a `get_custom_connection()` 
-function to create EmailBackend instances from it: 
+The django-lorien-common package implemented a similar
+dictionary-based `EMAIL_CONNECTIONS` setting with a `get_custom_connection()`
+function to create EmailBackend instances from it:
 [django-lorien-common/common/mail.py].
 
 [django-lorien-common/common/mail.py]: https://github.com/govtrack/django-lorien-common/blob/27241ff72536b442dfd64fad8589398b8a6e9f4d/common/mail.py
+
+
+## History
+
+This DEP is a bit unusual in that it postdates the approval of the feature it
+proposes. See the links in this timeline for extensive earlier discussion:
+* early 2022: [django-developers discussion]
+* mid 2024 (?): Discussion at DjangoCon Europe sprints
+* 2024-06-09: New feature [ticket-35514] opened and approved based on earlier
+  discussion
+* 2024-07-28: Jacob Rief opens Django [PR #18421] with an initial
+  implementation
+* 2024–2026: Iteration and discussion in the PR, which identifies a number of
+  design issues
+* 2026-02-09: This DEP created to help resolve issues raised by the PR and
+  finalize API
+* 2026-02-23–2026-03-12: Forum [discussion on
+  `fail_silently`][forum-fail_silently] and other details
+
+The DEP's revision history and additional commentary can be found in
+django/deps [PR #105].
+
+[ticket-35514]: https://code.djangoproject.com/ticket/35514
+[PR #18421]: https://github.com/django/django/pull/18421
+[django-developers discussion]: https://groups.google.com/g/django-developers/c/R8ebGynQjK0/m/Tu-o4mGeAQAJ
+[PR #105]: https://github.com/django/deps/pull/105
+[forum-fail_silently]: https://forum.djangoproject.com/t/changing-how-django-core-mail-handles-fail-silently/44278
 
 
 ## AI disclosure

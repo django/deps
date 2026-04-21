@@ -6,7 +6,7 @@ Shepherd: Natalia Bidart
 Status: Draft
 Type: Feature
 Created: 2026‑02‑09
-Last-Modified: 2026‑04‑04
+Last-Modified: 2026‑04‑21
 ---
 # DEP 0018: Dictionary-based EMAIL_PROVIDERS settings
 
@@ -68,9 +68,6 @@ questions**). The implementation is targeted to land in Django 6.1.
 
 
 ## Motivation
-
-(See the original [django-developers discussion] for more details and 
-use cases.)
 
 It's common to use different email services—or different configurations of 
 the same email service—for different types of email:
@@ -319,7 +316,7 @@ Notes:
 
 * If neither `using` nor `connection` is given, the default provider is used.
 
-* `using` affects how a message is sent, so is an option to the APIs that
+* `using` affects how a message is sent, so it's an option to the APIs that
   initiate sending—*not* APIs that construct a message to be sent later. (So
   `using` is *not* an EmailMessage attribute or constructor option. If it were,
   `providers[alias].send_messages([msg1, msg2])` would be ambiguous. See
@@ -497,9 +494,7 @@ In `django.core.mail.backends`:
   [upgrading third-party EmailBackend
   implementations](#upgrading-emailbackend-implementations) later in this
   document. For the console, filebased and SMTP backends this will involve
-  significant changes to initialization. Using our own recommendations
-  ("dogfooding") helps ensure this proposal will be workable for other Django
-  packages.
+  significant changes to initialization.
 
 There are some additional compatibility changes related to [*`fail_silently` in
 EmailBackend implementations*](#fail_silently-in-emailbackend-implementations).
@@ -1360,10 +1355,6 @@ A good rule of thumb is to use `alias` *only* in error messages (to identify
 the offending `EMAIL_PROVIDERS` entry) or to distinguish updated from
 deprecated initialization (by checking for `None`). Any other use of `alias` is
 likely problematic.
-
-(🤔 Maybe Django should actively prevent misuse by blocking access to 
-`settings.EMAIL_PROVIDERS` while `providers.create_connection()` is 
-initializing the backend instance?)
 
 Here's an example. Before migration, this EmailBackend for the hypothetical
 Wheemail service gets a required WHEEMAIL_API_KEY and optional WHEEMAIL_REGION

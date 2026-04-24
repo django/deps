@@ -191,7 +191,7 @@ A January final release, carrying the new year's number, gives a
 holiday period for both the Releaser and users evaluating upgrades.
 
 Annual releases are (of course) slower than eight monthly ones, and that is a
-cost or this proposal. At this stage in Django's lifecycle, and given its
+cost for this proposal. At this stage in Django's lifecycle, and given its
 strong stability guarantees, the motivating factors for this DEP make it one
 worth paying.
 

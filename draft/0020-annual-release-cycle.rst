@@ -17,22 +17,23 @@ DEP 0020: Annual Release Cycle
 Abstract
 ========
 
-This DEP proposes that Django adopt an annual release cycle for major
-versions, replacing the eight-monthly cycle established in `DEP 4`__.
+This DEP proposes that Django adopt an annual feature-release cycle,
+replacing the eight-monthly cycle established in `DEP 4`__.
 
 __ https://github.com/django/deps/blob/main/final/0004-release-schedule.rst
 
-Under the proposed schedule, one major version of Django is released each
-calendar year, in January, and is supported for three years: one year of
-bugfix and security releases, followed by two years of security releases
-only. At any given time, three major versions are in support. The existing
-two-tier feature-release/LTS distinction is retired, with every release
-receiving what was previously the LTS-level commitment.
+Under the proposed schedule, Django publishes one feature release each
+calendar year, in January. Each feature release is supported for three
+years: one year of bugfix and security releases, followed by two years
+of security releases only. At any given time, three feature releases are
+in support. The existing two-tier feature-release/LTS distinction is
+retired, with every release receiving what was previously the LTS-level
+commitment.
 
 Django's version numbering moves to Calendar Versioning in the form
 ``YYYY.N``, so that the release year is encoded in the version itself.
 
-The first release under this DEP is Django ``2028.1``, replacing what would
+The first release under this DEP is Django ``2028.0``, replacing what would
 otherwise have been Django 7.0.
 
 This DEP supersedes DEP 4 and subsumes the clarifications in `DEP 44`__.
@@ -45,13 +46,13 @@ Specification
 Release Cadence
 ---------------
 
-Django will issue one major release per calendar year.
+Django will issue one feature release per calendar year.
 
-Final major releases will be made in approximately the second week of
+Final feature releases will be made in approximately the second week of
 January, carrying the new year's number. The exact release day remains at
 the Releaser's discretion, following the factors noted in DEP 44.
 
-Each major release is preceded by a pre-release phase:
+Each feature release is preceded by a pre-release phase:
 
 * An alpha release in early October, following the corresponding CPython
   final release.
@@ -74,33 +75,34 @@ Versioning
 Django will use `Calendar Versioning <https://calver.org/>`__ in the form
 ``YYYY.N``, where:
 
-* ``YYYY`` is the four-digit calendar year of the major release.
+* ``YYYY`` is the four-digit calendar year of the feature release.
 * ``N`` is a monotonically incrementing counter within that year, starting
-  at ``1`` for the major release. Each subsequent bugfix release
+  at ``0`` for the feature release. Each subsequent patch release
   increments ``N``.
 
 For example:
 
-* ``2028.1`` is the major release made in January 2028.
-* ``2028.2`` is the first bugfix release following ``2028.1``.
-* ``2029.1`` is the next major release, made in January 2029.
+* ``2028.0`` is the feature release made in January 2028.
+* ``2028.1`` is the first patch release following ``2028.0``.
+* ``2029.0`` is the next feature release, made in January 2029.
 
 Version numbers remain orderable under the standard comparison rules used
-by Python packaging tools. No third number is used; there is no separate
-"patch" component.
+by Python packaging tools. There is no third numeric component; patch
+releases increment ``N``.
 
 Support Window
 --------------
 
-Every major release is supported for three years from its date of release:
+Every feature release is supported for three years from its date of
+release:
 
 * **Year 1**: bugfix and security releases.
 * **Years 2 and 3**: security releases only.
 
-At any given time, three major versions are under support: the current
+At any given time, three feature releases are under support: the current
 release and the two prior years' releases. On the release of
-``YYYY.1``, bugfix support for ``(YYYY-1).1`` ends, and security support
-for ``(YYYY-3).1`` ends.
+``YYYY.0``, bugfix support for ``(YYYY-1).0`` ends, and security support
+for ``(YYYY-3).0`` ends.
 
 Every release receives the same support commitment. The explicit "LTS"
 label used in DEP 4 is retired; see Rationale.
@@ -108,10 +110,10 @@ label used in DEP 4 is retired; see Rationale.
 Python Version Support
 ----------------------
 
-Each Django major release supports three Python versions: the two Python
-versions with active upstream support at the start of the Django
+Each Django feature release supports three Python versions: the two
+Python versions with active upstream support at the start of the Django
 pre-release phase ("green"), plus the most recent Python version to have
-moved to security-only or end-of-life status ("plus last yellow").
+moved to security-only status ("plus last yellow").
 
 This ensures that:
 
@@ -125,10 +127,10 @@ Deprecation Policy
 If a feature is deprecated in release ``A``, a deprecation warning is
 raised in ``A`` and ``A+1``, and the feature is removed in ``A+2``. This
 preserves the existing guarantee that a deprecated feature remains
-available, with warnings, across at least two major releases.
+available, with warnings, across at least two feature releases.
 
 Because every release is supported for three years, a user on any
-supported version has at least two further major releases in which to
+supported version has at least two further feature releases in which to
 respond to any deprecation before it is removed.
 
 Transition
@@ -138,9 +140,9 @@ Releases up to and including Django 6.x continue on the existing schedule
 under DEP 4 and DEP 44. Django 5.2 LTS and Django 6.2 LTS receive their
 full advertised support windows.
 
-The first release under this DEP is Django ``2028.1``, replacing what
+The first release under this DEP is Django ``2028.0``, replacing what
 would otherwise have been Django 7.0 (scheduled under the existing cycle
-for December 2027). ``2028.1`` is released in January 2028 and is
+for December 2027). ``2028.0`` is released in January 2028 and is
 supported for three years on the terms above.
 
 Motivation
@@ -273,8 +275,8 @@ Backwards Compatibility
 =======================
 
 API stability commitments under this DEP are preserved: deprecated
-features continue to warn for at least two major releases before removal,
-and security support extends for three years from each release.
+features continue to warn for at least two feature releases before
+removal, and security support extends for three years from each release.
 
 The main compatibility impacts are on tooling and ecosystem expectations
 rather than on Django's Python API:
@@ -301,7 +303,7 @@ rather than on Django's Python API:
 * **Third-party package metadata.** ``Framework :: Django :: X.Y``
   trove classifiers, tox environments, and CI matrices in the wider
   ecosystem will need to be adjusted. Because the transition takes
-  effect at a clearly signposted release (``2028.1``), maintainers have
+  effect at a clearly signposted release (``2028.0``), maintainers have
   advance notice.
 
 No change is proposed to the support commitments already made for Django

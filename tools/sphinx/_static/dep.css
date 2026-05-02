@@ -1,0 +1,137 @@
+/* Minimal styling, with a nod to djangoproject.com green. */
+:root {
+  --django-green: #0c4b33;
+  --django-green-light: #44b78b;
+  --django-cream: #f4f5ec;
+  --border: #d8d8d8;
+  --muted: #666;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+div.related, div.sphinxsidebar h1 a, .document a {
+  color: var(--django-green);
+}
+
+div.body h1, div.body h2, div.body h3 {
+  color: var(--django-green);
+}
+
+div.body h1 {
+  border-bottom: 3px solid var(--django-green-light);
+  padding-bottom: .25em;
+}
+
+/* DEP index controls */
+.dep-index-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  align-items: flex-end;
+  margin: 1.5em 0 1em;
+  padding: 1em;
+  background: var(--django-cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.dep-index-controls label {
+  display: flex;
+  flex-direction: column;
+  font-size: .85em;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.dep-index-controls select,
+.dep-index-controls input {
+  margin-top: .25em;
+  padding: .35em .5em;
+  font-size: 1em;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: normal;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: white;
+  min-width: 180px;
+}
+.dep-index-controls select[multiple] {
+  min-height: 6.5em;
+}
+.dep-index-controls .dep-index-summary {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: .9em;
+}
+
+/* DEP index table */
+table.dep-index {
+  width: 100%;
+  border-collapse: collapse;
+  margin: .5em 0 2em;
+  font-size: .95em;
+}
+table.dep-index th,
+table.dep-index td {
+  text-align: left;
+  padding: .5em .75em;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table.dep-index th {
+  background: var(--django-green);
+  color: white;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+table.dep-index th .sort-indicator {
+  font-size: .75em;
+  margin-left: .25em;
+  opacity: .7;
+}
+table.dep-index td.dep-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+table.dep-index tr:hover {
+  background: var(--django-cream);
+}
+table.dep-index tr.hidden {
+  display: none;
+}
+
+/* Status badges */
+.dep-status {
+  display: inline-block;
+  padding: .15em .55em;
+  border-radius: 3px;
+  font-size: .8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+.dep-status-final          { background: #0c4b33; color: white; }
+.dep-status-accepted       { background: #44b78b; color: white; }
+.dep-status-draft          { background: #f8e5a1; color: #6b5400; }
+.dep-status-draft-unnumbered { background: #f8e5a1; color: #6b5400; border: 1px dashed #b39400; }
+.dep-status-rejected       { background: #b94a48; color: white; }
+.dep-status-superseded     { background: #888; color: white; }
+.dep-status-withdrawn      { background: #ccc; color: #333; }
+
+/* Edit-on-GitHub footer link added by page.html */
+.dep-edit-link {
+  margin-top: 3em;
+  padding-top: 1em;
+  border-top: 1px solid var(--border);
+  font-size: .9em;
+  color: var(--muted);
+}
+.dep-edit-link a {
+  color: var(--django-green);
+}

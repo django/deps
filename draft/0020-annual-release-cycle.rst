@@ -71,7 +71,8 @@ non-security release if it believes there is reason to do so.
 Versioning
 ----------
 
-Django will use Calendar Versioning in the form ``YYYY.N``, where:
+Django will use `Calendar Versioning <https://calver.org/>`__ in the form
+``YYYY.N``, where:
 
 * ``YYYY`` is the four-digit calendar year of the major release.
 * ``N`` is a monotonically incrementing counter within that year, starting

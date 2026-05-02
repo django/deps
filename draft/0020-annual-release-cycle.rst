@@ -127,14 +127,20 @@ label used in DEP 4 is retired; see Rationale.
 Python Version Support
 ----------------------
 
-Each Django feature release supports three Python versions: the two
-Python versions with active upstream support at the start of the Django
-pre-release phase ("green"), plus the most recent Python version to have
-moved to security-only status ("plus last yellow").
+At its release, each Django feature release will support three Python
+versions: the two Python versions with active upstream support at the start of
+the Django pre-release phase ("green"), plus the most recent Python version to
+have moved to security-only status ("plus last yellow").
+
+In addition, the current mainstream support version of Django will adopt
+support for the new version of Python that is released in the October of its
+first year.
 
 This ensures that:
 
 * Django always supports the latest Python at the time of its release.
+* The current mainstream support version always picks up support for the latest
+  Python version as it is released.
 * The end of Django's support window aligns closely with the end of
   upstream support for its oldest supported Python.
 

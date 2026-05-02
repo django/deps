@@ -3,6 +3,7 @@ name: Build & deploy DEPs site
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -11,8 +12,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -26,17 +27,32 @@ jobs:
           cache-dependency-path: tools/requirements.txt
       - run: pip install -r tools/requirements.txt
       - run: python tools/generate.py
+      - uses: actions/configure-pages@v5
+        id: pages
+        if: github.event_name != 'pull_request'
       - run: sphinx-build -b dirhtml --keep-going _generated _site
         env:
           DEP_SITE_BASEURL: ${{ steps.pages.outputs.base_url }}
-      - uses: actions/configure-pages@v5
-        id: pages
+
+      # Pages-format artifact for the deploy job (push to main / manual run only).
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: _site
 
+      # Plain workflow artifact for PR previews (download from the PR's
+      # Checks tab and upload manually to Netlify / open locally).
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request'
+        with:
+          name: dep-site-preview-pr-${{ github.event.pull_request.number }}
+          path: _site
+          if-no-files-found: error
+          retention-days: 14
+
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

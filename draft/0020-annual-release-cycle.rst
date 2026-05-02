@@ -22,11 +22,11 @@ replacing the eight-monthly cycle established in `DEP 4`__.
 
 __ https://github.com/django/deps/blob/main/final/0004-release-schedule.rst
 
-Under the proposed schedule, Django publishes one feature release each
-calendar year, in January. Each feature release is supported for three
-years: one year of bugfix and security releases, followed by two years
-of security releases only. At any given time, three feature releases are
-in support. The existing two-tier feature-release/LTS distinction is
+Under the proposed schedule, Django publishes one feature release each calendar
+year, in January. Each feature release is supported for three years: one year
+of mainstream support, followed by two years of extended support, with the
+support level changing each December. At any given time, three feature releases
+are in support. The existing two-tier feature-release/LTS distinction is
 retired, with every release receiving what was previously the LTS-level
 commitment.
 
@@ -76,14 +76,15 @@ Django will use `Calendar Versioning <https://calver.org/>`__ in the form
 ``YYYY.N``, where:
 
 * ``YYYY`` is the four-digit calendar year of the feature release.
-* ``N`` is a monotonically incrementing counter within that year, starting
-  at ``0`` for the feature release. Each subsequent patch release
-  increments ``N``.
+* ``N`` is a monotonically incrementing counter, starting at ``0`` for the
+  feature release. Each subsequent patch release increments ``N``.
 
 For example:
 
 * ``2028.0`` is the feature release made in January 2028.
 * ``2028.1`` is the first patch release following ``2028.0``.
+* ``2028.24`` is the 24th patch release of the ``2028.x`` version, likely
+  occurring late in the support window.
 * ``2029.0`` is the next feature release, made in January 2029.
 
 Version numbers remain orderable under the standard comparison rules used
@@ -96,13 +97,21 @@ Support Window
 Every feature release is supported for three years from its date of
 release:
 
-* **Year 1**: bugfix and security releases.
-* **Years 2 and 3**: security releases only.
+* **Year 1** is considered *mainstream support*, receiving fixes for security
+  issues, data loss bugs, crashing bugs, major functionality bugs in
+  newly introduced features, and regressions from older versions of Django.
+* **Years 2 and 3** are considered *extended support*, receiving fixes for
+  security issues and data loss bugs only.
 
-At any given time, three feature releases are under support: the current
-release and the two prior years' releases. On the release of
-``YYYY.0``, bugfix support for ``(YYYY-1).0`` ends, and security support
-for ``(YYYY-3).0`` ends.
+The support level for a feature release changes in the December of each year,
+at the point just after that month's releases are (or would be) made. At this
+time, the current year's release enters extended support and the year-three
+release becomes end-of-life (EOL). The new year's feature release then begins
+mainstream support the following month.
+
+This means that, bar the transition period over the new year, at any given time,
+three feature releases are under support: the current release, under mainstream
+support, and the two prior years' releases, under extended support.
 
 Every release receives the same support commitment. The explicit "LTS"
 label used in DEP 4 is retired; see Rationale.

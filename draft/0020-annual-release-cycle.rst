@@ -54,10 +54,18 @@ the Releaser's discretion, following the factors noted in DEP 44.
 
 Each feature release is preceded by a pre-release phase:
 
-* An alpha release in early October, following the corresponding CPython
+* An alpha release in early/mid October, following the corresponding CPython
   final release.
-* A beta release approximately four weeks before the release candidate.
-* A release candidate approximately two weeks before the final release.
+* A beta release in early/mid November.
+* A release candidate in early/mid December.
+
+As has been the case historically:
+
+* Feature development is continual on Django's ``main`` development branch.
+* Stable release branches are created just prior to the alpha release each
+  release series. This marks the *feature freeze* for the feature release.
+* In order to prepare for this release, Django's main branch will begin
+  adoption of pre-release CPython versions from their pre-release phase.
 
 Bugfix and security releases continue to be made at the beginning of each
 month for each supported stable version, as per DEP 4 and DEP 44. In
@@ -154,6 +162,10 @@ would otherwise have been Django 7.0 (scheduled under the existing cycle
 for December 2027). ``2028.0`` is released in January 2028 and is
 supported for three years on the terms above.
 
+Django 6.2 LTS, released April 2027, continues to receive security
+support per DEP 4 alongside the first feature releases under this DEP,
+with its support window concluding in April 2030.
+
 Motivation
 ==========
 
@@ -226,6 +238,16 @@ existing users and to stakeholders evaluating Django against other
 frameworks. (Retaining the "LTS" label on every release, as an
 always-applied marker rather than a distinguishing one, remains a viable
 option if the working group and documentation editors find it useful.)
+
+Deprecation calendar
+--------------------
+
+A consequence of the longer release cycle is that deprecation periods
+lengthen in calendar terms. Under DEP 4's eight-monthly cycle, a feature
+deprecated in release ``A`` was removed approximately 16 months later in
+``A+2``. Under this DEP the same ``A`` → ``A+1`` → ``A+2`` path occupies
+approximately 24 months. Users gain calendar time to respond to
+deprecations without any change to the policy itself.
 
 Calendar Versioning: ``YYYY.N``
 -------------------------------

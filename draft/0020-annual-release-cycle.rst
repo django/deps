@@ -5,7 +5,7 @@ DEP 0020: Annual Release Cycle
 :DEP: 0020
 :Author: Carlton Gibson
 :Implementation Team: TBD
-:Shepherd: TBD
+:Shepherd: Natalia Bidart
 :Status: Draft
 :Type: Process
 :Created: 2026-04-24

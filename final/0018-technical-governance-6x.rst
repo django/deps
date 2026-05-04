@@ -85,10 +85,10 @@ For features which qualify as a Major Change, proposers may be asked to
 use `the DEP process`_. Likewise, other changes, for example to processes,
 that do not fit the new features description may be presented as DEPs
 
-If discussion of a Minor Change has failed to produce consensus, a
-member may ask the Steering Council to make a decision.
+If discussion of a Minor Change has failed to produce consensus, anyone
+may ask the Steering Council to make a decision.
 
-Rejected discussions and features are eligible to be revisited at the
+Rejected suggestions and features are eligible to be revisited at the
 Steering Council's discretion.
 
 
@@ -157,18 +157,18 @@ To be eligible to be on the steering council, a person must do the following:
 
 * Be a DSF Individual member.
 
-* Shared any of their corporate affiliations.
+* Have shared any of their corporate affiliations.
 
 * Have three or more Steering Council Qualities.
 
-* Not be a members of the `DSF Board`_.
+* Not be a member of the `DSF Board`_.
 
 Steering Council Qualities
 **************************
 
 Below are several traits a Django contributor may possess that are beneficial
 when on the Steering Council. An individual is unlikely to possess all of
-them, but qualified candidates should have more than one. Each trait is
+them, but qualified candidates should have three or more. Each trait is
 followed up by a set of possible indicators that could be evidence of this
 trait. The lists of indicators are not complete, if you feel you possess that
 trait with an indicator that's not listed, that is sufficient.
@@ -300,7 +300,7 @@ Indicators:
 
 * Familiar with several areas of the Django codebase
 
-* Has helped maintain Django or another well-used project for years
+* Has helped maintain Django or a well-used project in the Django ecosystem for years
 
 
 Steering Council elections
@@ -386,7 +386,7 @@ A member of the Steering Council can be removed in the following
 ways:
 
 * They become ineligible due to actions of the Code of Conduct
-  committee of the DSF. If this occurs, the affected person
+  Working Group of the DSF. If this occurs, the affected person
   immediately ceases to be a member of the Steering Council. If that
   person's ineligibility ends at a later date, they may become a
   candidate for the Steering Council again in an election occurring
@@ -397,9 +397,8 @@ ways:
   jointly by the other members of the Steering Council, and the DSF
   Board. A valid determination of ineligibility requires that all
   other members of the Steering Council vote to declare the affected
-  person ineligible and that all members of the DSF Board who can
-  vote on the issue (the affected person, if a DSF Board member, can
-  not vote) vote "yes" on a motion that the person in question is
+  person ineligible and that all members of the DSF Board 
+  vote "yes" on a motion that the person in question is
   ineligible.
 
 * A member of the Steering Council resigns from the Steering Council
@@ -439,7 +438,7 @@ next meeting.
 If the statement is found to be accurate and correct the DSF Board shall
 inform the Steering Council of the breach and provide 2 weeks to
 rectify said breach. If the Steering Council fails to rectify the
-breach in the time allotted, a new Steering Council election will be
+breach to the Board in the time allotted, a new Steering Council election will be
 triggered. Current members of the Steering Council may run in the new
 election.
 
@@ -474,10 +473,10 @@ Interaction of the Steering Council and the Security Team
 
 The `Security Team`_ has the following powers:
 
-* To request a Merger merge code to fix a security issue being
+* To request a Merger merges code to fix a security issue being
   handled under Django's security process.
 
-* To request a Releaser issue a release of Django containing code to
+* To request a Releaser issues a release of Django containing code to
   fix a security issue being handled under Django's security
   process.
 
@@ -707,8 +706,9 @@ Regarding specific changes:
 
 * Not allowing Board members to serve on the Steering Council.
 
-  * This simplifies some of the governance by reducing exception cases.
-    Plus, these roles are meant to be time-intensive and it's unlikely
+  * This simplifies some of the governance by reducing exception cases
+    related to serving on both simultaneously.
+  * Plus, these roles are meant to be time-intensive and it's unlikely
     for someone to do both well.
 
 * Removing the explicit voting from the decision making of the Steering
@@ -758,9 +758,9 @@ Commons CC0 1.0 Universal license
 
 (All DEPs must include this exact copyright statement.)
 
-.. _DEP 44: https://github.com/django/deps/blob/main/accepted/0044-clarify-release-process.rst
+.. _DEP 44: https://github.com/django/deps/blob/main/final/0044-clarify-release-process.rst
 .. _Mergers Team: https://github.com/django/dsf-working-groups/blob/main/active/mergers-team.md
-.. _Releasers Team: https://github.com/django/dsf-working-groups/blob/main/active/releasers-team.md
+.. _Releasers Team: https://github.com/django/dsf-working-groups/blob/main/active/releasers.md
 .. _Security Team: https://github.com/django/dsf-working-groups/blob/main/active/security-team.md
 .. _Triage & Review Team: https://github.com/django/dsf-working-groups/blob/main/active/triage-and-review-team.md
 .. _django/dsf-working-groups GitHub repository: https://github.com/django/dsf-working-groups

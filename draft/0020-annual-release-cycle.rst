@@ -144,6 +144,13 @@ This ensures that:
 * The end of Django's support window aligns closely with the end of
   upstream support for its oldest supported Python.
 
+Given Python's release cycle, the oldest supported Python will be end-of-life
+(EOL) two months before the corresponding Django version. At this point, Django
+will continue to test against the then EOL Python, in order to avoid
+regressions in line with the stability policy. Nonetheless, Django may decline
+to address an issue affecting only the then EOL Python version, that emerges in
+the final two months of its support window.
+
 Deprecation Policy
 ------------------
 
@@ -299,6 +306,15 @@ still-evolving packages, may reasonably adopt a "Green Only" Python
 support policy for their own releases, in order to reduce their own
 maintenance burden, without this being in conflict with Django's wider
 policy.
+
+The option to decline to address an issue affecting only the then EOL Python
+version during the final two months of a Django version support window is there
+to avoid (particularly) the Fellows and Security Team being obliged to spend
+time here. It allows us to adopt the less-agressive "Plus Last Yellow" policy
+without committing to fixing issues affecting only EOL Python versions. (It's a
+compromise between the too-aggressive "Green Only" policy, the "rug-pull" of
+dropping support for a Python version in a patch release, and not having to
+spend dedicated time supporting EOL versions.)
 
 Related work: automated upgrade tooling
 ---------------------------------------

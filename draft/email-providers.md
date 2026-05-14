@@ -64,7 +64,7 @@ In the process, we will deprecate and remove:
 
 **Status:** The feature was approved in 2024 through the older ticketing
 process. This DEP is rapidly approaching a final draft. The
-[implementation][PR #21052] is targeted to land in Django 6.1.
+[implementation][PR #21231] will land in Django 6.1.
 
 
 ## Motivation
@@ -1415,9 +1415,9 @@ settings.py to `DEFAULT_FROM_EMAIL = "old EMAIL_HOST_USER"` and then replace
 
 ## Reference implementation
 
-Django [PR #21052] provides a reference implementation.
+Django [PR #21231] provides a reference implementation.
 
-[PR #21052]: https://github.com/django/django/pull/21052
+[PR #21231]: https://github.com/django/django/pull/21231
 
 
 ## Future work

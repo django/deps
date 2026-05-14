@@ -6,7 +6,7 @@ Shepherd: Natalia Bidart
 Status: Draft
 Type: Feature
 Created: 2026‑02‑09
-Last-Modified: 2026‑04‑21
+Last-Modified: 2026‑05‑13
 ---
 # DEP 0018: Dictionary-based EMAIL_PROVIDERS settings
 
@@ -679,15 +679,19 @@ During the deprecation period:
   with deprecated settings until upgraded dependencies are available.
 
 * When "default settings" are in use (no specific email configuration in
-  settings.py), the settings module issues a warning that the default email
-  provider will change from SMTP to none after the deprecation period.
-  Something like (exact wording TBD), "Django 7.0 will not have a default email
-  provider. Define EMAIL_PROVIDERS in settings.py to continue using the SMTP
-  EmailBackend."
+  settings.py), attempting to send mail issues a warning that Django 7.0 will
+  not have a default email configuration. The warning should communicate that
+  defining a default configuration will be needed to avoid errors sending mail.
 
-  (If `EMAIL_BACKEND` or any other deprecated setting *is* defined in
-  settings.py, the settings module instead warns that setting is deprecated,
-  per the first rule in this section.)
+  This is intended to alert projects that use Django 6.1's default SMTP server
+  on localhost, so don't have any deprecated settings defined and wouldn't
+  otherwise be notified of the upcoming change. (Projects with any deprecated
+  settings defined will instead receive a startup-time deprecation warning, per
+  the first rule in this section.)
+
+  The warning is issued on sending, rather than settings init, to avoid 
+  creating deprecation noise for projects that don't use Django's email at all.
+
 
 [email-related settings]: https://docs.djangoproject.com/en/6.0/ref/settings/#email
 

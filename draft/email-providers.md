@@ -38,6 +38,7 @@ Last-Modified: 2026‑05‑14
 - [Naming](#naming)
 - [Reference implementation](#reference-implementation)
 - [Future work](#future-work)
+  - [Future: sendtestemail using option](#future-sendtestemail-using-option)
   - [Future: System checks](#future-system-checks)
   - [Future: Password reset mailer](#future-password-reset-mailer)
   - [Future: Mailer-specific message defaults](#future-mailer-specific-message-defaults)
@@ -1448,6 +1449,16 @@ Django [PR #21231] provides a reference implementation.
 This section describes some **potential**, **future**, related features that
 are *not* part of this proposal but may help inform some of the design
 decisions here.
+
+### Future: sendtestemail using option
+
+The [sendtestemail] management command should accept a `--using ALIAS` option,
+for testing a particular `MAILERS` configuration.
+
+This is recommended as early follow-on work. (It is not strictly required for
+this proposal and has been omitted here to control scope.)
+
+[sendtestemail]: https://docs.djangoproject.com/en/stable/ref/django-admin/#sendtestemail
 
 ### Future: System checks
 

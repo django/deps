@@ -39,9 +39,12 @@ For example, a scalar subquery can be used as an annotation:
        first_subject=Subquery(first_subject)
    ).values("first_subject")
 
-The reasons this works.
-1. Here the result of alias `first_object` will be treated as same columns of Sales table.
-2. The reason why it treat as same column as other columns of Sales table is bcs here django uses `SELECT` clause. and this is fair.
+The reasons this works:
+
+* Here the result of alias ``first_object`` is treated like a selected column of
+  the ``Sales`` query.
+* This happens because Django renders the annotation in the ``SELECT`` clause.
+  That is valid for scalar expressions.
 
 But this breaks when we are dealing with multi-columns results. for example:
 ```python

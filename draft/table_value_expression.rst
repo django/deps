@@ -145,6 +145,41 @@ There are three aspects to this that we'd like to work on:
 Specification
 =============
 
+Composite output metadata
+-------------------------
+
+The first requirement is a way for an expression or query source to describe
+multiple output columns.
+
+For scalar expressions, Django already uses ``Expression.output_field``. For
+example, a subquery returning only ``subject`` can expose a single field such as
+``CharField``.
+
+For table expressions that expose more than one column, Django needs an
+equivalent representation for multiple named fields. For example:
+
+.. code-block:: python
+
+   JsonEach("payload")
+   # exposes:
+   #   key -> TextField()
+   #   value -> JSONField()
+
+This may be implemented as a lightweight composite output field, or as part of
+a more general ``CompositeField`` design. The initial scope should be limited to
+describing expression/query output, not full model-field behavior.
+
+This matters because the ORM must preserve Django's existing lookup behavior.
+If ``item__key`` resolves to a ``TextField``, then normal text lookups and
+transforms should continue to work.
+
+The exact public API is still open.
+
+Expression-like table sources
+-----------------------------
+
+After output columns can be represented, the ORM needs a way to register an
+expression or query as a table source in ``FROM`` or ``JOIN``.
 
 This DEP uses ``TableExpression`` as a placeholder name. The final public API
 may use a different name.
@@ -184,9 +219,9 @@ For a multi-column source:
 The implementation should preserve Django's existing lookup behavior by
 associating each exposed column with a Django field.
 
-The exact mechanism is open. One possible direction is to represent
-multi-column output through ``Expression.output_field`` using a composite output
-representation.
+The exact mechanism is open. One possible direction is to represent this through
+``Expression.output_field`` using the lightweight composite output metadata
+described above.
 
 Table Source Compilation
 ------------------------
@@ -264,38 +299,6 @@ reusable scalar expressions.
 Alternatives Considered
 =======================
 
-Composite Output Metadata
--------------------------
-
-Another approach is to represent the output shape through ``output_field``:
-
-.. code-block:: python
-
-   class JsonEach(Func):
-       function = "json_each"
-       output_field = CompositetField([
-           ("key", models.TextField()),
-           ("value", models.JSONField()),
-       ])
-
-This may integrate better with the rest of the ORM, but it requires more
-exploration of Django's field and expression internals.
-
-Relation-Style API
-------------------
-
-One possible design is a dedicated relation wrapper:
-
-.. code-block:: python
-
-   Sales.objects.alias(
-       item=Relation(JsonEach("payload"))
-   )
-
-That design may require helper objects to bridge relation aliases to column
-references.
-
-
 Explicit Column Metadata
 ------------------------
 
@@ -314,6 +317,7 @@ An early implementation could accept column metadata directly:
 This may be easy to prototype, but it creates a separate metadata path from
 ``Expression.output_field``.
 
+You can find more detail `here <https://github.com/p-r-a-v-i-n/Generic---Relation---API-Design/blob/main/RELATION_API_BLUEPRINT.md>`_.
 
 Copyright
 =========
@@ -321,4 +325,3 @@ Copyright
 This document has been placed in the public domain per the Creative Commons
 CC0 1.0 Universal license
 (http://creativecommons.org/publicdomain/zero/1.0/deed).
-

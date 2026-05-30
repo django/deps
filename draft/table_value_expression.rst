@@ -47,13 +47,14 @@ The reasons this works:
   That is valid for scalar expressions.
 
 But this breaks when we are dealing with multi-columns results. for example:
-```python
+
+.. code-block:: python
    first_object = Cohort.objects.order_by("id").values("subject", "duration")[:1]
 
    Sales.objects.annotate(
        first_subject=Subquery(first_object)
    ).values("first_subject")
-```
+
 This will raise `Cannot resolve expression type, unknown output_field`. bcs ORM don't know how to handle the multi-columns.
 
 

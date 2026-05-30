@@ -269,7 +269,7 @@ Another approach is to represent the output shape through ``output_field``:
 
    class JsonEach(Func):
        function = "json_each"
-       output_field = CompositeOutputField([
+       output_field = CompositetField([
            ("key", models.TextField()),
            ("value", models.JSONField()),
        ])
@@ -291,9 +291,6 @@ One possible design is a dedicated relation wrapper:
 That design may require helper objects to bridge relation aliases to column
 references.
 
-This remains a possible implementation approach, but this DEP does not start
-from it. Simon's implementation hints suggest first exploring whether table
-sources can blend more directly into the existing ``Expression`` interface.
 
 Explicit Column Metadata
 ------------------------

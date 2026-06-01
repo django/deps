@@ -1,5 +1,5 @@
-DEP XXXX: Table Expressions in the Django ORM
-=============================================
+DEP XXXX: Supoort for Table Expressions in the Django ORM
+=========================================================
 
 :DEP: XXXX
 :Author: Pravin Kamble

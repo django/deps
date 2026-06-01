@@ -3,8 +3,8 @@ DEP XXXX: Table Expressions in the Django ORM
 
 :DEP: XXXX
 :Author: Pravin Kamble
-:Implementation Team: Jacob Walls and Pravin Kamble
-:Shepherd: -
+:Implementation Team: Pravin Kamble
+:Shepherd: Jacob Walls
 :Status: Draft
 :Type: Feature
 :Created: 2026-05-30
@@ -41,7 +41,7 @@ For example, a scalar subquery can be used as an annotation:
 
 The reasons this works:
 
-* Here the result of alias ``first_object`` is treated like a selected column of
+* ``.values("first_subject")`` is treated like a selected column of
   the ``Sales`` query.
 * This happens because Django renders the annotation in the ``SELECT`` clause.
   That is valid for scalar expressions.
@@ -77,8 +77,7 @@ Conceptual SQL shape today:
    SELECT generate_series(1, 3) AS "series"
    FROM "sales"
 
-This treats ``generate_series()`` like a scalar expression selected from the
-base table.
+it's not clear how to get it into the `FROM` clause. 
 
 
 Filtering Set-Returning Annotations
@@ -180,6 +179,9 @@ Expression-like table sources
 
 After output columns can be represented, the ORM needs a way to register an
 expression or query as a table source in ``FROM`` or ``JOIN``.
+
+We will take inspiration from existing `FilteredRelation`. We would follow the
+mechanism it used to register itself as a table source in ``FROM`` clause.
 
 This DEP uses ``TableExpression`` as a placeholder name. The final public API
 may use a different name.

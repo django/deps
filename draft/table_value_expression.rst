@@ -46,7 +46,7 @@ The reasons this works:
 * This happens because Django renders the annotation in the ``SELECT`` clause.
   That is valid for scalar expressions.
 
-But this breaks when we are dealing with multi-columns results. for example:
+But this breaks when we are dealing with multi-column results. For example:
 
 .. code-block:: python
    first_object = Cohort.objects.order_by("id").values("subject", "duration")[:1]
@@ -55,7 +55,7 @@ But this breaks when we are dealing with multi-columns results. for example:
        first_subject=Subquery(first_object)
    ).values("first_subject")
 
-This will raise `Cannot resolve expression type, unknown output_field`. bcs ORM don't know how to handle the multi-columns.
+This will raise `Cannot resolve expression type, unknown output_field`. because the ORM does not have an expression representing multiple columns.
 
 
 Set-Returning Functions in ``SELECT``
@@ -77,7 +77,7 @@ Conceptual SQL shape today:
    SELECT generate_series(1, 3) AS "series"
    FROM "sales"
 
-it's not clear how to get it into the `FROM` clause. 
+The ORM does not expose a way to place it in the `FROM` clause.
 
 
 Filtering Set-Returning Annotations
@@ -178,10 +178,10 @@ Expression-like table sources
 -----------------------------
 
 After output columns can be represented, the ORM needs a way to register an
-expression or query as a table source in ``FROM`` or ``JOIN``.
+expression or query as a table source in the ``FROM`` or ``JOIN``.
 
-We will take inspiration from existing `FilteredRelation`. We would follow the
-mechanism it used to register itself as a table source in ``FROM`` clause.
+We will take inspiration from the existing `FilteredRelation`. We would follow the
+mechanism it used to register itself as a table source in the ``FROM`` clause.
 
 This DEP uses ``TableExpression`` as a placeholder name. The final public API
 may use a different name.
@@ -258,16 +258,10 @@ a smaller helper shared by multiple query paths.
 Rationale
 =========
 
-Why Focus on the Problem Before a Specific Class
-------------------------------------------------
+Why ``FilteredRelation`` is relevant
+------------------------------------
+It's the only way users have today to insert content into the ``JOIN`` clause (by appending a ``WHERE`` clause).
 
-The first question is the ORM capability Django needs:
-
-* represent table-like query sources,
-* know their output columns,
-* and resolve references to those columns.
-
-Once that capability is clear, the exact internal object model can be evaluated.
 
 Why ``output_field`` Matters
 ----------------------------

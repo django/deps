@@ -746,10 +746,10 @@ Commons CC0 1.0 Universal license
 (All DEPs must include this exact copyright statement.)
 
 .. _DEP 44: https://github.com/django/deps/blob/main/final/0044-clarify-release-process.rst
-.. _Mergers Team: https://github.com/django/dsf-working-groups/blob/main/active/mergers-team.md
+.. _Mergers Team: https://github.com/django/dsf-working-groups/blob/main/active/mergers.md
 .. _Releasers Team: https://github.com/django/dsf-working-groups/blob/main/active/releasers.md
-.. _Security Team: https://github.com/django/dsf-working-groups/blob/main/active/security-team.md
-.. _Triage & Review Team: https://github.com/django/dsf-working-groups/blob/main/active/triage-and-review-team.md
+.. _Security Team: https://github.com/django/dsf-working-groups/blob/main/active/security.md
+.. _Triage & Review Team: https://github.com/django/dsf-working-groups/blob/main/active/triage-and-review.md
 .. _django/dsf-working-groups GitHub repository: https://github.com/django/dsf-working-groups
 .. _new-features GitHub repository: https://github.com/django/new-features
 .. _the DEP process: https://github.com/django/deps/blob/main/final/0001-dep-process.rst

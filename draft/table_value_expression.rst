@@ -55,7 +55,7 @@ But this breaks when we are dealing with multi-column results. For example:
        first_subject=Subquery(first_object)
    ).values("first_subject")
 
-This will raise `Cannot resolve expression type, unknown output_field`. because the ORM does not have an expression representing multiple columns.
+This will raise `Cannot resolve expression type, unknown output_field`. because the ORM does not have an expression representing multiple columns and thus cannot make use of a join against the multi-column subquery.
 
 
 Set-Returning Functions in ``SELECT``
@@ -276,7 +276,7 @@ Rationale
 
 Why ``FilteredRelation`` is relevant
 ------------------------------------
-It's the only way users have today to insert content into the ``JOIN`` clause (by appending a ``WHERE`` clause).
+It's the only way users have today to insert content into the ``JOIN`` clause (by appending a condition to the ``ON`` clause).
 
 
 Why ``output_field`` Matters

@@ -7,7 +7,6 @@ DEP 0019: Technical governance for the Django project
   Tim Schilling
 :Implementation Team: Carlton Gibson, Emma Delescolle, Frank Wiles,
   Lily Foote, Tim Schilling
-:Shepherd: TBD
 :Status: Draft
 :Type: Process
 :Created: 2026-04-16

@@ -62,22 +62,21 @@ Set-Returning Functions in ``SELECT``
 -------------------------------------
 
 PostgreSQL's ``generate_series()`` is a set-returning function. Today, if it is
-used as an annotation, Django renders it in the ``SELECT`` list:
+used as a scalar annotation, Django renders it in the ``SELECT`` list:
 
 .. code-block:: python
 
-   Sales.objects.annotate(
-       series=GenerateSeries(1, 3)
-   ).values("series")
+   Sales.objects.annotate(series=GenerateSeriesFunc(1, 3))
 
-Conceptual SQL shape today:
+The actual SQL generated:
 
 .. code-block:: sql
 
-   SELECT generate_series(1, 3) AS "series"
-   FROM "sales"
+   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", generate_series(1, 3) AS "series"
+   FROM "SRF_sales"
 
-The ORM does not expose a way to place it in the `FROM` clause.
+
+The ORM does not expose a way to place the set-returning function in the ``FROM`` clause.
 
 
 Filtering Set-Returning Annotations
@@ -88,20 +87,37 @@ expression:
 
 .. code-block:: python
 
-   Sales.objects.annotate(
-       series=GenerateSeries(1, 3)
-   ).filter(series__gt=1)
+   Sales.objects.annotate(series=GenerateSeriesFunc(1, 3)).filter(series__gt=1)
 
-Conceptual SQL shape today:
+The actual SQL generated:
 
 .. code-block:: sql
 
-   SELECT ..., generate_series(1, 3) AS "series"
-   FROM "sales"
+   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", generate_series(1, 3) AS "series"
+   FROM "SRF_sales"
    WHERE generate_series(1, 3) > 1
 
-The function is still not a table source. It is duplicated as an expression in
-the ``SELECT`` and ``WHERE`` clauses.
+This query fails immediately at the database level. In PostgreSQL, it raises:
+``ERROR: set-returning functions are not allowed in WHERE``
+
+This is because the ``WHERE`` clause expects a scalar boolean expression for each row, not a set of rows. The function is duplicated as a set-returning expression in both the ``SELECT`` and ``WHERE`` clauses instead of being treated as a table source.
+
+
+Comparison: Placing the Function in the ``FROM`` Clause
+-------------------------------------------------------
+
+If the set-returning function is instead compiled in the ``FROM`` clause (using a ``LATERAL`` join), the query behavior is clean, valid, and efficient:
+
+.. code-block:: sql
+
+   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", "series"."value" AS "series"
+   FROM "SRF_sales"
+   CROSS JOIN LATERAL generate_series(1, 3) AS "series"("value")
+   WHERE "series"."value" > 1
+
+Benefits:
+* Join and Cardinality Control: Compiling the function in the ``FROM`` clause allows the ORM to choose between ``LEFT JOIN LATERAL`` (preserving the parent rows when the set is empty) and ``CROSS JOIN LATERAL``.
+* Valid Filtering: The ``WHERE`` clause filters on the materialized column reference ``"series"."value"`` instead of executing a set-returning function inline. This evaluates correctly and I assume no database execution errors.
 
 Multi-Column Subqueries
 -----------------------

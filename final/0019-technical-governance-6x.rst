@@ -468,29 +468,8 @@ To see the list of teams and the process of adding new
 teams, please see the `django/dsf-working-groups GitHub repository`_.
 
 
-Interaction of the Steering Council and the Security Team
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-The `Security Team`_ has the following powers:
-
-* To request a Merger merges code to fix a security issue being
-  handled under Django's security process.
-
-* To request a Releaser issues a release of Django containing code to
-  fix a security issue being handled under Django's security
-  process.
-
-In the event that the Steering Council feels the Security Team has
-used the above powers inappropriately, the Steering Council may appeal
-to the DSF Board to mediate the issue. Any member of the DSF Board who
-is also a member of the Security Team will
-abstain from participation in the DSF Board's decision-making in such
-mediation. The decision of the DSF Board in the dispute will be
-binding on both the Steering Council and the Security Team.
-
-
-Interaction of the Steering Council and other teams
-+++++++++++++++++++++++++++++++++++++++++++++++++++
+Interaction of the Steering Council and teams
++++++++++++++++++++++++++++++++++++++++++++++
 
 The Steering Council may oversee or have a liaison on various teams
 and working groups in the Django community. In all cases the following
@@ -618,6 +597,8 @@ It achieves those goals with the following:
 * Allowing the DSF Board greater autonomy in running the Steering Council
   elections.
 
+* Removed explicit Security Team and Steering Council interaction definition.
+
 
 Rationale
 =========
@@ -736,6 +717,12 @@ Regarding specific changes:
   * By not including as many requirements of the voting mechanics, the Board
     can integrate lessons learned from the DSF Board elections for the
     Steering Council.
+
+* Removed explicit Security Team and Steering Council interaction definition.
+
+  * The relationship between these two teams isn't particularly unique. The
+    security release ability can and should be designated in the
+    Security Team's charter rather than in this document.
 
 Backwards Compatibility
 =======================

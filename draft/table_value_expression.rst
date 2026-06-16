@@ -36,7 +36,7 @@ For example, a scalar subquery can be used as an annotation:
    first_subject = Cohort.objects.order_by("id").values("subject")[:1]
 
    Sales.objects.annotate(
-       first_subject=Subquery(first_subject)
+       first_subject=first_subject
    ).values("first_subject")
 
 The reasons this works:
@@ -52,7 +52,7 @@ But this breaks when we are dealing with multi-column results. For example:
    first_object = Cohort.objects.order_by("id").values("subject", "duration")[:1]
 
    Sales.objects.annotate(
-       first_subject=Subquery(first_object)
+       first_subject=first_object
    ).values("first_subject")
 
 This will raise `Cannot resolve expression type, unknown output_field`. because the ORM does not have an expression representing multiple columns and thus cannot make use of a join against the multi-column subquery.
@@ -128,13 +128,10 @@ one column:
 .. code-block:: python
 
    Sales.objects.annotate(
-       first_subject=Subquery(
-           Cohort.objects.order_by("id").values("subject")[:1]
-       )
+       first_subject=Cohort.objects.order_by("id").values("subject")[:1]
    )
 
-But a queryset returning multiple columns cannot be represented as a scalar
-``Subquery``:
+But a queryset returning multiple columns cannot be represented as a scalar:
 
 .. code-block:: python
 
@@ -147,7 +144,7 @@ expression, it could expose named columns:
 
    Sales.objects.alias(
        cohort_data=TableExpression(
-           Cohort.objects.values("subject", "duration")
+           Cohort.objects.values("subject", "duration")[:1]
        )
    ).values("cohort_data__subject", "cohort_data__duration")
 

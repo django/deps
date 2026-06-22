@@ -651,15 +651,14 @@ Regarding specific changes:
 
 * Allowing approving DEPs during elections.
 
-  * The community and `DSF Board`_ both have mechanisms to remove an unruly
-    Steering Council. These limitations appear to have only limited
-    productive functions of the Steering Council. Allowing approving
-    DEPs during elections allows for the community to operate more
-    freely. It's possible that a newly elected Steering Council will
-    change decisions from the previous Steering Council. This is seen
-    as the system working. If at any point, the trust in this system
-    is abused, the community can rely on reporting members for
-    violations of Django's Code of Conduct.
+  * This is about not putting barriers in the way of usual project processes
+    during the election period. Technical decisions can be reversed by the
+    incoming Steering Council if desired (and this would be evidence of the
+    system working at intended). Governance changes require approval by the
+    Board, and are thus unable to be snuck through inappropriately. Finally,
+    the outgoing Steering Council is (as at all times) governed by the Django
+    Code of Conduct, and so there is the continued check there. In short,
+    there's not reason **not** to allow the normal processes to continue. 
 
 * Allowing governance changing DEPs during elections.
 

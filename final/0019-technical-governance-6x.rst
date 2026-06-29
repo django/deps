@@ -658,7 +658,7 @@ Regarding specific changes:
     Board, and are thus unable to be snuck through inappropriately. Finally,
     the outgoing Steering Council is (as at all times) governed by the Django
     Code of Conduct, and so there is the continued check there. In short,
-    there's not reason **not** to allow the normal processes to continue. 
+    there's no reason **not** to allow the normal processes to continue. 
 
 * Allowing governance changing DEPs during elections.
 

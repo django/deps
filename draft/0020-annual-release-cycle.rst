@@ -4,7 +4,7 @@ DEP 0020: Annual Release Cycle
 
 :DEP: 0020
 :Author: Carlton Gibson
-:Implementation Team: TBD
+:Implementation Team: Sarah Boyce, Natalia Bidart, Jacob Walls, Carlton Gibson
 :Shepherd: Natalia Bidart
 :Status: Draft
 :Type: Process

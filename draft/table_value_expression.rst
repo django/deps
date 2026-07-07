@@ -70,11 +70,13 @@ used as a scalar annotation, Django renders it in the ``SELECT`` list:
 
 
 Expected SQL:
+
 .. code-block:: sql
 
    SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", "series"."value" AS "series"
    FROM "SRF_sales"
    CROSS JOIN LATERAL generate_series(1, 3) AS "series"("value")
+
 
 The actual SQL generated:
 
@@ -98,12 +100,14 @@ expression:
    Sales.objects.alias(series=GenerateSeriesFunc(1, 3)).filter(series__gt=1)
 
 Expected SQL:
+
 .. code-block:: sql
 
    SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", "series"."value" AS "series"
    FROM "SRF_sales"
    CROSS JOIN LATERAL generate_series(1, 3) AS "series"("value")
    WHERE "series"."value" > 1
+
 
 The actual SQL generated:
 

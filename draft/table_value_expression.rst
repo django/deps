@@ -224,7 +224,7 @@ the query's select list and dynamically form the ``CompositeField`` to handle th
 Expression-like table sources
 -----------------------------
 After output columns can be represented, the ORM needs a way to explicitly register an expression or query as a table source in the ``FROM`` clause.
-We can be sure if subqueries return multi-column single row or multi-column multi-row.
+We cannot be sure if subqueries return multi-column single row or multi-column multi-row.
 For example:
 
 .. code-block:: python

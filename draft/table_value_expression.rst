@@ -53,7 +53,7 @@ But this breaks when we are dealing with multi-column results. For example:
 
    Sales.objects.annotate(
        first_subject=first_object
-   ).values("first_subject")
+   ).values("first_subject__subject", "first_object__duration")
 
 This will raise `Cannot resolve expression type, unknown output_field`. because the ORM does not have an expression representing multiple columns and thus cannot make use of a join against the multi-column subquery.
 
@@ -67,6 +67,14 @@ used as a scalar annotation, Django renders it in the ``SELECT`` list:
 .. code-block:: python
 
    Sales.objects.annotate(series=GenerateSeriesFunc(1, 3))
+
+
+Expected SQL:
+.. code-block:: sql
+
+   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", "series"."value" AS "series"
+   FROM "SRF_sales"
+   CROSS JOIN LATERAL generate_series(1, 3) AS "series"("value")
 
 The actual SQL generated:
 
@@ -87,7 +95,15 @@ expression:
 
 .. code-block:: python
 
-   Sales.objects.annotate(series=GenerateSeriesFunc(1, 3)).filter(series__gt=1)
+   Sales.objects.alias(series=GenerateSeriesFunc(1, 3)).filter(series__gt=1)
+
+Expected SQL:
+.. code-block:: sql
+
+   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day", "series"."value" AS "series"
+   FROM "SRF_sales"
+   CROSS JOIN LATERAL generate_series(1, 3) AS "series"("value")
+   WHERE "series"."value" > 1
 
 The actual SQL generated:
 
@@ -143,9 +159,7 @@ expression, it could expose named columns:
 .. code-block:: python
 
    Sales.objects.alias(
-       cohort_data=TableExpression(
-           Cohort.objects.values("subject", "duration")[:1]
-       )
+       cohort_data=Cohort.objects.values("subject", "duration")[:1]
    ).values("cohort_data__subject", "cohort_data__duration")
 
 
@@ -167,76 +181,53 @@ For scalar expressions, Django already uses ``Expression.output_field``. For
 example, a subquery returning only ``subject`` can expose a single field such as
 ``CharField``.
 
-For table expressions that expose more than one column, Django needs an
-equivalent representation for multiple named fields. For example:
+For expressions that expose more than one column, Django needs an
+equivalent representation for multiple named fields. For example, a subquery or table expression might expose:
 
 .. code-block:: python
 
-   JsonEach("payload")
    # exposes:
-   #   key -> TextField()
-   #   value -> JSONField()
+   #   title -> CharField()
+   #   body -> TextField()
 
-This may be implemented as a lightweight composite output field, or as part of
-a more general ``CompositeField`` design. The initial scope should be limited to
-describing expression/query output, not full model-field behavior.
+To solve this, this proposal introduces a ``CompositeField``. This acts as a lightweight composite output field designed
+specifically for describing multi-column expression/query output, rather than acting as a concrete database model field.
+This distinction matters because the ORM must preserve Django's existing lookup behavior.
+By wrapping the output in a ``CompositeField``, if ``posts__title`` resolves to a ``CharField``, then all normal
+text lookups and transforms (like ``__icontains``) will automatically continue to work as expected.
 
-This matters because the ORM must preserve Django's existing lookup behavior.
-If ``item__key`` resolves to a ``TextField``, then normal text lookups and
-transforms should continue to work.
-
-The exact public API is still open.
-
-Expression-like table sources
------------------------------
-
-After output columns can be represented, the ORM needs a way to register an
-expression or query as a table source in the ``FROM`` or ``JOIN``.
-
-We will take inspiration from the existing `FilteredRelation`. We would follow the
-mechanism it used to register itself as a table source in the ``FROM`` clause.
-
-This DEP uses ``TableExpression`` as a placeholder name. The final public API
-may use a different name.
-
-Example:
-
-.. code-block:: python
-
-   Sales.objects.alias(
-       series=TableExpression(GenerateSeries(1, 3))
-   ).filter(series__value__gt=1)
-
-For single-column table expressions, the final API may allow a shorter form such
-as ``series__gt=1``. That detail is still open.
-
-Handling multi-columns
-----------------------
+Handling multi-columns single row
+---------------------------------
 
 A table expression must describe the columns it exposes.
-
-For a single-column source:
-
-.. code-block:: python
-
-   GenerateSeries(1, 3)
-   # exposes: value -> IntegerField()
 
 For a multi-column source:
 
 .. code-block:: python
 
-   JsonEach("payload")
-   # exposes:
-   #   key -> TextField()
-   #   value -> JSONField()
+   subquery = Post.objects.filter(user=OuterRef("pk")).values("title", "body")[:1]
+   User.objects.alias(posts=subquery).values("posts__title", "posts__body")
 
-The implementation should preserve Django's existing lookup behavior by
-associating each exposed column with a Django field.
+On the fly we will set the ``output_field`` of the subquery to CompositeField.
+This could be achieved when the initial ``resolve_ref()`` is triggered to get the transform.
+When Django tries to extract the subfield, it delegates to ``BaseExpression.get_transform()`` which looks up ``self.output_field``.
 
-The exact mechanism is open. One possible direction is to represent this through
-``Expression.output_field`` using the lightweight composite output metadata
-described above.
+This seamlessly triggers ``sql/Query.output_field`` on the inner query, which is exactly where we can evaluate
+the query's select list and dynamically form the ``CompositeField`` to handle the extraction.
+
+Expression-like table sources
+-----------------------------
+After output columns can be represented, the ORM needs a way to explicitly register an expression or query as a table source in the ``FROM`` clause.
+We can be sure if subqueries return multi-column single row or multi-column multi-row. For example:
+.. code-block:: python
+   subquery = Post.objects.filter(user=first_user).values("title", "body")
+   User.objects.alias(posts=subquery).values("posts__title", "posts__body")
+In this example, the ORM cannot reliably know if the ``subquery`` returns exactly one row or multiple rows.
+To solve this, our approach requires the developer to explicitly declare when a result is a multi-row table source. The user will do this by wrapping the queryset in a ``TableExpression``.
+.. code-block:: python
+   User.objects.alias(posts=TableExpression(subquery))
+This explicit wrapper allows the ORM to cleanly separate the processing logic. When encountering a ``TableExpression``, the ORM knows to place the subquery inside the ``FROM`` clause (utilizing ``LATERAL`` joins if there are outer references) rather than resolving it as a scalar subquery in the ``SELECT`` clause.
+*(Note: This DEP uses ``TableExpression`` as a placeholder name. The final public API may use a different name).*
 
 Table Source Compilation
 ------------------------
@@ -279,12 +270,11 @@ It's the only way users have today to insert content into the ``JOIN`` clause (b
 Why ``output_field`` Matters
 ----------------------------
 
-Most Django expressions expose their result type through ``output_field``.
-This works naturally for scalar expressions.
+In Django, most expressions expose their internal data types and lookup capabilities through the ``output_field``. This architecture works naturally for standard scalar expressions that return a single column.
 
-Table expressions need something similar, but they may expose multiple columns.
-Using an ``output_field``-based design may allow table-like expressions to fit
-the existing ``Expression`` interface more naturally.
+However, queries that expose multiple columns need a similar mechanism to expose their underlying schema. Rather than proposing a completely new API interface to handle multi-column results, this design leans heavily into the existing ``output_field`` pattern.
+
+By proposing that multi-column expressions dynamically generate a ``CompositeField`` and assign it to their ``output_field``, these queries will seamlessly satisfy Django's internal ``BaseExpression`` interface. This approach allows the ORM to resolve multi-column lookups (e.g., ``posts__title``) using the exact same code paths it already uses for standard scalar transformations, drastically reducing the required complexity of the implementation.
 
 
 Why ``alias()`` Is a Candidate API
@@ -295,6 +285,7 @@ inside a query.
 
 Table expression aliases are similar from the user's point of view:
 
+In the below example we are assuming expression returns multi-row resuls. Thus wrapped by ``TableExpression``.
 .. code-block:: python
 
    Sales.objects.alias(

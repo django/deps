@@ -136,6 +136,7 @@ If the set-returning function is instead compiled in the ``FROM`` clause (using 
    WHERE "series"."value" > 1
 
 Benefits:
+
 * Join and Cardinality Control: Compiling the function in the ``FROM`` clause allows the ORM to choose between ``LEFT JOIN LATERAL`` (preserving the parent rows when the set is empty) and ``CROSS JOIN LATERAL``.
 * Valid Filtering: The ``WHERE`` clause filters on the materialized column reference ``"series"."value"`` instead of executing a set-returning function inline. This evaluates correctly and I assume no database execution errors.
 
@@ -168,9 +169,10 @@ expression, it could expose named columns:
 
 
 There are three aspects to this that we'd like to work on:
-- A table expression can be registered as a source in ``FROM`` or ``JOIN``.
-- A table expression has a stable alias.
-- Columns exposed by that alias can be referenced in the rest of the queryset.
+
+* A table expression can be registered as a source in ``FROM`` or ``JOIN``.
+* A table expression has a stable alias.
+* Columns exposed by that alias can be referenced in the rest of the queryset.
 
 Specification
 =============
@@ -222,14 +224,22 @@ the query's select list and dynamically form the ``CompositeField`` to handle th
 Expression-like table sources
 -----------------------------
 After output columns can be represented, the ORM needs a way to explicitly register an expression or query as a table source in the ``FROM`` clause.
-We can be sure if subqueries return multi-column single row or multi-column multi-row. For example:
+We can be sure if subqueries return multi-column single row or multi-column multi-row.
+For example:
+
 .. code-block:: python
+
    subquery = Post.objects.filter(user=first_user).values("title", "body")
    User.objects.alias(posts=subquery).values("posts__title", "posts__body")
+
 In this example, the ORM cannot reliably know if the ``subquery`` returns exactly one row or multiple rows.
-To solve this, our approach requires the developer to explicitly declare when a result is a multi-row table source. The user will do this by wrapping the queryset in a ``TableExpression``.
+To solve this, our approach requires the developer to explicitly declare when a result is a multi-row table source.
+The user will do this by wrapping the queryset in a ``TableExpression``.
+
 .. code-block:: python
+
    User.objects.alias(posts=TableExpression(subquery))
+
 This explicit wrapper allows the ORM to cleanly separate the processing logic. When encountering a ``TableExpression``, the ORM knows to place the subquery inside the ``FROM`` clause (utilizing ``LATERAL`` joins if there are outer references) rather than resolving it as a scalar subquery in the ``SELECT`` clause.
 *(Note: This DEP uses ``TableExpression`` as a placeholder name. The final public API may use a different name).*
 
@@ -290,6 +300,7 @@ inside a query.
 Table expression aliases are similar from the user's point of view:
 
 In the below example we are assuming expression returns multi-row resuls. Thus wrapped by ``TableExpression``.
+
 .. code-block:: python
 
    Sales.objects.alias(

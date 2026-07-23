@@ -228,9 +228,19 @@ A January final release, carrying the new year's number, gives a
 holiday period for both the Releaser and users evaluating upgrades.
 
 Annual releases are (of course) slower than eight monthly ones, and that is a
-cost for this proposal. At this stage in Django's lifecycle, and given its
-strong stability guarantees, the motivating factors for this DEP make it one
-worth paying.
+cost for this proposal. The bulk of Django's user base is not pushing for
+faster releases, though. Rather, it's the gap between LTS releases that puts
+the brake on average upgrade momentum. By removing that gap, we speed the
+community as a whole.
+
+At the same time, it's not realistic for us to offer more frequent releases,
+whilst maintaining Django's support and stability guarantees. Nonetheless,
+Django's main development branch is itself (remarkably) stable. Teams wanting
+to be on the cutting edge have for many years deployed from the main branch.
+Whilst out of scope for this DEP, it remains open for future work to improve
+the messaging around testing and using Django's main development branch, and
+assessing the feasibility of us providing incremental development releases as
+part of the monthly release process.
 
 Every release as LTS
 --------------------

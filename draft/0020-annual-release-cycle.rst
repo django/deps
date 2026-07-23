@@ -132,6 +132,10 @@ versions: the two Python versions with active upstream support at the start of
 the Django pre-release phase ("green"), plus the most recent Python version to
 have moved to security-only status ("plus last yellow").
 
+See the official `Status of Python versions`__ guide for reference.
+
+__ https://devguide.python.org/versions/
+
 In addition, the current mainstream support version of Django will adopt
 support for the new version of Python that is released in the October of its
 first year.

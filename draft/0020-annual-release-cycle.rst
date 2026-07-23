@@ -62,7 +62,7 @@ Each feature release is preceded by a pre-release phase:
 As has been the case historically:
 
 * Feature development is continual on Django's ``main`` development branch.
-* Stable release branches are created just prior to the alpha release each
+* Stable release branches are created just prior to the alpha release for each
   release series. This marks the *feature freeze* for the feature release.
 * In order to prepare for this release, Django's main branch will begin
   adoption of pre-release CPython versions from their pre-release phase.
@@ -102,8 +102,8 @@ releases increment ``N``.
 Support Window
 --------------
 
-Every feature release is supported for three years from its date of
-release:
+Every feature release is supported for three years (strictly, 35 months) from
+its date of release:
 
 * **Year 1** is considered *mainstream support*, receiving fixes for security
   issues, data loss bugs, crashing bugs, major functionality bugs in
@@ -113,9 +113,9 @@ release:
 
 The support level for a feature release changes in the December of each year,
 at the point just after that month's releases are (or would be) made. At this
-time, the current year's release enters extended support and the year-three
-release becomes end-of-life (EOL). The new year's feature release then begins
-mainstream support the following month.
+time, the current year's release enters extended support and the release from
+35 months prior becomes end-of-life (EOL). The new year's feature release then
+begins mainstream support the following month.
 
 This means that, bar the transition period over the new year, at any given time,
 three feature releases are under support: the current release, under mainstream
@@ -137,8 +137,8 @@ See the official `Status of Python versions`__ guide for reference.
 __ https://devguide.python.org/versions/
 
 In addition, the current mainstream support version of Django will adopt
-support for the new version of Python that is released in the October of its
-first year.
+support in a patch release for the new version of Python that is released in
+the October of its first year.
 
 This ensures that:
 
@@ -163,9 +163,9 @@ raised in ``A`` and ``A+1``, and the feature is removed in ``A+2``. This
 preserves the existing guarantee that a deprecated feature remains
 available, with warnings, across at least two feature releases.
 
-Because every release is supported for three years, a user on any
-supported version has at least two further feature releases in which to
-respond to any deprecation before it is removed.
+Because every release is supported for three years, a user on any supported
+version has at least two feature releases in which to respond to any
+deprecation before it is removed.
 
 Transition
 ----------
@@ -199,8 +199,7 @@ __ https://peps.python.org/pep-0602/
 
 Python's annual release cycle has been a great success, but it fails to align
 well with Django's existing 8 month release cycle, with every third release
-being an long-term support (LTS) release, having three full years of security
-updates.
+being an LTS, having three full years of security updates.
 
 As a concrete example, Django 4.2 LTS, which reached EOL during the preparation
 of this DEP, supported five full versions of Python at the point it was EOL,
@@ -208,18 +207,18 @@ Python 3.8 to 3.12 inclusive.
 
 Of those, Python 3.12 was released after Django 4.2 left mainstream support.
 Django 4.2's status as the LTS version meant that adding Python 3.12 support
-was required by the community. That's OK. We've lived with it. But it create
+was required by the community. That's OK. We've lived with it. But it creates
 extra maintenance overhead that's not intended for the *extended support*
 phase.
 
 More pressingly, both Python 3.8 and Python 3.9 were end of life significantly
-before Django 4.2. By the time Django 4.2 expired, Python 3.8 had been EOL for
-a 18 full months. Supporting EOL versions of Python is neither good for
+before Django 4.2's EOL. By the time Django 4.2 expired, Python 3.8 had been
+EOL for 18 full months. Supporting EOL versions of Python is neither good for
 maintenance, nor for our users, whom we should be encouraging to upgrade onto
 supported versions.
 
 (Django 4.2 is just an example here. The Python support story shifts
-symmetrically for any given Django LTS version)
+symmetrically for any given Django LTS version.)
 
 By switching to an annual release cycle, Django can much better align with
 Python's release schedule.
@@ -229,7 +228,7 @@ the gap between LTS releases.
 
 Under the current policy, users on an LTS release do not receive most bugfixes,
 which land only on the current feature release branch. Not only does this mean
-that we have value that we're not able to deliver but, there are reports of
+that we have value that we're not able to deliver, but there are reports of
 users ceasing to file issues with Django and engage in the maintenance process,
 instead maintaining private patches against their LTS version.
 
@@ -249,19 +248,19 @@ Removing the LTS gap encourages annual updates, allows them at any time in
 the extended support window, and gives two years, rather than one, in which an
 update to an equivalently supported Django is available.
 
-At the same time, we align the update process to the official advice. In theory,
+At the same time, we align the update process with the official advice. In theory,
 LTS-to-LTS updates are doable. In reality, we `still say`__, it’s “usually
 easier to upgrade through each feature release incrementally”. By removing the
 distinction there, we ease the update process for our LTS users.
 
 __ https://docs.djangoproject.com/en/5.2/howto/upgrade-version/#:~:text=usually%20easier%20to%20upgrade%20through%20each%20feature%20release%20incrementally
 
-Beyond these concerns, we aim to provide a simpler support story for our third-party package maintainers.
+Beyond these concerns, we aim to provide a simpler support story for our
+third-party package maintainers.
 
 Our current recommendation is that third-party packages drop support for
-everything prior to the current LTS on the release of the subsequent x.0 that
-follows it. For example, the Django 6.0 release notes contain this `advice for
-maintainers`__:
+everything prior to the current LTS on the release of the subsequent x.0. For
+example, the Django 6.0 release notes contain this `advice for maintainers`__:
 
     Following the release of Django 6.0, we suggest that third-party app
     authors drop support for all versions of Django prior to 5.2.
@@ -282,18 +281,18 @@ can clarify Django's versioning and support status, not just for users, but for
 people outside the immediate Django community too.
 
 The current ``X.Y`` numbering mimics semantic versioning despite not being
-SemVer. At every x.0 release there's confusion at to why it's not a major
+SemVer. At every x.0 release there's confusion as to why it's not a major
 breaking release. The x.0, x.1, x.2 LTS cycle is opaque to people who aren't
 vested in the Django community. It makes explaining Django's versioning to
 stakeholders truly challenging. And without constant reference to the
 `Supported Versions`__ guide, it's not feasible to know when a given version of
-Django was released, or when it is supported to.
+Django was released, or when its support ends.
 
 __ https://www.djangoproject.com/download/#supported-versions
 
-Calendar versioning implies the stability and continuity, that is Django's
-chief achievement as it's matured, and it makes questions obvious. When was it
-released? Year. When it is end of life? Year + 3. The messaging value of this
+Calendar versioning implies the stability and continuity that is Django's
+chief achievement as it's matured. And it makes questions obvious. When was it
+released? Year. When is it end of life? Year + 3. The messaging value of this
 is much more important than we're naturally inclined to credit it.
 
 Rationale
@@ -312,7 +311,7 @@ A January final release, carrying the new year's number, gives a
 "New Year, not Last Year" feel to each release and avoids the December
 holiday period for both the Releaser and users evaluating upgrades.
 
-Annual releases are (of course) slower than eight monthly ones, and that is a
+Annual releases are (of course) slower than eight-monthly ones, and that is a
 cost for this proposal. The bulk of Django's user base is not pushing for
 faster releases, though. Rather, it's the gap between LTS releases that puts
 the brake on average upgrade momentum. By removing that gap, we speed the
@@ -323,9 +322,9 @@ whilst maintaining Django's support and stability guarantees. Nonetheless,
 Django's main development branch is itself (remarkably) stable. Teams wanting
 to be on the cutting edge have for many years deployed from the main branch.
 Whilst out of scope for this DEP, it remains open for future work to improve
-the messaging around testing and using Django's main development branch, and
-assessing the feasibility of us providing incremental development releases as
-part of the monthly release process.
+the messaging around testing and using Django's main development branch, and to
+assess the feasibility of us providing incremental development releases as part
+of the monthly release process.
 
 Every release as LTS
 --------------------
@@ -382,21 +381,22 @@ than as a standalone adjustment.
 
 __ https://forum.djangoproject.com/t/should-we-adjust-djangos-versioning-to-use-a-form-of-calver/42811
 
-Django itself does not distinguish between patch releases. There are only
-feature releases and patch releases. Hence the two valued scheme: ``YYYY.N``.
-Projects such as PyCharm use add an additional minor feature value, so similar
-to ``YYYY.M.N``, where ``M`` is the minor release within the year. This remains
-open as a future possibility if it were needed, but it may by useful for
-third-party packages wishing to follow Django's versioning scheme, whilst
-maintaining a *minor version* notion.
+Django itself does not distinguish minor from patch releases: there are only
+feature releases and patch releases. Hence the two-value scheme, ``YYYY.N``.
+Projects such as PyCharm add a minor-release component — ``YYYY.M.N``, where
+``M`` is the minor release within the year. This remains open as a future
+possibility should it be needed, and may be useful for third-party packages
+wishing to follow Django's versioning whilst retaining a minor-version notion.
 
 Python support: "Plus Last Yellow"
 ----------------------------------
 
-Of the two Python support policies sketched in the preliminary
-discussion — "Green Only" (the two currently supported Python versions)
-and "Plus Last Yellow" (those two plus the most recent end-of-life or
-security-only version) — this DEP selects "Plus Last Yellow".
+Of the two Python support policies sketched in the `preliminary discussion`__ —
+"Green Only" (the two currently supported Python versions) and "Plus Last
+Yellow" (those two plus the most recent end-of-life or security-only version) —
+this DEP selects "Plus Last Yellow".
+
+__ https://buttondown.com/carlton/archive/an-annual-release-cycle-for-django/
 
 "Plus Last Yellow" is the less aggressive of the two. It gives users one
 additional Python version per Django release, smoothing the Python
@@ -413,11 +413,11 @@ policy.
 The option to decline to address an issue affecting only the then EOL Python
 version during the final two months of a Django version support window is there
 to avoid (particularly) the Fellows and Security Team being obliged to spend
-time here. It allows us to adopt the less-agressive "Plus Last Yellow" policy
-without committing to fixing issues affecting only EOL Python versions. (It's a
-compromise between the too-aggressive "Green Only" policy, the "rug-pull" of
-dropping support for a Python version in a patch release, and not having to
-spend dedicated time supporting EOL versions.)
+time here. It allows us to adopt the more conservative "Plus Last Yellow"
+policy without committing to fixing issues affecting only EOL Python versions.
+(It's a compromise between the overly aggressive "Green Only" policy and the
+"rug-pull" of dropping support for a Python version in a patch release. The
+goal is not having to spend dedicated time supporting EOL versions.)
 
 Related work: automated upgrade tooling
 ---------------------------------------
@@ -466,7 +466,8 @@ No change is proposed to the support commitments already made for Django
 5.2 LTS or Django 6.2 LTS under the existing schedule.
 
 References to, for example, Steering Council terms that are grounded in LTS
-cycles will need to be updated to simply state two-years, or as appropriate.
+cycles will need to be updated to simply state two-years, or as appropriate,
+but such edits are out of scope for this DEP.
 
 Reference Implementation
 ========================

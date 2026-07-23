@@ -186,34 +186,115 @@ with its support window concluding in April 2030.
 Motivation
 ==========
 
-*Outline — WIP to be expanded*
+The primary motivations for this proposal are to align better with Python's now
+annual release cycle, and to close the gap between long-term support (LTS)
+releases of Django. These are interlocking.
 
-* **Alignment with Python's annual release cycle.** Python has released
-  annually since Python 3.9. Django's eight-month cycle is continually
-  misaligned with Python's, complicating Python support decisions and
-  increasing the matrix of supported interpreters.
+From Python 3.9, Python itself moved to an annual release schedule (`PEP 602`__).
+New Python versions are released in the October each year. Each has 2 years of
+full support, 3 more years of security fixes after that, before being End of
+Life (EOL).
 
-* **Removing the gap between LTS cycles.** Under the current policy, users
-  on an LTS release do not receive most bugfixes, which land only on the
-  current feature release. There are reports of users ceasing to file
-  issues with Django and instead maintaining private patches against
-  their LTS version. Making every release an LTS closes this gap: every
-  supported user receives bugfixes for a full year.
+__ https://peps.python.org/pep-0602/
 
-* **Simpler support story for third-party packages.** A rolling
-  three-version support window (the latest release and the two prior
-  years') gives third-party maintainers a clear and stable FIFO queue of
-  Django versions to target. Today, the overlap between the end-of-life
-  of an old LTS and the active life of new feature releases puts
-  maintainers under pressure to support more versions at once, for
-  longer.
+Python's annual release cycle has been a great success, but it fails to align
+well with Django's existing 8 month release cycle, with every third release
+being an long-term support (LTS) release, having three full years of security
+updates.
 
-* **Version and timing clarity (secondary).** The present ``X.Y``
-  numbering mimics semantic versioning despite not being semver, and the
-  numbers carry no information about when a release was made or how
-  current it is. ``YYYY.N`` encodes both, and makes Django's actual
-  stability and upgrade story easier to communicate. This is a genuine
-  improvement but is not the primary driver for this DEP.
+As a concrete example, Django 4.2 LTS, which reached EOL during the preparation
+of this DEP, supported five full versions of Python at the point it was EOL,
+Python 3.8 to 3.12 inclusive.
+
+Of those, Python 3.12 was released after Django 4.2 left mainstream support.
+Django 4.2's status as the LTS version meant that adding Python 3.12 support
+was required by the community. That's OK. We've lived with it. But it create
+extra maintenance overhead that's not intended for the *extended support*
+phase.
+
+More pressingly, both Python 3.8 and Python 3.9 were end of life significantly
+before Django 4.2. By the time Django 4.2 expired, Python 3.8 had been EOL for
+a 18 full months. Supporting EOL versions of Python is neither good for
+maintenance, nor for our users, whom we should be encouraging to upgrade onto
+supported versions.
+
+(Django 4.2 is just an example here. The Python support story shifts
+symmetrically for any given Django LTS version)
+
+By switching to an annual release cycle, Django can much better align with
+Python's release schedule.
+
+By giving every release the same *LTS* three year support window, we can remove
+the gap between LTS releases.
+
+Under the current policy, users on an LTS release do not receive most bugfixes,
+which land only on the current feature release branch. Not only does this mean
+that we have value that we're not able to deliver but, there are reports of
+users ceasing to file issues with Django and engage in the maintenance process,
+instead maintaining private patches against their LTS version.
+
+Giving every release the same LTS support level closes this gap. Every user can
+update to each feature release, receiving bugfixes (and new features) as they
+do so.
+
+Removing the gap between LTS releases also removes the relatively sudden
+pressure to upgrade quickly to the new LTS, once it's finally available, before
+the current one you're on becomes EOL. In theory you have a year, which sounds
+plenty, but we see a `persistent pattern`__ in the download numbers for Django
+where projects have failed to update from the older LTS before it reaches EOL.
+
+__ https://buttondown.com/carlton/archive/how-we-make-decisions-in-django/#:~:text=Community%20as%20context
+
+Removing the LTS gap encourages annual updates, allows them at any time in
+the extended support window, and gives two years, rather than one, in which an
+update to an equivalently supported Django is available.
+
+At the same time, we align the update process to the official advice. In theory,
+LTS-to-LTS updates are doable. In reality, we `still say`__, it’s “usually
+easier to upgrade through each feature release incrementally”. By removing the
+distinction there, we ease the update process for our LTS users.
+
+__ https://docs.djangoproject.com/en/5.2/howto/upgrade-version/#:~:text=usually%20easier%20to%20upgrade%20through%20each%20feature%20release%20incrementally
+
+Beyond these concerns, we aim to provide a simpler support story for our third-party package maintainers.
+
+Our current recommendation is that third-party packages drop support for
+everything prior to the current LTS on the release of the subsequent x.0 that
+follows it. For example, the Django 6.0 release notes contain this `advice for
+maintainers`__:
+
+    Following the release of Django 6.0, we suggest that third-party app
+    authors drop support for all versions of Django prior to 5.2.
+
+__ https://docs.djangoproject.com/en/dev/releases/6.0/#third-party-library-support-for-older-versions-of-django
+
+The reality, though, is that significant numbers of users are yet to update at
+this point and there is significant pressure to maintain support for the older
+LTS, well beyond the point at which we’re officially meant to have dropped it.
+
+A rolling three-version support window (the latest release and the two prior
+years') gives third-party maintainers a clear and stable FIFO queue of Django
+versions to target. That it coincides with updating the Python support matrix
+creates a unified, regular, and predictable cycle.
+
+Finally, by adopting calendar versioning, to match the new release cycle, we
+can clarify Django's versioning and support status, not just for users, but for
+people outside the immediate Django community too.
+
+The current ``X.Y`` numbering mimics semantic versioning despite not being
+SemVer. At every x.0 release there's confusion at to why it's not a major
+breaking release. The x.0, x.1, x.2 LTS cycle is opaque to people who aren't
+vested in the Django community. It makes explaining Django's versioning to
+stakeholders truly challenging. And without constant reference to the
+`Supported Versions`__ guide, it's not feasible to know when a given version of
+Django was released, or when it is supported to.
+
+__ https://www.djangoproject.com/download/#supported-versions
+
+Calendar versioning implies the stability and continuity, that is Django's
+chief achievement as it's matured, and it makes questions obvious. When was it
+released? Year. When it is end of life? Year + 3. The messaging value of this
+is much more important than we're naturally inclined to credit it.
 
 Rationale
 =========

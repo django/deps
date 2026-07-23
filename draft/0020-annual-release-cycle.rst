@@ -152,8 +152,8 @@ Given Python's release cycle, the oldest supported Python will be end-of-life
 (EOL) two months before the corresponding Django version. At this point, Django
 will continue to test against the then EOL Python, in order to avoid
 regressions in line with the stability policy. Nonetheless, Django may decline
-to address an issue affecting only the then EOL Python version, that emerges in
-the final two months of its support window.
+to address an issue affecting only the then EOL Python version, if such emerges
+in the final two months of its support window.
 
 Deprecation Policy
 ------------------

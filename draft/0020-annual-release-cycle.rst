@@ -382,6 +382,14 @@ than as a standalone adjustment.
 
 __ https://forum.djangoproject.com/t/should-we-adjust-djangos-versioning-to-use-a-form-of-calver/42811
 
+Django itself does not distinguish between patch releases. There are only
+feature releases and patch releases. Hence the two valued scheme: ``YYYY.N``.
+Projects such as PyCharm use add an additional minor feature value, so similar
+to ``YYYY.M.N``, where ``M`` is the minor release within the year. This remains
+open as a future possibility if it were needed, but it may by useful for
+third-party packages wishing to follow Django's versioning scheme, whilst
+maintaining a *minor version* notion.
+
 Python support: "Plus Last Yellow"
 ----------------------------------
 

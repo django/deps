@@ -393,8 +393,8 @@ Python support: "Plus Last Yellow"
 
 Of the two Python support policies sketched in the `preliminary discussion`__ —
 "Green Only" (the two currently supported Python versions) and "Plus Last
-Yellow" (those two plus the most recent end-of-life or security-only version) —
-this DEP selects "Plus Last Yellow".
+Yellow" (those two plus the most recent security-only version) — this DEP
+selects "Plus Last Yellow".
 
 __ https://buttondown.com/carlton/archive/an-annual-release-cycle-for-django/
 

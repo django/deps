@@ -137,8 +137,9 @@ If the set-returning function is instead compiled in the ``FROM`` clause (using 
 
 Benefits:
 
-* Join and Cardinality Control: Compiling the function in the ``FROM`` clause allows the ORM to choose between ``LEFT JOIN LATERAL`` (preserving the parent rows when the set is empty) and ``CROSS JOIN LATERAL``.
-* Valid Filtering: The ``WHERE`` clause filters on the materialized column reference ``"series"."value"`` instead of executing a set-returning function inline. This evaluates correctly and I assume no database execution errors.
+* The function is evaluated as a row source instead of as a scalar expression.
+* The ``WHERE`` clause filters a normal column reference such as
+  ``"series"."value"``.
 
 Multi-Column Subqueries
 -----------------------
@@ -202,84 +203,121 @@ This distinction matters because the ORM must preserve Django's existing lookup 
 By wrapping the output in a ``CompositeField``, if ``posts__title`` resolves to a ``CharField``, then all normal
 text lookups and transforms (like ``__icontains``) will automatically continue to work as expected.
 
-Handling multi-columns single row
----------------------------------
+Handling multi-column sources
+-----------------------------
 
-A table expression must describe the columns it exposes.
-
-For a multi-column source:
+A multi-column source must describe the columns it exposes:
 
 .. code-block:: python
 
-   subquery = Post.objects.filter(user=OuterRef("pk")).values("title", "body")[:1]
+   subquery = Post.objects.values("title", "body")[:1]
    User.objects.alias(posts=subquery).values("posts__title", "posts__body")
 
-On the fly we will set the ``output_field`` of the subquery to CompositeField.
-This could be achieved when the initial ``resolve_ref()`` is triggered to get the transform.
-When Django tries to extract the subfield, it delegates to ``BaseExpression.get_transform()`` which looks up ``self.output_field``.
+The inner query's selected fields are used to form its ``CompositeField``.
 
-This seamlessly triggers ``sql/Query.output_field`` on the inner query, which is exactly where we can evaluate
-the query's select list and dynamically form the ``CompositeField`` to handle the extraction.
+Under this proposal, the source remains in ``Query.annotations`` until one of
+its fields, or the complete row, is referenced. Django then checks whether a
+``SubqueryJoin`` for that annotation already exists in ``Query.alias_map``. It
+reuses the existing join or creates one when needed.
+
+An individual reference such as ``posts__title`` becomes a typed ``Col``
+pointing to the derived table. A reference to the complete ``posts`` alias
+becomes an internal tuple containing all its columns.
+
+The ORM cannot reliably know whether a query returns one row or many rows. A
+caller that requires one row must limit the query, for example with ``[:1]``.
+
+Correlated sources are also part of the intended design:
+
+.. code-block:: python
+
+   subquery = (
+       Post.objects.filter(user=OuterRef("pk"))
+       .values("title", "body")[:1]
+   )
+   User.objects.alias(posts=subquery).values("posts__title", "posts__body")
+
+At the SQL level, a correlated source requires ``LATERAL`` or the equivalent
+syntax supported by the database.
 
 Expression-like table sources
 -----------------------------
-After output columns can be represented, the ORM needs a way to explicitly register an expression or query as a table source in the ``FROM`` clause.
-We cannot be sure if subqueries return multi-column single row or multi-column multi-row.
-For example:
+
+After output columns can be represented, the ORM needs a way to identify a
+function expression that is valid as a source in the ``FROM`` clause.
+
+A set-returning function can use the same lazy flow as a multi-column queryset:
 
 .. code-block:: python
 
-   subquery = Post.objects.filter(user=first_user).values("title", "body")
-   User.objects.alias(posts=subquery).values("posts__title", "posts__body")
+   Sales.objects.alias(
+       series=GenerateSeries(1, 3),
+   ).filter(series__gt=1)
 
-In this example, the ORM cannot reliably know if the ``subquery`` returns exactly one row or multiple rows.
-To solve this, our approach requires the developer to explicitly declare when a result is a multi-row table source.
-The user will do this by wrapping the queryset in a ``TableExpression``.
+The function must describe its output through ``output_field``. A scalar result
+can use a normal field, while a multi-column result can use
+``CompositeField``.
 
-.. code-block:: python
-
-   User.objects.alias(posts=TableExpression(subquery))
-
-This explicit wrapper allows the ORM to cleanly separate the processing logic. When encountering a ``TableExpression``, the ORM knows to place the subquery inside the ``FROM`` clause (utilizing ``LATERAL`` joins if there are outer references) rather than resolving it as a scalar subquery in the ``SELECT`` clause.
-*(Note: This DEP uses ``TableExpression`` as a placeholder name. The final public API may use a different name).*
+The exact author-facing opt-in is still open. It may use suitable metadata on a
+custom function expression, or a small function base class that authors
+inherit.
 
 Table Source Compilation
 ------------------------
 
 The ORM must also know where and how a table expression should be compiled.
 
-Examples include:
+This proposal introduces ``SubqueryJoin`` to represent a multi-column queryset
+in the ``FROM`` clause. A function source requires different SQL, so it also
+introduces ``SetReturningFunctionJoin``.
 
-* inline in the ``FROM`` clause,
-* as a ``LATERAL JOIN``,
-* or, in future work, as a ``WITH``/CTE binding.
+Both proposed joins are stored directly in the existing ``Query.alias_map`` and
+compiled through the existing ``FROM``-clause machinery. Correlated sources use
+``LATERAL`` or the database's equivalent syntax.
 
-This means output metadata alone is not enough. The ORM also needs table-source
-compilation behavior.
+This means output metadata alone is not enough. ``output_field`` describes the
+columns and their types, while the join describes how the source is compiled.
 
 Query Integration
 -----------------
 
-Table expression aliases should be usable in common queryset operations:
+Existing behavior for single-column subqueries does not change. The new logic
+is used only when ``filter()``, ``values()``, ``order_by()``, or another
+expression references a supported multi-column or set-returning alias.
+
+For example, when the ORM receives:
 
 .. code-block:: python
 
-   .values("item__key")
-   .filter(item__key="name")
-   .order_by("item__key")
-   .annotate(key_copy=F("item__key"))
+   .filter(info__email="bob@mail.com")
 
-The exact resolver integration point is open. Candidate locations include
-``Query.resolve_ref()``, ``Query.setup_joins()``, ``Query.names_to_path()``, or
-a smaller helper shared by multiple query paths.
+it splits the name and checks whether ``info`` is present in
+``Query.annotations``. If the annotation is a multi-column query, it checks
+whether a matching ``SubqueryJoin`` is already present in
+``Query.alias_map``. It reuses that join or creates one when needed.
+
+The derived table is then added to the ``FROM`` clause:
+
+.. code-block:: sql
+
+   LEFT OUTER JOIN (
+       SELECT email, name
+       FROM ...
+   ) info ON (1 = 1)
+
+After that, ``info__email`` resolves to a typed ``Col`` pointing to
+``info.email``. If the complete annotation is used, it resolves to an internal
+tuple containing all its columns.
+
+Set-returning function sources follow the same flow, using their
+function-specific join representation.
+
+The source is added only when it is needed, and multiple references reuse the
+same join. The existing filtering, selection, annotation, and ordering
+machinery continues from the resulting ``Col`` or tuple.
 
 Rationale
 =========
-
-Why ``FilteredRelation`` is relevant
-------------------------------------
-It's the only way users have today to insert content into the ``JOIN`` clause (by appending a condition to the ``ON`` clause).
-
 
 Why ``output_field`` Matters
 ----------------------------
@@ -299,20 +337,62 @@ inside a query.
 
 Table expression aliases are similar from the user's point of view:
 
-In the below example we are assuming expression returns multi-row resuls. Thus wrapped by ``TableExpression``.
-
 .. code-block:: python
 
-   Sales.objects.alias(
-       item=TableExpression(JsonEach("payload"))
-   )
+   Sales.objects.alias(series=GenerateSeries(1, 3))
 
-Internally, however, table expression aliases are different from scalar
-annotation aliases. They must be registered as table sources, not only as
-reusable scalar expressions.
+The alias remains lazy until another queryset operation references it. This
+fits multi-column querysets and set-returning functions without requiring a
+new wrapper around every source.
+
+Why reuse the multi-column subquery path?
+-----------------------------------------
+
+Multi-column querysets and set-returning functions need the same operation:
+turn a lazy annotation into a ``FROM`` source and resolve its output into
+typed ``Col`` expressions.
+
+The proposed design uses ``Query.annotations``, ``Query.alias_map``, alias
+allocation, and ``SubqueryJoin``. A function source can reuse that flow and add
+only the join behavior required for its SQL syntax.
 
 Alternatives Considered
 =======================
+
+A generic ``TableExpression`` wrapper
+-------------------------------------
+
+An earlier approach wrapped a source explicitly:
+
+.. code-block:: python
+
+   User.objects.alias(posts=TableExpression(subquery))
+
+This is explicit, but it adds another public abstraction and encourages a
+separate resolution layer. The initial cases can use the annotation and join
+machinery directly. A generic wrapper can be reconsidered if more kinds of
+arbitrary ``FROM`` sources are added later.
+
+A small function base class
+---------------------------
+
+One possible function opt-in is a small ``Func`` subclass, provisionally
+called ``TableFunction``:
+
+.. code-block:: python
+
+   class GenerateSeries(TableFunction):
+       function = "generate_series"
+       output_field = IntegerField()
+
+Function authors could inherit it when defining their own set-returning
+functions. This is one possible API, not a required part of this DEP. Another
+option is suitable metadata on a top-level custom ``Func`` used through
+``alias()``.
+
+The final choice must preserve existing ``SELECT``-list behavior and distinguish
+an expression that returns multiple rows from one that is valid as a complete
+``FROM`` source.
 
 Explicit Column Metadata
 ------------------------
@@ -321,8 +401,8 @@ An early implementation could accept column metadata directly:
 
 .. code-block:: python
 
-   TableExpression(
-       JsonEach("payload"),
+   JsonEach(
+       "payload",
        columns={
            "key": models.TextField(),
            "value": models.JSONField(),
@@ -333,6 +413,20 @@ This may be easy to prototype, but it creates a separate metadata path from
 ``Expression.output_field``.
 
 You can find more detail `here <https://github.com/p-r-a-v-i-n/Generic---Relation---API-Design/blob/main/RELATION_API_BLUEPRINT.md>`_.
+
+Backwards Compatibility
+=======================
+
+Existing single-column subqueries and ordinary scalar expressions keep their
+current behavior.
+
+Only an explicitly supported function alias becomes a table source. Merely
+setting ``set_returning`` or returning more than one row must not silently
+change where an existing expression is compiled until the final opt-in
+contract is agreed.
+
+The proposal does not introduce concrete model fields, migrations, or database
+schema changes.
 
 Copyright
 =========

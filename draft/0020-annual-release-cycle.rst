@@ -337,14 +337,13 @@ supported for three years — removes the failure mode without reducing the
 commitment offered to any user.
 
 The explicit "LTS" label is retired in this DEP on the grounds that every
-release now carries the commitment that label previously denoted. It
-remains the responsibility of the Marketing Working Group, the
-djangoproject.com site, and the Django documentation to communicate the
-length and stability of the three-year support window clearly — both to
-existing users and to stakeholders evaluating Django against other
-frameworks. (Retaining the "LTS" label on every release, as an
-always-applied marker rather than a distinguishing one, remains a viable
-option if the working group and documentation editors find it useful.)
+release now carries the commitment that label previously denoted. It remains
+important, via the djangoproject.com site and the Django documentation, to
+communicate the length and stability of the three-year support window clearly —
+both to existing users and to stakeholders evaluating Django against other
+frameworks. (Retaining the "LTS" label on every release, as an always-applied
+marker rather than a distinguishing one, remains a viable option if, on
+implementation, the documentation editors find it useful.)
 
 Deprecation calendar
 --------------------
@@ -447,9 +446,9 @@ rather than on Django's Python API:
 
 * **The "LTS" label.** External resources (hosting providers, tutorials,
   books, third-party packages) that refer to "the Django LTS" will need
-  to be updated to reflect that every release is long-term supported.
-  The Marketing Working Group and the documentation are expected to lead
-  on this communication.
+  to be updated to reflect that every release is long-term supported. The
+  documentation should make the support guarantee clear — it's a unique selling
+  point — and community/marketing efforts should emphasise it too.
 
 * **Release tooling and schedules.** Internal release tooling, the
   ``internals/release-process/`` documentation, and the release schedule
@@ -483,8 +482,7 @@ this DEP requires changes including:
   ``django/__init__.py`` and related locations.
 * Updating the download and "supported versions" pages on
   djangoproject.com.
-* Communicating the change via the Django blog and the Marketing
-  Working Group.
+* Communicating the change via the Django blog and other marketing efforts.
 
 Copyright
 =========

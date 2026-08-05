@@ -158,8 +158,8 @@ in the final two months of its support window.
 Deprecation Policy
 ------------------
 
-If a feature is deprecated in release ``A``, a deprecation warning is
-raised in ``A`` and ``A+1``, and the feature is removed in ``A+2``. This
+If a feature is deprecated in release ``X``, a deprecation warning is
+raised in ``X`` and ``X+1``, and the feature is removed in ``X+2``. This
 preserves the existing guarantee that a deprecated feature remains
 available, with warnings, across at least two feature releases.
 

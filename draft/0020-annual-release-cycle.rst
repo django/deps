@@ -351,8 +351,8 @@ Deprecation calendar
 
 A consequence of the longer release cycle is that deprecation periods
 lengthen in calendar terms. Under DEP 4's eight-monthly cycle, a feature
-deprecated in release ``A`` was removed approximately 16 months later in
-``A+2``. Under this DEP the same ``A`` → ``A+1`` → ``A+2`` path occupies
+deprecated in release ``X`` was removed approximately 16 months later in
+``X+2``. Under this DEP the same ``X`` → ``X+1`` → ``X+2`` path occupies
 approximately 24 months. Users gain calendar time to respond to
 deprecations without any change to the policy itself.
 

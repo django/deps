@@ -444,6 +444,11 @@ rather than on Django's Python API:
   having a bounded major component, or that uses ad hoc string parsing,
   will need updating.
 
+* Aliases for existing deprecation classes, such as
+  ``RemovedInDjango70Warning`` and ``RemovedInDjango71Warning``, as well as any
+  similar utilities, should be maintained (possibly with a warning) throughout
+  the transition period.
+
 * **The "LTS" label.** External resources (hosting providers, tutorials,
   books, third-party packages) that refer to "the Django LTS" will need
   to be updated to reflect that every release is long-term supported. The

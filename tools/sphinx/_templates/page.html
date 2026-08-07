@@ -1,0 +1,13 @@
+{% extends "!page.html" %}
+
+{# Add an "Edit on GitHub" link below each DEP page. #}
+{% block body %}
+{{ super() }}
+{% if pagename.startswith("dep/") %}
+<p class="dep-edit-link">
+  Source for this DEP lives in the
+  <a href="https://github.com/{{ github_user }}/{{ github_repo }}/tree/{{ github_branch }}">django/deps</a>
+  repository. Found a typo or want to suggest a change? Open a pull request.
+</p>
+{% endif %}
+{% endblock %}

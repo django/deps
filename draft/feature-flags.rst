@@ -111,14 +111,14 @@ When ``feature.is_enabled()`` is called, it evaluates the flag in a particular
 sequence:
 
 * Context Resolution: This merges any implicit context stored in the active 
-``ContextVar`` with any explicit dictionary passed to ``context``.
+  ``ContextVar`` with any explicit dictionary passed to ``context``.
 * Backend Retrieval: This fetches the flag configuration dictionary from the 
-specified storage backend.
+  specified storage backend.
 * Kill-Switch: Checks the ``enabled`` boolean.
 * Targeting Rules: If conditions exist, the evaluator executes the rules against 
-the resolved context. If no conditions exist, the flag is enabled for all callers.
+  the resolved context. If no conditions exist, the flag is enabled for all callers.
 * Safe Fallback: If the backend raises an exception or the flag definition is 
-missing, it catches the error and returns ``default``.
+  missing, it catches the error and returns ``default``.
 
 
 Basic Usage

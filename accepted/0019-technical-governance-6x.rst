@@ -38,17 +38,27 @@ changes made to Django's codebase:
 The following terms are used in this document to refer to types of
 releases of Django:
 
-* "Major Release Series" means the x.0 through x.2 releases of Django,
-  for a given x. For example, Django 3.0, 3.1, and 3.2 collectively
-  form a Major Release Series.
+* "Annual Release" means the xxxx.0 releases for Django. This begins with
+  2028.0, replacing 7.0. The details can be found in `DEP 20`_
 
-* "Feature Release" means an x.y.0 release of Django, where x.0 began
-  a major release series and y is either 0, 1, or 2. For example,
-  Django 3.1.0 is a Feature Release.
+* "Bugfix Release" means an xxxx.yy release of Django, where yy is not 0.
+  For example, Django 2028.1 is a Bugfix Release, while Django 2028.0
+  is an Annual Release.
 
-* "Bugfix Release" means an x.y.z release of Django, where z is not 0.
-  For example, Django 3.1.4 is a Bugfix Release, while Django 3.1.0
-  is a Feature Release.
+* Prior to 2028, Django followed a different release numbering. These ended with
+  6.2 and the new release number began with 2028.0.  The details can be found in `DEP 20`_
+
+    * "Major Release Series" means the x.0 through x.2 releases of Django,
+      for a given x. For example, Django 3.0, 3.1, and 3.2 collectively
+      form a Major Release Series.
+
+    * "Feature Release" means an x.y.0 release of Django, where x.0 began
+      a major release series and y is either 0, 1, or 2. For example,
+      Django 3.1.0 is a Feature Release.
+
+    * "Bugfix Release" means an x.y.z release of Django, where z is not 0.
+      For example, Django 3.1.4 is a Bugfix Release, while Django 3.1.0
+      is a Feature Release.
 
 * "Security Release" means a Bugfix Release which included a fix for a
   security issue in Django being handled under `Django's security
@@ -320,9 +330,8 @@ Steering Council election triggers
 Elections of the Steering Council are triggered by any of the
 following events:
 
-* The final Feature Release of a Major Release Series of Django if
-  no election of the Steering Council has yet occurred during that
-  Major Release Series.
+* The an Annual Release of Django for an even numbered year if no election of
+  the Steering Council has yet occurred since the previous even numbered year.
 
 * The resignation or another event that leaves Steering Council with
   fewer than three elected members. This is to prevent the majority
@@ -743,6 +752,7 @@ Commons CC0 1.0 Universal license
 
 (All DEPs must include this exact copyright statement.)
 
+.. _DEP 20: https://github.com/django/deps/blob/main/accepted/0020-annual-release-cycle.rst
 .. _DEP 44: https://github.com/django/deps/blob/main/final/0044-clarify-release-process.rst
 .. _Mergers Team: https://github.com/django/dsf-working-groups/blob/main/active/mergers.md
 .. _Releasers Team: https://github.com/django/dsf-working-groups/blob/main/active/releasers.md

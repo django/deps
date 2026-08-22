@@ -338,7 +338,7 @@ following events:
   of the Steering Council consisting of appointed members appointments
   rather than elected members.
 
-* The Steering Council votes to hold an election.
+* The Steering Council agrees to hold an election.
 
 Steering Council voting eligibility
 ***********************************
@@ -404,7 +404,7 @@ ways:
   member of the Steering Council. This determination must be made
   jointly by the other members of the Steering Council, and the DSF
   Board. A valid determination of ineligibility requires that all
-  other members of the Steering Council vote to declare the affected
+  other members of the Steering Council agree to declare the affected
   person ineligible and that all members of the DSF Board 
   vote "yes" on a motion that the person in question is
   ineligible.
@@ -429,9 +429,7 @@ and willing. The process is as follows:
   nomination must be discarded.
 
 * A qualified nominee will fill the vacancy if the Steering Council
-  votes to appoint the nominee. As an exception to the Steering
-  Council voting process described above, this vote must be completed
-  within one-week and it must be unanimous approval.
+  agrees to appoint the nominee.
 
 Removing the entire Steering Council
 ************************************
@@ -508,9 +506,7 @@ Major Changes to Django, and as such shall require the use of the DEP
 process as described in DEP 1, with modifications as described below.
 
 1. To reach the "accepted" state, a DEP proposing changes to this
-   governance process must receive an outcome of "Accept" in a vote
-   of the Steering Council with a score of at least 4, rather than
-   the usual 3.
+   governance process must be accepted by the Steering Council.
 
 2. Once such a DEP reaches "accepted" status, the Steering Council
    will direct one of its members to notify `DSF Board`_,

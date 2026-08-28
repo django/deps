@@ -330,8 +330,8 @@ Steering Council election triggers
 Elections of the Steering Council are triggered by any of the
 following events:
 
-* The Annual Release of Django for an even numbered year if no election of
-  the Steering Council has yet occurred since the previous even numbered year.
+* The Annual Release of Django for an odd numbered year if no election of
+  the Steering Council has yet occurred since the previous odd numbered year.
 
 * The resignation or another event that leaves Steering Council with
   fewer than three elected members. This is to prevent the majority

@@ -401,14 +401,24 @@ same join. The existing filtering, selection, annotation, and ordering
 machinery continues from the resulting ``Col`` or tuple.
 
 Join type follows normal queryset boolean semantics. When a table source is
-required by the query, it is compiled as a ``CROSS`` join. If the function returns
-no rows, the corresponding base row also produces no result:
+required by the query, it is compiled as a ``CROSS`` join. For example, assume
+that ``Sales`` contains objects with primary keys 1 and 2:
 
 .. code-block:: python
 
-   Sales.objects.alias(
-       series=GenerateSeries(1, 3),
-   ).filter(series__gt=1)
+   sales = (
+       Sales.objects.annotate(series=GenerateSeries(1, 3))
+       .filter(series__gt=1)
+       .order_by("pk", "series")
+   )
+
+   [(sale.pk, sale.series) for sale in sales]
+   # [(1, 2), (1, 3), (2, 2), (2, 3)]
+
+The function initially produces the values 1, 2, and 3 for each ``Sales``
+object. The filter removes ``(1, 1)`` and ``(2, 1)``, leaving the two values
+shown above for each object. If the function returns no rows, the corresponding
+``Sales`` object also produces no result.
 
 When a table source is referenced only by one side of an ``OR`` condition, it
 must not remove a base row that satisfies the other side. In that case it is

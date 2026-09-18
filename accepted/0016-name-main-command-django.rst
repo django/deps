@@ -29,13 +29,8 @@ Specification
 
 The ``django`` command will be added as the preferred spelling
 for the existing ``django-admin`` command.
-The ``django-admin`` command will remain indefinitely,
-with a message that says
-
-  The ``django-admin`` command is being renamed to ``django``.
-  You can keep using either name,
-  they are equivalent except for the printing of this message.
-  For more details on the naming change, see DEP XXXX.
+The ``django-admin`` command will remain indefinitely
+as an alias of the ``django`` command.
 
 Official documentation will be updated
 to reference this new ``django`` command
@@ -47,8 +42,7 @@ Backwards Compatibility
 =======================
 
 The existing ``django-admin`` command will remain indefinitely
-as an alias of the ``django`` command,
-with messaging about the new name.
+as an alias of the ``django`` command.
 There are no plans to remove the ``django-admin`` alias,
 because of the expansive amount of external resources,
 such as blog posts and tutorials,
@@ -146,7 +140,6 @@ of external resources that reference the existing command name.
 
 This drawback is mitigated by clear documentation
 that the two commands are equivalent,
-the added messaging in the ``django-admin`` command,
 and because the benefits of
 following common convention outweigh the cost.
 
@@ -178,8 +171,7 @@ Only add an alias
 -----------------
 
 This could be a less invasive change by only adding the new command name,
-and not modifying the documentation
-or printing a message in the ``django-admin`` command.
+and not modifying the documentation.
 This would avoid the vast majority of the work involved in this change.
 However, some common challenges are caused
 by the command name being different from the package name,

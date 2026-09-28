@@ -14,7 +14,7 @@ DEP 0022: Adding import maps to Django
    :depth: 3
    :local:
 
-The first draft of this DEP has been written by Thibaud Colas years ago. It has
+The first draft of this DEP was written by Thibaud Colas years ago. It has
 also been discussed in the `Django forum
 <https://forum.djangoproject.com/t/rejuvenating-vs-deprecating-form-media/21285>`__.
 The current version has deviated a lot but still owes its existence to this.
@@ -67,8 +67,9 @@ format is defined by the `HTML standard
 <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap>`__
 has a good introduction.
 
-The API follows. The implementation is available in (and proven by)
-`django-js-asset <https://github.com/feincms/django-js-asset>`_.
+The API follows. It is also implemented for current Django versions by
+`django-js-asset <https://github.com/feincms/django-js-asset>`_ (see
+`Reference Implementation`_).
 
 .. code-block:: python
 
@@ -211,10 +212,13 @@ Templates which render ``{{ media.css }}`` and ``{{ media.js }}`` separately
 have to render ``{{ media.importmap }}`` as well. The admin's
 ``change_list.html`` is updated accordingly.
 
-Import maps are passed using the ``importmap`` argument only. When rendering an
-import map found in a ``js`` list, ``Media`` raises a ``TypeError`` pointing to
-the ``importmap`` argument, since rendering it in place would produce several
-import maps.
+Import maps are passed using the ``importmap`` argument or attribute only. When
+rendering an import map found in a ``js`` list, ``Media`` raises a
+``TypeError`` pointing to the ``importmap`` argument, since rendering it in
+place would produce several import maps. [#js-lists]_
+
+.. [#js-lists] The error also helps finding code written for django-js-asset
+   4.x, which shipped import maps in ``js`` lists.
 
 
 A complete example
@@ -485,10 +489,10 @@ storage. The hashes have to be calculated from the files as they are served.
 `DEP 0021 <https://github.com/django/deps/pull/122>`__ proposes
 ``Storage.integrity()`` for this and adds an ``integrity`` attribute when
 rendering media assets. Modules loaded through an import map don't have a
-``<script>`` element of their own, so ``ImportMap`` adds their hashes to the
-``integrity`` section of the import map instead when resolving paths.
+``<script>`` element of their own, so ``ImportMap`` would add their hashes to
+the ``integrity`` section of the import map instead when resolving paths.
 
-A template tag for rendering the import map, similar to 
+A template tag for rendering the import map, similar to
 ``{% csp_nonce_attr media %}``, has also been considered. The tag could
 remember that the import map has already been rendered and warn about entries
 added afterwards. This only helps when all media is rendered through the tag,
@@ -614,25 +618,24 @@ a thing which should be possible if not encouraged.
 Reference Implementation
 ========================
 
-The described implementation is available in the main branch of
-`django-js-asset <https://github.com/feincms/django-js-asset>`__ and will be
+There is no implementation of the changes to Django yet.
+
+The proposed API is available for current Django versions in the main branch
+of `django-js-asset <https://github.com/feincms/django-js-asset>`__ and will be
 released as django-js-asset 5.0, probably after alpha or preview releases which
-are only installed when requested explicitly. As described above, having this
-functionality in core would allow everyone to start using import maps in their
-apps and be sure that the maps are handled, merged and rendered correctly and
-consistently.
+are only installed when requested explicitly. django-js-asset 5.0 will follow
+this DEP as it evolves. As described above, having this functionality in core
+would allow everyone to start using import maps in their apps and be sure that
+the maps are handled, merged and rendered correctly and consistently.
 
-Since a third party package cannot change ``Media`` itself, django-js-asset
-ships a ``js_asset.Media`` subclass which supports the ``importmap=`` argument
-and merges and renders the import maps. Media which only uses ``Media`` has to
-be wrapped using ``js_asset.Media.from_media()`` for that. Django's ``Media``
-doesn't know about ``importmap`` yet, so widgets can't use ``class Media`` for
-import maps and define ``media = js_asset.Media(importmap=..., js=[...])``
-instead. For the same reason, the admin's ``change_list.html`` has to be
-overridden to render ``{{ media.importmap }}``.
-
-django-js-asset 5.0 will follow this DEP as it evolves and serve as the
-reference implementation.
+django-js-asset isn't a reference implementation of the changes to Django
+though, since it has to work with Django's existing ``Media``. It ships a
+``js_asset.Media`` subclass which supports the ``importmap=`` argument and
+merges and renders the import maps. Plain ``Media`` objects have to be wrapped
+using ``js_asset.Media.from_media()`` for that. Widgets can't use
+``class Media`` for import maps and define
+``media = js_asset.Media(importmap=..., js=[...])`` instead, and the admin's
+``change_list.html`` has to be overridden to render ``{{ media.importmap }}``.
 
 Prior art:
 

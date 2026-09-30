@@ -21,11 +21,11 @@ distances across supported database backends:
 Applications use common Python values, including `SparseVector`, and shared
 enums. Backends handle database-specific storage, queries, and indexing.
 Supported operations have consistent semantics, but capabilities may differ.
-Unsupported options raise errors rather than silently changing behavior. The
-API integrates with Django’s existing validation, migrations, and serialization.
+The API integrates with Django's existing validation, migrations, and
+serialization.
 
 Ordinary distance queries remain exact. Approximate search requires explicit
-opt-in, its query API is still an open question. Embedding generation
+opt-in; its query API remains an open question. Embedding generation
 and model-provider integrations are outside this proposal.
 
 ## Motivation
@@ -47,6 +47,11 @@ migration details.
 ## Specification
 
 ### Scope and public API
+
+This draft specifies field storage, exact distance expressions, and vector index
+declarations. The approximate-search query API remains unresolved. Shipping
+indexes as an accelerated ORM search feature depends on resolving that API;
+otherwise, the initial release would include only storage and exact distances.
 
 The proposed public imports are:
 
@@ -79,17 +84,17 @@ supported subset:
 - Dense `FLOAT32`, `FLOAT64`, `INT8`, and packed `BINARY` vectors.
 - Sparse `FLOAT32`, `FLOAT64`, and `INT8` vectors.
 - Explicit distance calculations, including numeric threshold filtering.
-- Migration-managed HNSW and IVF vector indexes where supported.
+- Migration-managed hierarchical navigable small world (HNSW) and inverted file
+  (IVF) vector indexes where supported.
 
 **Out of scope:** Embedding generation, vector arithmetic and aggregation,
 automatic normalization, hybrid full-text search, reranking, and cross-database
 fallback storage.
 
-**Backend targets:** Oracle, PostgreSQL with pgvector, SQLite, and MySQL. Other
-backends can implement the same API. Support depends on server versions,
-drivers, extensions, and database editions or distributions. Storage, metric,
-and index capabilities are checked separately; unsupported options fail
-explicitly.
+**Backend targets:** Oracle, PostgreSQL with pgvector, and MySQL. SQLite is also
+an intended target, but its extension choice is provisional. Other backends can
+implement the same API. The backend integration section defines capability
+checks and behavior for unsupported operations.
 
 ### VectorField
 
@@ -149,9 +154,6 @@ Field declarations have these restrictions:
 - Sparse fields require a positive integer `dim`; `VectorField.ANY` is not supported.
 - Sparse `BINARY` storage is not supported.
 - Binary dimensions count bits and, when specified, must be a multiple of eight.
-
-Backends must reject unsupported formats, storage types, or dimension policies
-rather than downcast values or substitute dense storage.
 
 Empty vectors are not treated as `NULL` or zero vectors.
 `empty_strings_allowed` is false.
@@ -216,13 +218,15 @@ query = SparseVector(dim=30, indices=[3, 10, 12], values=[2.5, 2.5, 1.0])
 `SparseVector(dim, indices, values)` follows the validation rules above and
 exposes those three attributes. The constructor accepts a list or appropriately
 typed array for `values`; the field performs format-specific validation. After
-normalization, `indices` is a tuple of integers and `values` is an `array.array`
-with the field’s type code. Backends handle driver conversion and preserve
-zero-based indices in Python.
+field normalization through `to_python()`, `indices` is a tuple of integers and
+`values` is an `array.array` with the field's type code. Database reads return
+this same representation. The constructor does not select a field's storage
+format; format-specific conversion occurs during field normalization. Backends
+handle driver conversion and preserve zero-based indices in Python.
 
-The convenience tuple accepted by the prototype is not part of the initial API,
-avoiding ambiguity with dense sequences. NumPy users explicitly convert their
-data to lists or supported arrays.
+Convenience tuples are not accepted for sparse values, avoiding ambiguity with
+dense sequences. NumPy users explicitly convert their data to lists or supported
+arrays.
 
 ### Distance expressions
 
@@ -354,7 +358,9 @@ covering columns, and unique indexes are not supported.
 The remaining options are backend-dependent:
 
 - `accuracy` requests target accuracy as an integer percentage from 1 to 100.
-  It is not a guarantee of recall or exact results. It is not restricted to IVF.
+  It is not a guarantee of recall or exact results. Recall is the proportion of
+  the exact nearest neighbors returned by an approximate search. This option is
+  not restricted to IVF.
 - `hnsw_neighbors` and `hnsw_efconstruction` apply only to HNSW.
 - `ivf_neighbor_partitions`, `ivf_sample_per_partition`, and
   `ivf_min_vectors_per_partition` apply only to IVF.
@@ -391,13 +397,14 @@ class IndexedProduct(models.Model):
 ```
 
 Index construction may require substantial memory, existing data, and database
-configuration. The example requires HNSW cosine indexing support, it is not a 
-promise that every target supports it.
+configuration. The example requires HNSW cosine indexing support. Not every
+backend target supports this combination.
 
 ### Exact and approximate search
 
-HNSW and IVF vector indexes are approximate search structures, not ordinary indexes
-that necessarily preserve an exact nearest-neighbor result. Metric selection,
+HNSW and IVF vector indexes support approximate nearest-neighbor (ANN) search.
+Unlike ordinary indexes, they do not necessarily preserve an exact
+nearest-neighbor result. Metric selection,
 query shape, and row-limiting syntax affect index eligibility. Creating an index
 therefore does not establish that a particular ORM query will use it.
 
@@ -432,18 +439,20 @@ The implementation targets are:
 | --- | --- |
 | Oracle | Native vector types and operations, gated by server, driver, and client capabilities. |
 | PostgreSQL | The pgvector extension, with extension-version checks and explicit installation prerequisites. Formats and index options without an equivalent remain unsupported. |
-| SQLite | SQLite-Vector extension seems to be the best supported. |
+| SQLite | Provisional: SQLite-Vector is the candidate extension. The integration approach and supported capabilities remain to be established. |
 | MySQL | Native `VECTOR` type. |
 
 Declaring a field never installs or loads an extension. 
 
-Backends must distinguish vector storage, sparse storage, distance metrics, 
-and indexing support. Feature detection must account for server versions, 
-extensions, drivers, and client libraries. Dimension limits, sparse nonzero limits, 
-and indexability must be checked separately where they differ.
+Backends must distinguish vector storage, sparse storage, distance metrics,
+and indexing support. Feature detection must account for server versions,
+editions or distributions, extensions, drivers, and client libraries. Dimension
+limits, sparse nonzero limits, and indexability must be checked separately where
+they differ.
 
-Backends convert common Python values to and from native vector storage without
-exposing driver types. 
+Unsupported options must be rejected rather than silently changing behavior.
+Backends must not downcast values, substitute dense storage for sparse storage,
+or change the requested dimension policy.
 
 Field checks honor the selected database aliases and migration routers.
 Unsupported databases receive an actionable check error where the model is
@@ -491,7 +500,7 @@ comments rather than silently substitute the default field configuration.
 - Dense vectors: a list of numbers (byte values for `BINARY`).
 - Sparse vectors: an object with `dim`, `indices`, and `values`.
 
-`VectorField` will NOT supply a form field as it is not typically useful. 
+`VectorField` does not provide a default form field.
 
 ## Rationale
 
@@ -505,13 +514,11 @@ conversion.
 
 ### Explicit defaults rather than database-dependent inference
 
-The supplied documentation defaults the field format to `FLOAT32`, while the
-code defaults it to `None`, creates a wildcard format, and converts lists to
-`FLOAT32`. This draft chooses a fixed `FLOAT32` default and defers flexible
-formats, keeping schema, values, and fixtures consistent.
+A fixed `FLOAT32` default keeps schema declarations, Python values, and fixtures
+consistent. Flexible scalar formats are deferred.
 
-The expression retains the prototype's Euclidean default, but always emits it
-explicitly. Oracle's [distance documentation][distance-docs] describes
+The distance expression defaults to Euclidean distance and always emits the
+metric explicitly. Oracle's [distance documentation][distance-docs] describes
 omitted-metric inference involving indexes. A query's mathematical meaning
 should not change as a side effect of adding an index.
 

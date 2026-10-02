@@ -30,9 +30,37 @@ and implementation details may continue to evolve.
 Motivation
 ==========
 
-This section describes the current limitation.
+Some database expressions produce a set of rows or expose multiple columns
+instead of returning one scalar value. Application developers should be able
+to use these expressions as query sources and work with their columns through
+the normal queryset API.
 
-For example, a scalar subquery can be used as an annotation:
+This proposal provides three related capabilities:
+
+* A table expression can be added as a source in ``FROM`` or ``JOIN``.
+* The source has a stable alias.
+* Columns exposed by that alias can be selected, filtered, ordered, and used in
+  other expressions.
+
+Placing these expressions in the ``FROM`` clause allows the database to treat
+them as row sources rather than scalar values. Their output columns can then be
+referenced normally from ``SELECT``, ``WHERE``, and other query clauses. For
+example, filtering a set-returning function should produce SQL in this form:
+
+.. code-block:: sql
+
+   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day"
+   FROM "SRF_sales"
+   CROSS JOIN LATERAL generate_series(1, 3) AS "series"("series")
+   WHERE "series"."series" > 1
+
+Here, the function is evaluated as a row source and ``WHERE`` filters a normal
+column reference.
+
+Multi-Column Subqueries
+-----------------------
+
+A scalar subquery can be used as an annotation:
 
 .. code-block:: python
 
@@ -65,6 +93,26 @@ This raises ``Cannot resolve expression type, unknown output_field`` because
 the ORM does not have an expression representing multiple columns and thus
 cannot make use of a join against the multi-column subquery.
 
+As a table source, the same queryset could expose named columns:
+
+.. code-block:: python
+
+   Sales.objects.alias(
+       first_object=first_object,
+   ).values("first_object__subject", "first_object__duration")
+
+The single-column restriction has also led to third-party workarounds.
+Baptiste Mispelon's `article on returning a model instance from a subquery
+<https://blog.bmispelon.rocks/articles/2024/2024-05-09-django-getting-a-full-model-instance-from-a-subquery.html>`_
+describes combining several model fields into one JSON value and converting
+that value back into a model instance. The technique is also available in the
+`django-model-subquery package
+<https://github.com/bmispelon/django-model-subquery>`_.
+
+This proposal takes a different approach: the subquery remains a table source
+whose columns keep their individual field types and can be referenced through
+its alias.
+
 
 Set-Returning Functions in ``SELECT``
 -------------------------------------
@@ -94,7 +142,8 @@ The actual SQL generated:
    FROM "SRF_sales"
 
 
-The ORM does not expose a way to place the set-returning function in the ``FROM`` clause.
+The ORM does not expose a way to place the set-returning function in the
+``FROM`` clause.
 
 
 Filtering Set-Returning Annotations
@@ -106,16 +155,6 @@ expression:
 .. code-block:: python
 
    Sales.objects.alias(series=GenerateSeriesFunc(1, 3)).filter(series__gt=1)
-
-Expected SQL:
-
-.. code-block:: sql
-
-   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day"
-   FROM "SRF_sales"
-   CROSS JOIN LATERAL generate_series(1, 3) AS "series"("series")
-   WHERE "series"."series" > 1
-
 
 The actual SQL generated:
 
@@ -130,60 +169,8 @@ This query fails immediately at the database level. In PostgreSQL, it raises:
 
 This is because the comparison in ``WHERE`` expects one scalar value for each
 row, not a set of rows. The function is compiled directly in ``WHERE`` instead
-of being treated as a table source.
-
-
-Comparison: Placing the Function in the ``FROM`` Clause
--------------------------------------------------------
-
-If the set-returning function is instead compiled in the ``FROM`` clause (using a ``LATERAL`` join), the query behavior is clean, valid, and efficient:
-
-.. code-block:: sql
-
-   SELECT "SRF_sales"."id", "SRF_sales"."sold_on", "SRF_sales"."day"
-   FROM "SRF_sales"
-   CROSS JOIN LATERAL generate_series(1, 3) AS "series"("series")
-   WHERE "series"."series" > 1
-
-Benefits:
-
-* The function is evaluated as a row source instead of as a scalar expression.
-* The ``WHERE`` clause filters a normal column reference such as
-  ``"series"."series"``.
-
-Multi-Column Subqueries
------------------------
-
-Subqueries have a similar limitation. A scalar subquery works when it returns
-one column:
-
-.. code-block:: python
-
-   Sales.objects.annotate(
-       first_subject=Cohort.objects.order_by("id").values("subject")[:1]
-   )
-
-But a queryset returning multiple columns cannot be represented as a scalar:
-
-.. code-block:: python
-
-   Cohort.objects.values("subject", "duration")
-
-As a scalar expression, this has no single ``output_field``. As a table
-source, it could expose named columns:
-
-.. code-block:: python
-
-   Sales.objects.alias(
-       cohort_data=Cohort.objects.values("subject", "duration")[:1]
-   ).values("cohort_data__subject", "cohort_data__duration")
-
-
-There are three aspects to this that we'd like to work on:
-
-* A table expression can be registered as a source in ``FROM`` or ``JOIN``.
-* A table expression has a stable alias.
-* Columns exposed by that alias can be referenced in the rest of the queryset.
+of being treated as a table source. The intended ``FROM`` form is shown at the
+beginning of this section.
 
 Specification
 =============
@@ -213,10 +200,9 @@ lightweight composite output field designed specifically for describing
 multi-column expression or query output, rather than as a concrete database
 model field.
 
-This distinction matters because the ORM must preserve Django's existing
-lookup behavior. By wrapping the output in a ``CompositeField``, if
-``posts__title`` resolves to a ``CharField``, then normal text lookups and
-transforms such as ``__icontains`` continue to work.
+By wrapping the output in a ``CompositeField``, if ``posts__title`` resolves
+to a ``CharField``, then normal text lookups and transforms such as
+``__icontains`` continue to work.
 
 Handling multi-column sources
 -----------------------------
@@ -267,7 +253,8 @@ make the source selectable as one annotation.
 The ORM cannot reliably know whether a query returns one row or many rows. A
 caller that requires one row must limit the query, for example with ``[:1]``.
 
-Correlated sources are also part of the intended design:
+Correlated multi-column sources require ``LATERAL`` support. PostgreSQL,
+MySQL 8.0.14+, and Oracle support ``LATERAL``. MariaDB and SQLite do not:
 
 .. code-block:: python
 
@@ -276,9 +263,6 @@ Correlated sources are also part of the intended design:
        .values("title", "body")[:1]
    )
    User.objects.alias(posts=subquery).values("posts__title", "posts__body")
-
-At the SQL level, a correlated source requires ``LATERAL`` or the equivalent
-syntax supported by the database.
 
 Expression-like table sources
 -----------------------------
@@ -348,12 +332,14 @@ in the ``FROM`` clause. A function source requires different SQL, so it also
 introduces ``SetReturningFunctionJoin``.
 
 Both proposed joins are stored directly in the existing ``Query.alias_map`` and
-compiled through the existing ``FROM``-clause machinery. The backend compiler
-uses the syntax required by that database, including ``LATERAL`` or its
-equivalent for correlated sources.
+compiled through the existing ``FROM``-clause machinery. A function source can
+use ``LATERAL`` when required by the backend. Correlated sources use the syntax
+required by each database.
 
-This means output metadata alone is not enough. ``output_field`` describes the
-columns and their types, while the join describes how the source is compiled.
+``output_field`` lets the ORM resolve the names and types of columns exposed by
+a table source, but it doesn't describe how to add that source to the SQL
+``FROM`` clause. A multi-column queryset must be compiled as a derived table.
+The join representation provides this compilation behavior.
 
 The infrastructure is database-independent, but table-valued functions are
 not. Function names, argument syntax, exposed column names, and whether a
@@ -402,7 +388,8 @@ machinery continues from the resulting ``Col`` or tuple.
 
 Join type follows normal queryset boolean semantics. When a table source is
 required by the query, it is compiled as a ``CROSS`` join. For example, assume
-that ``Sales`` contains objects with primary keys 1 and 2:
+that ``Sales`` contains an object with primary key 1 for Monday and another
+with primary key 2 for Tuesday:
 
 .. code-block:: python
 
@@ -431,7 +418,26 @@ compiled as a ``LEFT OUTER`` join:
    ).filter(Q(day="Monday") | Q(series__gt=1))
 
 Selecting a column from the source makes the source required, even when a
-filter would otherwise make it optional.
+filter would otherwise make it optional. Changing only ``alias()`` to
+``annotate()`` selects ``series``:
+
+.. code-block:: python
+
+   sales = (
+       Sales.objects.annotate(
+           series=GenerateSeries(1, 3),
+       )
+       .filter(Q(day="Monday") | Q(series__gt=1))
+       .order_by("pk", "series")
+   )
+
+   [(sale.pk, sale.series) for sale in sales]
+   # [(1, 1), (1, 2), (1, 3), (2, 2), (2, 3)]
+
+Every returned object now needs a value for ``series``, so the table source is
+required and uses a ``CROSS`` join. If the function returns no rows, there is
+no ``series`` value to select and the corresponding ``Sales`` object produces
+no result.
 
 Rationale
 =========
@@ -465,9 +471,9 @@ Table expression aliases are similar from the user's point of view:
 
    Sales.objects.alias(series=GenerateSeries(1, 3))
 
-The alias remains lazy until another queryset operation references it. This
-fits multi-column querysets and set-returning functions without requiring a
-new wrapper around every source.
+The alias remains lazy: Django adds the source to the ``FROM`` clause only when
+a later queryset operation references it. For example, merely declaring
+``series=GenerateSeries(1, 3)`` doesn't repeat every ``Sales`` row three times.
 
 Why reuse the multi-column subquery path?
 -----------------------------------------
@@ -476,9 +482,10 @@ Multi-column querysets and set-returning functions need the same operation:
 turn a lazy annotation into a ``FROM`` source and resolve its output into
 typed ``Col`` expressions.
 
-The proposed design uses ``Query.annotations``, ``Query.alias_map``, alias
-allocation, and ``SubqueryJoin``. A function source can reuse that flow and add
-only the join behavior required for its SQL syntax.
+Using the same resolution path gives both kinds of source consistent queryset
+behavior. Their aliases remain lazy, their output columns support normal field
+lookups and transforms, and boolean conditions determine whether the source is
+required or optional. Only the SQL used to render each source is different.
 
 Alternatives Considered
 =======================
@@ -504,7 +511,7 @@ custom ``Func`` can opt in directly with ``table_source = True``.
 Explicit Column Metadata
 ------------------------
 
-An early implementation could accept column metadata directly:
+Another rejected implementation idea could have accepted column metadata directly:
 
 .. code-block:: python
 
@@ -519,7 +526,6 @@ An early implementation could accept column metadata directly:
 This is explicit, but it creates a separate metadata path from
 ``Expression.output_field``.
 
-You can find more detail `here <https://github.com/p-r-a-v-i-n/Generic---Relation---API-Design/blob/main/RELATION_API_BLUEPRINT.md>`_.
 
 Backwards Compatibility
 =======================

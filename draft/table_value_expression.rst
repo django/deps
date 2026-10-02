@@ -369,10 +369,22 @@ The derived table is then added to the ``FROM`` clause:
 
 .. code-block:: sql
 
-   LEFT OUTER JOIN (
+   CROSS JOIN (
        SELECT email, name
        FROM ...
-   ) info ON (1 = 1)
+   ) info
+
+This query can match ``email`` even when ``info`` is empty:
+
+.. code-block:: python
+
+   .filter(Q(email="bob@mail.com") | Q(info__email="bob@mail.com"))
+
+This uses a ``LEFT OUTER JOIN``:
+
+.. code-block:: sql
+
+   LEFT OUTER JOIN (...) info ON (1 = 1)
 
 After that, ``info__email`` resolves to a typed ``Col`` pointing to
 ``info.email``. If an operation needs the complete alias, it can resolve to an

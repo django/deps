@@ -96,9 +96,16 @@ The API follows. It is also implemented for current Django versions by
         element, like for ``Script`` and ``Stylesheet``.
         """
 
-        def __init__(self, imports=None, *, scopes=None, integrity=None, **attributes): ...
+        def __init__(
+            self,
+            imports: dict[str, str] | None = None,
+            *,
+            scopes: dict[str, dict[str, str]] | None = None,
+            integrity: dict[str, str] | None = None,
+            **attributes: str | bool,
+        ) -> None: ...
 
-        def render(self, *, attrs=None):
+        def render(self, *, attrs: dict[str, str | bool] | None = None) -> str:
             """
             Render the ``<script type="importmap">`` element. The import map
             with resolved paths is serialized as JSON and escaped using
@@ -107,12 +114,12 @@ The API follows. It is also implemented for current Django versions by
             attributes), e.g. for CSP nonces.
             """
 
-        def __eq__(self, other):
+        def __eq__(self, other: object) -> bool:
             """
             Import maps are equal when their data and attributes are equal.
             """
 
-        def __or__(self, other):
+        def __or__(self, other: ImportMap) -> ImportMap:
             """
             Return a new import map combining this import map and ``other``.
 
@@ -174,31 +181,35 @@ affects the modules coming after it in the HTML source.
 .. code-block:: python
 
     class Media:
-        def __init__(self, media=None, css=None, js=None, importmap=None):
+        def __init__(
+            self, media=None, css=None, js=None, importmap: ImportMap | None = None
+        ) -> None:
             """
             ``importmap`` is a single ``ImportMap``. Media definitions
             (``class Media``) can define an ``importmap`` attribute as well.
             """
 
-        def __add__(self, other):
+        def __add__(self, other: Media) -> Media:
             """
             Combine the CSS and JavaScript as before, and merge the import maps
             using ``|``. Entries of the media added later win.
             """
 
-        def __getitem__(self, name):
+        def __getitem__(self, name: str) -> Media:
             """
             ``media["importmap"]`` (``{{ media.importmap }}`` in templates)
             returns a media object containing only the import map, like
             ``media["css"]`` and ``media["js"]`` do for CSS and JavaScript.
             """
 
-        def render(self, *, attrs=None):
+        def render(self, *, attrs: dict[str, str | bool] | None = None) -> str:
             """
             Render the import map, the CSS and the JavaScript, in this order.
             """
 
-        def render_importmap(self, *, attrs=None):
+        def render_importmap(
+            self, *, attrs: dict[str, str | bool] | None = None
+        ) -> list[str]:
             """
             Return a list containing the rendered import map, or an empty list.
             """

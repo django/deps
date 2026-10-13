@@ -32,7 +32,8 @@ load.
 
 Browser support for multiple import maps is spotty at the time of writing.
 Chromium and Safari support multiple import maps since early 2025, but Firefox
-still only uses the first import map and ignores all others (see `MDN
+still only uses the first import map and ignores all others unless users enable the
+implementation explicitly in their browsers (see `MDN
 <https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap>`__).
 This means that when we want to use import maps, we have to ensure that there's
 only a single import map in the output or wait for years until we can use this
@@ -600,6 +601,16 @@ case. If an app really needs a specific copy of a module, for example of
 ``lit``, it can namespace the key (``my-app/lit``), use ``scopes`` which only
 apply to modules loaded from a given path prefix, or not use the import map for
 this module at all.
+
+Relying on browser support for multiple import maps instead of merging them has
+been rejected for now. Firefox has `implemented support
+<https://bugzilla.mozilla.org/show_bug.cgi?id=1916277>`__ but hasn't `enabled
+it <https://bugzilla.mozilla.org/show_bug.cgi?id=2021012>`__ at the time of
+writing. Once it ships, it still takes about 30 months until the feature is
+Baseline widely available, and some projects have to support older browsers
+for even longer. Missing support isn't a visual glitch, it's a deal breaker.
+Merged import maps keep working in browsers supporting multiple import
+maps, so nothing has to change once they are widely available.
 
 The design has been discussed at Django on the Med 2026 in Pescara, Italy.
 There's no consensus yet, it's a first draft and doesn't solve all problems in

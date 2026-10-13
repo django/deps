@@ -90,8 +90,8 @@ The API follows. It is also implemented for current Django versions by
 
         For paths resolved through ``static()``, ``integrity`` metadata is added
         automatically if the static files storage supports it (see `Deferred
-        functionality`_). ``integrity`` is only needed for other modules, e.g.
-        modules loaded from a CDN.
+        functionality`_). Specifying ``integrity`` explicitly is therefore only
+        needed for files hosted elsewhere, e.g. modules loaded from a CDN.
 
         The data is copied. ``attributes`` are added to the ``<script>``
         element, like for ``Script`` and ``Stylesheet``.

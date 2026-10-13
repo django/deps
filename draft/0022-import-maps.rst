@@ -115,19 +115,11 @@ The API follows. It is also implemented for current Django versions by
             attributes), e.g. for CSP nonces.
             """
 
-        def __eq__(self, other: object) -> bool:
-            """
-            Import maps are equal when their data and attributes are equal.
-            """
+        def __eq__(self, other: object) -> bool: ...
 
         def __or__(self, other: ImportMap) -> ImportMap:
             """
-            Return a new import map combining this import map and ``other``.
-
-            ``imports``, ``integrity`` and each scope in ``scopes`` are merged
-            like dictionaries, so entries of ``other`` replace entries of this
-            import map. Attributes are merged the same way. Neither import map
-            is modified.
+            Each scope in ``scopes`` is merged separately.
             """
 
 This allows us to build and render import map objects:

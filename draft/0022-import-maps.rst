@@ -83,10 +83,8 @@ The API follows. It is also implemented for current Django versions by
 
         Paths in ``imports`` and ``scopes`` are resolved when rendering, like
         ``Script`` paths: Relative paths are passed through ``static()``, while
-        URLs with a scheme and paths starting with ``/``, ``./`` or ``../`` are
-        used as they are. Paths ending with ``/`` are used as they are too,
-        since static file storages cannot resolve directories. Scope prefixes
-        are never resolved.
+        URLs with a scheme and paths starting with ``/`` are used as they are.
+        Scope prefixes are never resolved.
 
         For paths resolved through ``static()``, ``integrity`` metadata is added
         automatically if the static files storage supports it (see `Deferred
@@ -136,8 +134,8 @@ This allows us to build and render import map objects:
 
 Import map objects can be merged together using ``map1 | map2`` (similar to
 dictionary merging). The same key in a latter import map replaces values in the
-former. This is intentional since, for example, overriding entries a third
-party app provided should be possible.
+former; this also applies to attributes. This is intentional since, for
+example, overriding entries a third party app provided should be possible.
 
 Import map objects copy the data they are given and should be treated as
 immutable; merging always returns a new import map, and ``map1 |= map2`` binds
@@ -470,7 +468,7 @@ Deciding whether a path is passed through ``static()`` should also live in
 ``django.utils.assets``, as a small helper used by ``MediaAsset.path`` and
 ``ImportMap``. URLs with a scheme are detected the same way
 ``HashedFilesMixin.url_converter`` already does when post-processing CSS and
-JavaScript files, and the converter can use the helper too. This means that
+JavaScript files (``^[a-z]+:`` or starting with ``//``). This means that
 ``Script`` also leaves URLs with other schemes than ``http:`` and ``https:``
 alone, such as ``data:`` URLs, which were passed through ``static()`` before.
 

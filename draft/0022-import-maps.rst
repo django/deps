@@ -494,6 +494,15 @@ rendering media assets. Modules loaded through an import map don't have a
 ``<script>`` element of their own, so ``ImportMap`` would add their hashes to
 the ``integrity`` section of the import map instead when resolving paths.
 
+The import map itself is an inline script, so CSP only allows it with a nonce,
+``'unsafe-inline'`` or a hash of its contents in ``script-src``. A method
+returning the hash of the rendered JSON would allow using a hash instead of a
+nonce. It could return the ``IntegrityMetadataList`` proposed by DEP 0021,
+which suggests naming it ``integrity()``, but that could be confused with the
+``integrity`` section of the import map; ``csp_hash()`` would avoid that.
+DEP 0021 leaves CSP hashes out of scope, and Django's CSP support doesn't
+handle hash sources yet, so we're leaving it out for now as well.
+
 A template tag for rendering the import map, similar to
 ``{% csp_nonce_attr media %}``, has also been considered. The tag could
 remember that the import map has already been rendered and warn about entries

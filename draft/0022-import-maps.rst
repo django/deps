@@ -92,7 +92,8 @@ The API follows. It is also implemented for current Django versions by
         needed for files hosted elsewhere, e.g. modules loaded from a CDN.
 
         The data is copied. ``attributes`` are added to the ``<script>``
-        element, like for ``Script`` and ``Stylesheet``.
+        element, like for ``Script`` and ``Stylesheet``. Passing a ``type``
+        attribute raises a ``ValueError``, since it is always ``importmap``.
         """
 
         def __init__(
@@ -110,7 +111,7 @@ The API follows. It is also implemented for current Django versions by
             with resolved paths is serialized as JSON and escaped using
             ``json_script()``. ``attrs`` are added like in
             ``MediaAsset.render()`` (raising a ``ValueError`` for conflicting
-            attributes), e.g. for CSP nonces.
+            attributes and for ``type``), e.g. for CSP nonces.
             """
 
         def __eq__(self, other: object) -> bool: ...

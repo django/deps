@@ -1,11 +1,11 @@
-DEP XXXX: Support for Table Expressions in the Django ORM
-=========================================================
+DEP 0024: Support for Table Expressions in the Django ORM
+=======================================================
 
-:DEP: XXXX
+:DEP: 0024
 :Author: Pravin Kamble
 :Implementation Team: Pravin Kamble
 :Shepherd: Jacob Walls
-:Status: Draft
+:Status: Accepted
 :Type: Feature
 :Created: 2026-05-30
 

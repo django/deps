@@ -148,6 +148,11 @@ file names, for example ``ManifestStaticFilesStorage``. Import maps therefore
 resolve paths when rendering, like ``Script`` does. This makes it possible to
 define import maps at module level.
 
+Prefix mappings such as ``{"lit/": "vendor/lit/"}`` are resolved as well, but
+static file storages don't hash directories, so modules loaded through them
+use their unhashed file names. Such entries work, but don't profit from cache
+busting.
+
 
 Teaching ``Media`` about import maps
 ------------------------------------
@@ -335,8 +340,8 @@ order`_).
 Either way, both widgets end up using the same copy of Lit. This only works if
 both widgets are compatible with that version of Lit. If they aren't, one of
 the widgets breaks in the browser, and nothing warns about it. An app which
-really needs a specific copy of a library has to namespace the entry or use
-``scopes`` instead (see `Rationale`_).
+really needs a specific copy of a library has to namespace the entry instead
+(see `Rationale`_).
 
 The JavaScript modules use the stable identifiers from the import map and don't
 have to know about hashed file names. Modules of the same app should import
@@ -602,9 +607,14 @@ which we won't encounter often, but it is explicitly supported, and ``Media``
 cannot distinguish an intentional override by the project from two apps
 colliding by accident. The warning would therefore also fire for the supported
 case. If an app really needs a specific copy of a module, for example of
-``lit``, it can namespace the key (``my-app/lit``), use ``scopes`` which only
-apply to modules loaded from a given path prefix, or not use the import map for
-this module at all.
+``lit``, it can namespace the key (``my-app/lit``) or not use the import map
+for this module at all.
+
+``scopes`` only apply to modules loaded from a given URL prefix. Scope prefixes
+aren't resolved, so they have to be final URLs, which apps don't know since
+they depend on ``STATIC_URL``. Scopes are passed through as they are and are
+mostly useful for projects. Resolving scope prefixes through ``static()`` could
+be added later if apps need scopes.
 
 Relying on browser support for multiple import maps instead of merging them has
 been rejected for now. Firefox has `implemented support

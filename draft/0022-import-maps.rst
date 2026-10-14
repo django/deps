@@ -471,7 +471,7 @@ Deciding whether a path is passed through ``static()`` should also live in
 ``HashedFilesMixin.url_converter`` already does when post-processing CSS and
 JavaScript files (``^[a-z]+:`` or starting with ``//``). This means that
 ``Script`` also leaves URLs with other schemes than ``http:`` and ``https:``
-alone, such as ``data:`` URLs, which were passed through ``static()`` before.
+alone. Supporting e.g. ``data:`` URLs isn't a goal.
 
 The existing import paths (``django.forms.Media``,
 ``django.forms.widgets.Script``, ``django.templatetags.static.static`` etc.)

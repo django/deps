@@ -7,6 +7,7 @@ Status: Draft
 Type: Feature
 Created: 2014-11-16
 Last-Modified: 2014-11-18
+Discussions-To: [Forum thread](https://forum.djangoproject.com/t/updating-our-dep-process-dep-1/24783)
 ---
 # DEP XXXX: DEP template
 

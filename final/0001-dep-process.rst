@@ -164,9 +164,13 @@ Submitting the draft
 --------------------
 
 Once the idea's been vetted and the roles are filled, a draft DEP should be
-presented to the Django Forum. This gives the author a
-chance to flesh out the draft DEP to make sure it's properly formatted, of high
-quality, and to address initial concerns about the proposal.
+presented to the `Django Forum
+<https://forum.djangoproject.com/c/internals/deps/...>`_. The post should be
+titled "DEP Draft: <title>", while the body should include a brief description
+and a link to the Pull Request. Also include any links to any previous
+discussions or the related issue in the New Features repo. This gives the author
+a chance to flesh out the draft DEP to make sure it's properly formatted, of
+high quality, and to address initial concerns about the proposal.
 
 Following the discussion, the proposal should be sent as a GitHub pull request
 to the `django/deps <https://github.com/django/deps>`_ repo. This PR should add
@@ -377,6 +381,8 @@ The headers must contain the following fields:
     The person/people who have committed to implementing this DEP
 ``Shepherd``
     A more experienced developer to help mentor and guide the DEP forward
+``Discussions-To``
+   A URL to the DEP's discussion thread.
 ``Requires``
     If this DEP depends on another DEP being implemented first,
     this should be a link to the required DEP.

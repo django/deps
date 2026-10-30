@@ -9,6 +9,7 @@ DEP XXXX: DEP template
 :Status: Draft
 :Type: Feature
 :Created: 2014-11-16
+:Discussions-To: `Forum thread <https://forum.djangoproject.com/t/updating-our-dep-process-dep-1/24783>`_
 
 .. contents:: Table of Contents
    :depth: 3
